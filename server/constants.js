@@ -4,7 +4,7 @@ exports.INFO = 3
 exports.HINT = 4
 exports.CONSTANTS = {
     name: 'sins_of_a_solar_empire_ii',
-    version: 0.1,
+    version: require('../package.json').version,
     source: 'Jabberwocky: Sins 2 Language Server',
     folderRegex: new RegExp('^(?!(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]))[a-zA-Z_ 0-9]{1,255}$'),
     mods: {

@@ -25,6 +25,7 @@ module.exports = class NotificationUniform extends Definitions {
                 has_backdrop: boolean(),
                 click_action: enumerate({
                     items: [
+                        'open_military_research_window',
                         'open_npc_markets_window',
                         'open_npcs_window',
                         'open_exotic_factory_window',

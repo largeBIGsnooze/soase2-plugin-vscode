@@ -111,12 +111,12 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                     filling: object({
                         keys: {
                             editor_color: color(),
-                            primary_random_fixture_filling_name: string(),
                             is_existence_known_to_all: boolean(),
+                            primary_random_fixture_filling_name: this.cache.fillings('fixtures'),
+                            secondary_random_fixture_filling_name: this.cache.fillings('fixtures'),
                             primary_random_fixture_with_moon_filling_name: string(),
                             is_primary_fixture_player_home_planet: boolean(),
                             gravity_wells: this.cache.fillings('all'),
-                            secondary_random_fixture_filling_name: string(),
                         },
                     }),
                 },
@@ -130,9 +130,10 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                     name: string(),
                     filling: object({
                         keys: {
-                            entity_definition: string(),
+                            entity_definition: this.cache.units,
                             required_planet_bonuses: array({
-                                items: string(),
+                                items: this.cache.planet_bonuses,
+                                isUnique: true,
                             }),
                             militia_supply: array({
                                 items: float(),
@@ -186,9 +187,8 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                             items: array({
                                 items: object({
                                     keys: {
-                                        skybox: string(),
+                                        skybox: this.cache.skyboxes,
                                         probability: integer(),
-                                        name: string(),
                                     },
                                 }),
                             }),

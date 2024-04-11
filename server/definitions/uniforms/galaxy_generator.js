@@ -112,7 +112,7 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                         keys: {
                             editor_color: color(),
                             primary_random_fixture_filling_name: string(),
-                            is_existance_known_to_all: boolean(),
+                            is_existence_known_to_all: boolean(),
                             primary_random_fixture_with_moon_filling_name: string(),
                             is_primary_fixture_player_home_planet: boolean(),
                             gravity_wells: this.cache.fillings('all'),

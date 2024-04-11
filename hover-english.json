@@ -1,0 +1,40 @@
+{
+    "hover": [
+        {
+            "key": "version",
+            "description": "Archive version"
+        },
+        {
+            "key": "race",
+            "description": "Player race name from **player** uniforms"
+        },
+        {
+            "key": "mesh_point",
+            "description": "Name of the mesh point assigned to the ship's model"
+        },
+        {
+            "key": "name",
+            "description": "Entity name that is grabbed from the **localized_text**"
+        },
+        {
+            "key": "field",
+            "description": "Sections of the research tree it will be placed on"
+        },
+        {
+            "key": "tier",
+            "description": "Research tier"
+        },
+        {
+            "key": "research_time",
+            "description": "Time it takes to finish the research subject, in **seconds**"
+        },
+        {
+            "key": "domain",
+            "description": "Research type"
+        },
+        {
+            "key": "field_coord",
+            "description": "The X and Y coordinates on the research screen."
+        }
+    ]
+}

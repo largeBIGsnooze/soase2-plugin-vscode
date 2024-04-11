@@ -1,0 +1,210 @@
+{
+    "name": "soase2-plugin-vscode",
+    "displayName": "Sins of A Solar Empire 2 - Language Support",
+    "description": "Language support for modding Sins of A Solar Empire 2 in VS Code",
+    "icon": "images/soase2_plugin_logo.png",
+    "author": "Tyloth",
+    "publisher": "cyno-studios",
+    "license": "MIT",
+    "version": "0.1.0",
+    "preview": true,
+    "private": true,
+    "qna": "marketplace",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/largeBIGsnooze/soase2-plugin-vscode"
+    },
+    "engines": {
+        "vscode": "^1.79.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "galleryBanner": {
+        "color": "#101010",
+        "theme": "dark"
+    },
+    "keywords": [
+        "sins",
+        "soase",
+        "sins of a solar empire II",
+        "sins of a solar empire 2",
+        "sins 2",
+        "sins of a solar empire"
+    ],
+    "main": "./server/client",
+    "contributes": {
+        "configuration": {
+            "title": "SOASE2 configuration",
+            "properties": {
+                "soase2-plugin.cache.game": {
+                    "type": "string",
+                    "scope": "resource",
+                    "default": "",
+                    "description": "The location of your mod for caching variables"
+                },
+                "soase2-plugin.language": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "english"
+                    ],
+                    "default": "english",
+                    "description": "Localisation for on-hover information, etc..."
+                },
+                "soase2-plugin.extensions.ignore": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "scope": "resource",
+                    "default": [
+                        "ogg",
+                        "fxco",
+                        "dll"
+                    ],
+                    "description": "File extensions to ignore"
+                },
+                "soase2-plugin.folders.ignore": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "scope": "resource",
+                    "default": [
+                        "textures",
+                        "videos",
+                        "meshes",
+                        "scenarios"
+                    ],
+                    "description": "Folders to ignore"
+                },
+                "soase2-plugin.formatter.tabs": {
+                    "type": "integer",
+                    "scope": "application",
+                    "default": 4,
+                    "minimum": 0,
+                    "description": "Identation when formatting the file - default: 4"
+                }
+            }
+        },
+        "languages": [
+            {
+                "id": "sins_of_a_solar_empire_ii",
+                "aliases": [
+                    "Sins of A Solar Empire II"
+                ],
+                "extensions": [
+                    ".mod_meta_data",
+                    "sound",
+                    "font",
+                    "brush",
+                    "named_colors",
+                    "cursor",
+                    "death_sequence_group",
+                    "death_sequence",
+                    "shield_effect",
+                    "beam_effect",
+                    "exhaust_trail_effect",
+                    "entity_manifest",
+                    "unit_item",
+                    "npc_reward",
+                    "unit",
+                    "unit_skin",
+                    "weapon",
+                    "player",
+                    "ability",
+                    "action_data_source",
+                    "buff",
+                    "research_subject",
+                    "formation",
+                    "exotic",
+                    "flight_pattern",
+                    "gdpr_accept_data",
+                    "gravity_well_props",
+                    "gui",
+                    "button_style",
+                    "list_box_style",
+                    "label_style",
+                    "drop_box_style",
+                    "text_entry_box_style",
+                    "reflect_box_style",
+                    "scroll_bar_style",
+                    "localized_text",
+                    "mesh_material",
+                    "player_color_group",
+                    "player_icon",
+                    "player_portrait",
+                    "scenario",
+                    "skybox",
+                    "texture_animation",
+                    "uniforms",
+                    "welcome_message"
+                ],
+                "configuration": "./syntaxes/language-configuration.json",
+                "icon": {
+                    "dark": "./images/sins2_icon_transparent.png",
+                    "light": "./images/sins2_icon_transparent.png"
+                }
+            }
+        ],
+        "grammars": [
+            {
+                "language": "sins_of_a_solar_empire_ii",
+                "scopeName": "source.soase2",
+                "path": "./syntaxes/soase2.tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "soase2-plugin-open-menu",
+                "title": "SOASE2: Configuration"
+            },
+            {
+                "command": "soase2-plugin.validateFilesButton",
+                "title": "SOASE2: Validate root directory"
+            },
+            {
+                "command": "soase2-plugin.changeWorkspace",
+                "title": "SOASE2: Change workspace folder"
+            },
+            {
+                "command": "soase2-plugin.create-mod",
+                "title": "SOASE2: Create a mod"
+            },
+            {
+                "command": "soase2-plugin.unzip-scenario",
+                "title": "SOASE2: Un-zips scenario"
+            },
+            {
+                "command": "soase2-plugin.zip-scenario",
+                "title": "SOASE2: Zips scenario"
+            }
+        ]
+    },
+    "scripts": {
+        "esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "esbuild-base": "esbuild ./server/client.js ./server/lsp-connection.js --bundle --outdir=out/ --external:vscode --format=cjs --platform=node",
+        "lint": "eslint .",
+        "prettier": "npx prettier . --write",
+        "package": "vsce package"
+    },
+    "devDependencies": {
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "20.2.5",
+        "@types/vscode": "^1.79.0",
+        "@vscode/test-electron": "^2.3.9",
+        "esbuild": "^0.20.0",
+        "eslint": "^8.41.0",
+        "prettier": "3.2.5",
+        "typescript": "^5.1.3"
+    },
+    "dependencies": {
+        "chokidar": "^3.6.0",
+        "fast-glob": "^3.3.2",
+        "lodash": "^4.17.21",
+        "lorem-ipsum": "^2.0.8",
+        "vscode-json-languageservice": "^5.3.5",
+        "vscode-languageclient": "^9.0.1",
+        "vscode-languageserver": "^8.1.0"
+    }
+}

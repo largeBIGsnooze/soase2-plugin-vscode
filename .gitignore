@@ -1,0 +1,11 @@
+.vscode
+.vscode-test
+.vscodeignore
+node_modules
+package-lock.json
+.eslintrc.json
+test
+playground
+jsconfig.json
+server/providers/definition.js
+server/definitions/gui/todo

@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -28,6 +28,9 @@
         "color": "#101010",
         "theme": "dark"
     },
+    "activationEvents": [
+        "onStartupFinished"
+    ],
     "keywords": [
         "sins",
         "soase",

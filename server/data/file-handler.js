@@ -219,13 +219,6 @@ module.exports = class FileHandler {
         }
     }
 
-    readRandomFixtureFillings() {
-        try {
-            return this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_fixture_fillings?.map((e) => e.name))
-        } catch (e) {
-            return ''
-        }
-    }
     // TODO: Find out target types
     readAttackTargetTypes() {
         try {
@@ -599,7 +592,7 @@ module.exports = class FileHandler {
     }
 
     readShipTags() {
-        const vanilla_tags = ['planet', 'torpedo', 'star', 'buff_agent', 'asteroid', 'loot', 'debris', 'gravity_well', 'phase_lane']
+        const vanilla_tags = ['planet', 'torpedo', 'star', 'buff_agent', 'asteroid', 'loot', 'debris', 'gravity_well', 'phase_lane', 'cannon_shell']
         try {
             return new Set([...this.readUniform('unit_tag', 'unit_tags').map((e) => e?.name), ...vanilla_tags])
         } catch (e) {
@@ -754,13 +747,23 @@ module.exports = class FileHandler {
         }
     }
 
-    readGravityWellFillings() {
+    readGravityWellFillings(type) {
+        const readFixtures = () => {
+            try {
+                return this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_fixture_fillings?.map((e) => e?.name))
+            } catch (e) {
+                return ''
+            }
+        }
+
+        const fillings = { fillings: [], random: [], fixtures: readFixtures() }
         try {
-            const fillings = this.readUniform('galaxy_generator', 'fillings', (e) => e?.gravity_well_fillings?.map((e) => e?.name))
-            const random_fillings = this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_gravity_well_fillings?.map((e) => e?.name))
-            return new Set([...(fillings ?? ''), ...(random_fillings ?? '')])
+            this.readUniform('galaxy_generator', 'fillings', (e) => e?.gravity_well_fillings?.map((e) => fillings['fillings'].push(e?.name)))
+            this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_gravity_well_fillings?.map((e) => fillings['random'].push(e?.name)))
+            if (type === 'all') return new Set([...fillings['fillings'], ...fillings['random']])
+            return new Set(fillings[type])
         } catch (e) {
-            return ''
+            return { fillings: [], random: [], fixtures: [] }
         }
     }
 

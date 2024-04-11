@@ -274,7 +274,7 @@ module.exports = class Player extends Definitions {
                         }),
                         starting_is_colonized: boolean(),
                         starting_militia_supply: float(),
-                        random_fixture_filling: this.cache.random_fixture_fillings,
+                        random_fixture_filling: this.cache.fillings('fixtures'),
                         levels: array({
                             items: object({
                                 keys: {

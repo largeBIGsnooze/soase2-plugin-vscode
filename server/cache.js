@@ -84,11 +84,10 @@ module.exports = async (modFolder) => {
     cache.fonts = enumerate({ items: modCache.readEntities(['fonts/*.font'])?.map((e) => e?.name) })
     cache.abilities = enumerate({ items: modCache.readAbilities() })
     cache.unit_skins = enumerate({ items: modCache.readUnitSkins() })
-    cache.random_fixture_fillings = enumerate({ items: modCache.readRandomFixtureFillings() })
     cache.attack_target_types = enumerate({ items: modCache.readAttackTargetTypes() })
     cache.attack_target_type_groups = enumerate({ items: modCache.readAttackTargetTypeGroups() })
     cache.ship_tags = enumerate({ items: modCache.readShipTags() })
-    cache.fillings = enumerate({ items: modCache.readGravityWellFillings() })
+    cache.fillings = (type) => enumerate({ items: modCache.readGravityWellFillings(type) })
     cache.npc_tags = enumerate({ items: modCache.readNpcTags() })
     cache.meshes = enumerate({ items: modCache.readMeshes() })
     cache.special_operation_kinds = enumerate({ items: modCache.readSpecialOperationUnitKinds() })
@@ -290,7 +289,7 @@ module.exports = async (modFolder) => {
         cache.abilities = enumerate({ items: modCache.readAbilities() })
     })
     setFileWatcher(modFolder, { subfolder: 'uniforms/galaxy_generator.uniforms' }, () => {
-        cache.random_fixture_fillings = enumerate({ items: modCache.readRandomFixtureFillings() })
+        cache.fillings = (type) => enumerate({ items: modCache.readGravityWellFillings(type) })
     })
     setFileWatcher(
         modFolder,

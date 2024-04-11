@@ -85,6 +85,7 @@ module.exports = async (modFolder) => {
     cache.abilities = enumerate({ items: modCache.readAbilities() })
     cache.unit_skins = enumerate({ items: modCache.readUnitSkins() })
     cache.attack_target_types = enumerate({ items: modCache.readAttackTargetTypes() })
+    cache.scenarios = enumerate({ items: modCache.readScenarios() })
     cache.attack_target_type_groups = enumerate({ items: modCache.readAttackTargetTypeGroups() })
     cache.ship_tags = enumerate({ items: modCache.readShipTags() })
     cache.fillings = (type) => enumerate({ items: modCache.readGravityWellFillings(type) })
@@ -125,6 +126,7 @@ module.exports = async (modFolder) => {
     cache.planet_artifacts = enumerate({ items: modCache.readPlanetArtifacts() })
     cache.modLogos = enumerate({ items: modCache.readModLogos() })
 
+    setFileWatcher(modFolder, { subfolder: 'scenarios/*.scenario' }, () => (cache.scenarios = enumerate({ items: modCache.readScenarios() })))
     setFileWatcher(modFolder, { subfolder: 'gui/input_actions.gui' }, () => (cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })))
     setFileWatcher(modFolder, { subfolder: 'uniforms/target_filter.uniforms' }, () => (cache.target_filters_uniforms = enumerate({ items: modCache.readTargetFilters().uniform })))
 

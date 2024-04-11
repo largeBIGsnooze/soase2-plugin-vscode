@@ -1,17 +1,17 @@
-const { schema, array, string } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, array } = require('../data_types')
 
-module.exports = class ScenarioUniform extends Definitions {
+module.exports = class ScenarioUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
+        this.cache = cache
     }
 
     create() {
         return schema({
             keys: {
                 scenarios: array({
-                    items: string(),
+                    items: this.cache.scenarios,
+                    isUnique: true,
                 }),
             },
             required: ['scenarios'],

@@ -656,6 +656,14 @@ module.exports = class FileHandler {
         }
     }
 
+    readScenarios() {
+        try {
+            return this.readEntities(['scenarios/*.scenario']).map((e) => e?.name)
+        } catch (e) {
+            return ''
+        }
+    }
+
     readSpecialOperationUnitKinds() {
         try {
             return this.readUniform('special_operation_unit', 'special_operation_unit_kinds')?.map((e) => e?.name)

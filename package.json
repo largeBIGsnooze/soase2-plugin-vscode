@@ -10,6 +10,9 @@
     "preview": true,
     "private": true,
     "qna": "marketplace",
+    "bugs": {
+        "url": "https://github.com/largeBIGsnooze/soase2-plugin-vscode/issues"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/largeBIGsnooze/soase2-plugin-vscode"

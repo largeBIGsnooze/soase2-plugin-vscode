@@ -1,4 +1,4 @@
-const { schema, object, array, string, float, vector3, vector2, integer, boolean, color } = require('../data_types')
+const { schema, object, array, string, float, vector3, vector2, integer, boolean, color, percentage, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class GalaxyGeneratorUniform extends Definitions {
@@ -6,6 +6,12 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
         super(gameInstallationFolder)
         this.cache = cache
+    }
+
+    npc_filling_type() {
+        return enumerate({
+            items: ['guardian', 'militia', 'enemy_faction', 'friendly_faction'],
+        })
     }
 
     npc_fillings() {
@@ -16,7 +22,7 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                     filling: object({
                         keys: {
                             player_definition: this.cache.players,
-                            npc_filling_type: string(),
+                            npc_filling_type: this.npc_filling_type(),
                             npc_id: string(),
                         },
                     }),
@@ -36,9 +42,9 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                             items: array({
                                 items: object({
                                     keys: {
-                                        skybox: string(),
-                                        probability: integer(),
-                                        name: string(),
+                                        skybox: this.cache.skyboxes,
+                                        probability: float(),
+                                        name: this.cache.fillings('fixtures'),
                                     },
                                 }),
                             }),
@@ -91,8 +97,8 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                             items: array({
                                 items: object({
                                     keys: {
-                                        skybox: string(),
-                                        probability: integer(),
+                                        skybox: this.cache.skyboxes,
+                                        probability: float(),
                                         name: string(),
                                     },
                                 }),
@@ -112,9 +118,9 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                         keys: {
                             editor_color: color(),
                             is_existence_known_to_all: boolean(),
-                            primary_random_fixture_filling_name: this.cache.fillings('fixtures'),
-                            secondary_random_fixture_filling_name: this.cache.fillings('fixtures'),
-                            primary_random_fixture_with_moon_filling_name: string(),
+                            primary_random_fixture_filling_name: this.cache.fillings('random_fixtures'),
+                            secondary_random_fixture_filling_name: this.cache.fillings('random_fixtures'),
+                            primary_random_fixture_with_moon_filling_name: this.cache.fillings('random_fixtures'),
                             is_primary_fixture_player_home_planet: boolean(),
                             gravity_wells: this.cache.fillings('all'),
                         },
@@ -188,7 +194,7 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                                 items: object({
                                     keys: {
                                         skybox: this.cache.skyboxes,
-                                        probability: integer(),
+                                        probability: float(),
                                     },
                                 }),
                             }),

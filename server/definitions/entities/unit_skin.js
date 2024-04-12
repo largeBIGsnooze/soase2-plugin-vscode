@@ -59,6 +59,7 @@ module.exports = class UnitSkin extends Definitions {
                                 },
                             }),
                             star_mesh: super.planet({
+                                textures: this.cache.textures,
                                 meshes: this.cache.meshes,
                                 properties: {
                                     atmosphere: object({
@@ -71,6 +72,7 @@ module.exports = class UnitSkin extends Definitions {
                                 },
                             }),
                             planet_mesh: super.planet({
+                                textures: this.cache.textures,
                                 meshes: this.cache.meshes,
                                 properties: {
                                     city: object({
@@ -148,7 +150,7 @@ module.exports = class UnitSkin extends Definitions {
                                             enter_sound: this.cache.ogg,
                                         },
                                     }),
-                                    shield_effect: string(),
+                                    shield_effect: this.cache.shield_effects,
                                     effect_alias_bindings: array({
                                         items: array({
                                             items: [
@@ -201,18 +203,23 @@ module.exports = class UnitSkin extends Definitions {
                                         keys: {
                                             spawned: array({
                                                 items: this.cache.sounds,
+                                                isUnique: true,
                                             }),
                                             selected: array({
                                                 items: this.cache.sounds,
+                                                isUnique: true,
                                             }),
                                             order_issued: array({
                                                 items: this.cache.sounds,
+                                                isUnique: true,
                                             }),
                                             attack_order_issued: array({
                                                 items: this.cache.sounds,
+                                                isUnique: true,
                                             }),
                                             hyperspace_charge_started: array({
                                                 items: this.cache.sounds,
+                                                isUnique: true,
                                             }),
                                         },
                                     }),
@@ -221,7 +228,7 @@ module.exports = class UnitSkin extends Definitions {
                             death_sequence_group: this.cache.death_sequence_groups,
                             light: object({
                                 keys: {
-                                    type: string(),
+                                    type: enumerate({ items: ['point_infinite'] }),
                                     color: color(),
                                     intensity: float(),
                                 },

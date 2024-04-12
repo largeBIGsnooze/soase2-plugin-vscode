@@ -1,11 +1,8 @@
 const { schema, integer, vecInt2 } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class TextureAnimation extends Definitions {
+module.exports = class TextureAnimation {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 

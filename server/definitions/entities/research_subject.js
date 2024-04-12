@@ -68,7 +68,7 @@ module.exports = class ResearchSubject extends Definitions {
                     }),
                     buff: this.cache.buffs,
                     tooltip_sub_header_label: this.cache.localisation,
-                    tooltip_lines: this.tooltip_lines(this.cache.localisation, this.cache.unit_items, this.cache.units, this.cache.action_values, this.cache.buff_unit_modifiers, this.cache.weapon_modifier_ids, this.cache.planet_modifier_ids, this.cache.buff_unit_factory_modifiers),
+                    tooltip_lines: this.tooltip_lines(this.cache),
                     all_owned_units_target_filter: '',
                 },
                 condition: If({
@@ -91,7 +91,7 @@ module.exports = class ResearchSubject extends Definitions {
                     isUnique: true,
                 }),
                 ownerships: super.getOwnerships,
-                constraints: super.getConstraints(this.cache.weapon_tags, this.cache.buffs, this.cache.mutations, this.cache.action_values, this.cache.units),
+                constraints: super.getConstraints(this.cache),
             },
             required: ['ownerships'],
         })
@@ -133,16 +133,13 @@ module.exports = class ResearchSubject extends Definitions {
                     {
                         hasArrayValues: false,
                     },
-                    super.getResearchSubjects(this.cache.research_subjects),
-                    this.cache.weapon_tags
+                    this.cache
                 ),
                 unit_modifiers: super.create().modifiers.unit_modifiers.create(
                     {
                         hasArrayValues: false,
                     },
-                    this.cache.ship_tags,
-                    this.cache.action_values,
-                    this.cache.buff_unit_modifiers
+                    this.cache
                 ),
                 planet_modifiers: super.create().modifiers.planet_modifiers.createResearchSubject(this.cache.planets),
                 empire_modifiers: super.create().modifiers.empire_modifiers.create(),

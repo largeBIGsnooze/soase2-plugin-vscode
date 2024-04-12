@@ -19,7 +19,7 @@ const GameRendererUniform = require('./uniforms/game_renderer')
 const GuiUniform = require('./uniforms/gui')
 const NamedColors = require('./colors/named_colors')
 const Icons = require('./player_icons/icons')
-const PlayerColorGroup = require('./player_colors/player_color_group')
+const PlayerColorGroup = require('./player_colors/player_color_group').default
 const Skybox = require('./skybox/skybox')
 const Font = require('./font/font')
 const GravityWellProps = require('./gravity_well_props/gravity_well_props')
@@ -185,7 +185,7 @@ const FrontEndWelcomeDialog = require('./gui/front_end_welcome_dialog')
 const FrontEndListBoxStyle = require('./gui/front_end-list-box-style')
 const GameInputActionNameLabelStyle = require('./gui/game_input_action_name-label-style')
 const GameInputGroupHeaderLabelStyle = require('./gui/game_input_group_header-label-style')
-const GravityWellTooltip = require('./gui/game_input_group_header-label-style')
+const GravityWellTooltip = require('./gui/gravity_well_tooltip')
 const HudTitleLabelStyle = require('./gui/hud_title-label-style')
 const TitleScreenLabelStyle = require('./gui/title_screen-label-style')
 const HudAdvancedPlanetWindow = require('./gui/hud_advanced_planet_window')
@@ -532,7 +532,7 @@ module.exports = class EntityDefinition extends Document {
     static files = {
         ...this.entities,
         ...this.uniforms,
-        // ...this.gui,
+        // ...this.gui, // TODO: Finish this later...
         ...this.effects,
         ...this.misc,
     }

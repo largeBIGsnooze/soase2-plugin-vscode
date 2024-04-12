@@ -90,7 +90,7 @@ module.exports = class UnitItem extends Definitions {
             items: object({
                 keys: {
                     ability: this.cache.abilities,
-                    tooltip_lines: super.tooltip_lines(this.cache.localisation, this.cache.unit_items, this.cache.units, this.cache.action_values, this.cache.buff_unit_modifiers, this.cache.weapon_modifier_ids, this.cache.planet_modifier_ids, this.cache.buff_unit_factory_modifiers),
+                    tooltip_lines: super.tooltip_lines(this.cache),
                 },
             }),
         })
@@ -143,9 +143,7 @@ module.exports = class UnitItem extends Definitions {
                     {
                         hasArrayValues: true,
                     },
-                    this.cache.ship_tags,
-                    this.cache.action_values,
-                    this.cache.buff_unit_modifiers
+                    this.cache
                 ),
                 trade_capacity: this.tradeCapacity(),
                 item_level_count: float(),
@@ -164,8 +162,7 @@ module.exports = class UnitItem extends Definitions {
                     {
                         hasArrayValues: true,
                     },
-                    super.getResearchSubjects(this.cache.research_subjects),
-                    this.cache.weapon_tags
+                    this.cache
                 ),
                 is_planet_garrison: boolean(),
                 planet_garrison_hud_icons: this.planetGarrisonHudIcons(),

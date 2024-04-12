@@ -32,16 +32,13 @@ module.exports = class Player extends Definitions {
                                         {
                                             hasArrayValues: false,
                                         },
-                                        this.cache.ship_tags,
-                                        this.cache.action_values,
-                                        this.cache.buff_unit_modifiers
+                                        this.cache
                                     ),
                                     weapon_modifiers: super.create().modifiers.weapon_modifiers.create(
                                         {
                                             hasArrayValues: false,
                                         },
-                                        super.getResearchSubjects(this.cache.research_subjects),
-                                        this.cache.weapon_tags
+                                        this.cache
                                     ),
                                     empire_modifiers: super.create().modifiers.empire_modifiers.create(),
                                 },
@@ -274,7 +271,7 @@ module.exports = class Player extends Definitions {
                         }),
                         starting_is_colonized: boolean(),
                         starting_militia_supply: float(),
-                        random_fixture_filling: this.cache.fillings('fixtures'),
+                        random_fixture_filling: this.cache.fillings('random_fixtures'),
                         levels: array({
                             items: object({
                                 keys: {
@@ -322,7 +319,7 @@ module.exports = class Player extends Definitions {
                 }),
                 starting_units_in_gravity_well: object({
                     keys: {
-                        required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                        required_units: super.getRequiredUnits(this.cache),
                         random_units: super.units(this.cache.units),
                     },
                 }),
@@ -337,7 +334,7 @@ module.exports = class Player extends Definitions {
                 }),
                 starting_units_in_hyperspace: object({
                     keys: {
-                        required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                        required_units: super.getRequiredUnits(this.cache),
                         random_units: super.units(this.cache.units),
                     },
                 }),
@@ -504,7 +501,7 @@ module.exports = class Player extends Definitions {
                                                           keys: {
                                                               units: object({
                                                                   keys: {
-                                                                      required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                                                                      required_units: super.getRequiredUnits(this.cache),
                                                                       random_units: super.units(this.cache.units),
                                                                   },
                                                               }),
@@ -533,7 +530,7 @@ module.exports = class Player extends Definitions {
                                               keys: {
                                                   spawned_units: object({
                                                       keys: {
-                                                          required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                                                          required_units: super.getRequiredUnits(this.cache),
                                                           random_units: super.units(this.cache.units),
                                                       },
                                                   }),
@@ -845,9 +842,7 @@ module.exports = class Player extends Definitions {
                                                         {
                                                             hasArrayValues: false,
                                                         },
-                                                        this.cache.ship_tags,
-                                                        this.cache.action_values,
-                                                        this.cache.buff_unit_modifiers
+                                                        this.cache
                                                     ),
                                                 },
                                             }),
@@ -857,8 +852,7 @@ module.exports = class Player extends Definitions {
                                                         {
                                                             hasArrayValues: false,
                                                         },
-                                                        super.getResearchSubjects(this.cache.research_subjects),
-                                                        this.cache.weapon_tags
+                                                        this.cache
                                                     ),
                                                 },
                                             }),
@@ -868,9 +862,7 @@ module.exports = class Player extends Definitions {
                                                         {
                                                             hasArrayValues: false,
                                                         },
-                                                        this.cache.ship_tags,
-                                                        this.cache.action_values,
-                                                        this.cache.buff_unit_modifiers
+                                                        this.cache
                                                     ),
                                                 },
                                             }),

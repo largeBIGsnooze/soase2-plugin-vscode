@@ -187,29 +187,29 @@ class Definitions {
         })
     }
 
-    tooltip_lines(localisation, unit_items, units, action_values, buff_unit_modifiers, weapon_modifier_id, planet_modifier_id, buff_unit_factory_modifiers) {
+    tooltip_lines(data) {
         return array({
             items: object({
                 keys: {
                     visibility: enumerate({
                         items: ['upgrade_only'],
                     }),
-                    trade_import_points_id: buff_unit_modifiers,
+                    trade_import_points_id: data['buff_unit_modifiers'],
                     visible_if_value_zero: boolean(),
                     is_resolved_value: boolean(),
                     rendering_type: this.rendering_type,
-                    label_text: localisation,
+                    label_text: data['localisation'],
                     value_float_format: this.value_float_format,
-                    unit_factory_modifier_id: buff_unit_factory_modifiers,
-                    value_suffix_text: localisation,
-                    unit_modifier_id: buff_unit_modifiers,
-                    value_id: action_values,
-                    weapon_modifier_id: weapon_modifier_id,
+                    unit_factory_modifier_id: data['buff_unit_factory_modifiers'],
+                    value_suffix_text: data['localisation'],
+                    unit_modifier_id: data['buff_unit_modifiers'],
+                    value_id: data['action_values'],
+                    weapon_modifier_id: data['weapon_modifier_ids'],
                     value_color: this.value_color,
-                    unit_item: unit_items,
-                    unit: units,
+                    unit_item: data['unit_items'],
+                    unit: data['units'],
                     value_suffix: this.value_suffix,
-                    planet_modifier_id: planet_modifier_id,
+                    planet_modifier_id: data['planet_modifier_ids'],
                     is_resolved_value: boolean(),
                     value_modifiers: array({
                         items: object({
@@ -217,7 +217,7 @@ class Definitions {
                                 operator_type: enumerate({
                                     items: ['multiply', 'add'],
                                 }),
-                                operand_value: action_values,
+                                operand_value: data['action_values'],
                             },
                         }),
                     }),
@@ -227,27 +227,27 @@ class Definitions {
         })
     }
 
-    tooltip_line_groups(localisation, unit_items, units, action_values, buff_unit_modifiers, weapon_modifier_id, planet_modifier_id, buff_unit_factory_modifiers) {
+    tooltip_line_groups(data) {
         return array({
             items: object({
                 keys: {
-                    header_text: localisation,
-                    lines: this.tooltip_lines(localisation, unit_items, units, action_values, buff_unit_modifiers, weapon_modifier_id, planet_modifier_id, buff_unit_factory_modifiers),
+                    header_text: data['localisation'],
+                    lines: this.tooltip_lines(data),
                 },
             }),
         })
     }
 
-    getBuffConstraints(weapon_tags, buffs, mutations, action_values, target_filters, unit_variables, units) {
+    getBuffConstraints(data) {
         return array({
             items: object({
                 keys: {
-                    target_filter_id: target_filters,
+                    target_filter_id: data['target_filters'],
                     weapon: enumerate({
                         items: ['trigger_event_weapon'],
                     }),
                     any_weapon_tags: array({
-                        items: weapon_tags,
+                        items: data['weapon_tags'],
                         isUnique: true,
                     }),
                     constraint: object({
@@ -256,7 +256,7 @@ class Definitions {
                             unit_a: object({
                                 keys: {
                                     unit_type: this.getUnitType,
-                                    memory_unit_variable_id: unit_variables,
+                                    memory_unit_variable_id: data['unit_variables'],
                                 },
                             }),
                             unit_b: object({
@@ -267,14 +267,14 @@ class Definitions {
                         },
                     }),
                     constraint_type: this.getConstraintType,
-                    value_a: action_values,
-                    value_b: action_values,
-                    weapon_tag: weapon_tags,
+                    value_a: data['action_values'],
+                    value_b: data['action_values'],
+                    weapon_tag: data['weapon_tags'],
                     damage_source: this.getDamageSource,
-                    chance_value: action_values,
+                    chance_value: data['action_values'],
                     comparison_type: this.getComparisonType,
                     unit: this.getUnit,
-                    unit_constraint: this.getUnitConstraint(weapon_tags, buffs, mutations, action_values, units),
+                    unit_constraint: this.getUnitConstraint(data),
                     unit_a: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -302,15 +302,15 @@ class Definitions {
         })
     }
 
-    getUnitConstraint(weapon_tags, buffs, mutations, action_values, units) {
+    getUnitConstraint(data) {
         return object({
             keys: {
                 constraint_type: this.getConstraintType,
                 percentage_missing_threshold: float(),
                 amount_missing_threshold: float(),
                 weapon_type: this.getWeaponType,
-                mutation: mutations,
-                constraints: this.getConstraints(weapon_tags, buffs, mutations, action_values, units),
+                mutation: data['mutations'],
+                constraints: this.getConstraints(data),
             },
         })
     }
@@ -365,18 +365,18 @@ class Definitions {
         })
     }
 
-    getEffectDefinition(particle_effects, effect_alias_bindings) {
+    getEffectDefinition(data) {
         return object({
             keys: {
                 binding: this.getBinding,
                 effect_by_size: object({
                     keys: {
-                        small_unit: effect_alias_bindings,
-                        medium_unit: effect_alias_bindings,
-                        large_unit: effect_alias_bindings,
+                        small_unit: data['effect_alias_bindings'],
+                        medium_unit: data['effect_alias_bindings'],
+                        large_unit: data['effect_alias_bindings'],
                     },
                 }),
-                effect: effect_alias_bindings,
+                effect: data['effect_alias_bindings'],
                 mesh_point: string(),
                 mesh_point_usage: enumerate({
                     items: ['index', 'all'],
@@ -399,33 +399,19 @@ class Definitions {
         })
     }
 
-    getOperators({
-        units: units,
-        unit_items: unit_items,
-        abilities: abilities,
-        weapon_tags: weapon_tags,
-        action_values: action_values,
-        buffs: buffs,
-        mutations: mutations,
-        particle_effects: particle_effects,
-        effect_alias_bindings: effect_alias_bindings,
-        target_filters: target_filters,
-        float_variables: float_variables,
-        unit_variables: unit_variables,
-        special_operation_unit_kind: special_operation_unit_kind,
-    }) {
+    getOperators(data) {
         return array({
             items: object({
                 keys: {
-                    special_operation_unit_kind: special_operation_unit_kind,
-                    float_variable: float_variables,
-                    destination_target_filter_id: target_filters,
-                    arrival_delay_value: action_values,
-                    available_supply_value: action_values,
-                    build_strikecraft_count: action_values,
-                    unit_item: unit_items,
+                    special_operation_unit_kind: data['special_operation_kinds'],
+                    float_variable: data['float_variables'],
+                    destination_target_filter_id: data['target_filters'],
+                    arrival_delay_value: data['action_values'],
+                    available_supply_value: data['action_values'],
+                    build_strikecraft_count: data['action_values'],
+                    unit_item: data['unit_items'],
                     effect_alias_binding: this.getBinding,
-                    damage_value: action_values,
+                    damage_value: data['action_values'],
                     operator_type: this.getOperatorType,
                     new_owner_player: object({
                         keys: {
@@ -443,7 +429,7 @@ class Definitions {
                     clone_spawn_position: object({
                         keys: {
                             position_type: this.getPositionType,
-                            distance_value: action_values,
+                            distance_value: data['action_values'],
                             direction: this.getDirection,
                             source_position: this.getSourcePosition,
                         },
@@ -454,16 +440,16 @@ class Definitions {
                             unit: this.getUnit,
                         },
                     }),
-                    clone_count: action_values,
-                    buff_on_clone: buffs,
+                    clone_count: data['action_values'],
+                    buff_on_clone: data['buffs'],
                     skip_player_statistics: boolean(),
                     skip_awarding_experience: boolean(),
                     constrain_available_supply_to_owner_player: boolean(),
                     check_research_prerequisites: boolean(),
                     in_hyperspace: boolean(),
                     use_source_weapon_properties: boolean(),
-                    math_operators: this.getMathOperators(action_values),
-                    effect_definition: this.getEffectDefinition(particle_effects, effect_alias_bindings),
+                    math_operators: this.getMathOperators(data['action_values']),
+                    effect_definition: this.getEffectDefinition(data),
                     destination_unit: this.getDestinationUnit,
                     source_unit: object({
                         keys: {
@@ -472,8 +458,8 @@ class Definitions {
                     }),
                     units: object({
                         keys: {
-                            random_units: this.units(units),
-                            required_units: this.getRequiredUnits(units, unit_items, abilities),
+                            random_units: this.units(data['units']),
+                            required_units: this.getRequiredUnits(data),
                         },
                     }),
                     owner_player: object({
@@ -492,46 +478,46 @@ class Definitions {
                         },
                     }),
                     asset_type: this.getResources,
-                    asset_value: action_values,
+                    asset_value: data['action_values'],
                     damage_source: this.getDamageSource,
-                    bombing_damage_value: action_values,
-                    antimatter_restore_value: action_values,
+                    bombing_damage_value: data['action_values'],
+                    antimatter_restore_value: data['action_values'],
                     damage_affect_type: this.damageAffectType,
-                    antimatter_remove_value: action_values,
+                    antimatter_remove_value: data['action_values'],
                     mesh_point: string(),
                     weapon_tags: array({
-                        items: weapon_tags,
+                        items: data['weapon_tags'],
                         isUnique: true,
                     }),
-                    unit_variable: unit_variables,
+                    unit_variable: data['unit_variables'],
                     new_unit_value: object({
                         keys: {
                             unit_type: this.getUnitType,
                         },
                     }),
-                    duration_value: action_values,
+                    duration_value: data['action_values'],
                     to_player: object({
                         keys: {
                             player_type: this.getPlayerType,
                         },
                     }),
-                    points_value: action_values,
-                    effects: this.getEffects(particle_effects),
+                    points_value: data['action_values'],
+                    effects: this.getEffects(data['particle_effects']),
                     charge_duration: enumerate({
                         items: ['beam_charge_value', 'disintegration_beam_charge_value'],
                     }),
-                    beam_duration: action_values,
+                    beam_duration: data['action_values'],
                     planet_track_type: this.getPlanetTrackType,
-                    level_count_value: action_values,
+                    level_count_value: data['action_values'],
                     will_offset_development_track_upgrade_price: boolean(),
                     ignore_infinite_recursion_guard: boolean(),
-                    penetration_value: action_values,
+                    penetration_value: data['action_values'],
                     bypass_shields_chance_value: this.getBypassShieldsChanceValue,
-                    target_filter_id: target_filters,
-                    buff: buffs,
+                    target_filter_id: data['target_filters'],
+                    buff: data['buffs'],
                     affect_type: this.getAffectType,
-                    repair_value: action_values,
-                    constraint: this.getConstraint(weapon_tags, buffs, mutations, action_values, target_filters, float_variables, unit_variables, units),
+                    repair_value: data['action_values'],
+                    constraint: this.getConstraint(data),
                     collision_unit: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -540,8 +526,8 @@ class Definitions {
                     initial_float_values: array({
                         items: object({
                             keys: {
-                                float_variable_id: float_variables,
-                                value_id: action_values,
+                                float_variable_id: data['float_variables'],
+                                value_id: data['action_values'],
                             },
                         }),
                     }),
@@ -672,17 +658,17 @@ class Definitions {
         })
     }
 
-    getPositionOperators(particle_effects, effect_alias_bindings, units, buffs, special_operation_unit_kind) {
+    getPositionOperators(data) {
         return array({
             items: object({
                 keys: {
                     operator_type: this.getOperatorType,
-                    effect_definition: this.getEffectDefinition(particle_effects, effect_alias_bindings),
-                    unit_to_create: units,
-                    special_operation_unit_kind: special_operation_unit_kind,
+                    effect_definition: this.getEffectDefinition(data),
+                    unit_to_create: data['units'],
+                    special_operation_unit_kind: data['special_operation_kinds'],
                     unit_forward: this.getUnitForward,
                     is_self_building: boolean(),
-                    buff_on_created_unit: buffs,
+                    buff_on_created_unit: data['buffs'],
                     torpedo_source_unit: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -693,7 +679,7 @@ class Definitions {
                             unit_type: this.getUnitType,
                         },
                     }),
-                    buff_on_agent: buffs,
+                    buff_on_agent: data['buffs'],
                     effect_destination_unit: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -790,7 +776,7 @@ class Definitions {
         })
     }
 
-    getConstraints(weapon_tags, buffs, mutations, action_values, units) {
+    getConstraints(data) {
         return array({
             items: object({
                 keys: {
@@ -798,9 +784,9 @@ class Definitions {
                         items: ['military'],
                     }),
                     weapon_type: this.getWeaponType,
-                    tag: weapon_tags,
-                    value_a: action_values,
-                    value_b: action_values,
+                    tag: data['weapon_tags'],
+                    value_a: data['action_values'],
+                    value_b: data['action_values'],
                     comparison_type: this.getComparisonType,
                     constraint_type: this.getConstraintType,
                     ship_roles: this.getShipRoles,
@@ -808,7 +794,7 @@ class Definitions {
                     permission_type: enumerate({
                         items: ['can_hyperspace'],
                     }),
-                    buff: buffs,
+                    buff: data['buffs'],
                     unit: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -819,7 +805,7 @@ class Definitions {
                             constraint_type: this.getConstraintType,
                             percentage_missing_threshold: float(),
                             amount_missing_threshold: float(),
-                            mutation: mutations,
+                            mutation: data['mutations'],
                         },
                     }),
                     constraints: array({
@@ -843,15 +829,15 @@ class Definitions {
                     constraint: object({
                         keys: {
                             constraint_type: this.getConstraintType,
-                            buff: buffs,
+                            buff: data['buffs'],
                             unit: this.getUnit,
                             unit_constraint: object({
                                 keys: {
                                     constraint_type: this.getConstraintType,
                                     percentage_missing_threshold: float(),
                                     amount_missing_threshold: float(),
-                                    buff: buffs,
-                                    mutation: mutations,
+                                    buff: data['buffs'],
+                                    mutation: data['mutations'],
                                 },
                             }),
                             mutation: '',
@@ -861,7 +847,7 @@ class Definitions {
                             values: ['has_mutation'],
                             requires: [],
                             properties: {
-                                mutation: mutations,
+                                mutation: data['mutations'],
                             },
                         }),
                     }),
@@ -874,7 +860,7 @@ class Definitions {
                     value: 'has_definition',
                     requires: ['unit_definition'],
                     properties: {
-                        unit_definition: units,
+                        unit_definition: data['units'],
                     },
                     additional: IfMap({
                         key: 'constraint_type',
@@ -1005,17 +991,17 @@ class Definitions {
         })
     }
 
-    getRequiredUnits(units, ship_components, abilities) {
+    getRequiredUnits(data) {
         return array({
             items: object({
                 keys: {
-                    unit: units,
+                    unit: data['units'],
                     options: object({
                         keys: {
                             is_temporary_ruler_ship: boolean(),
-                            forced_leveled_up_ability: abilities,
+                            forced_leveled_up_ability: data['abilities'],
                             items: array({
-                                items: ship_components,
+                                items: data['ship_components'],
                                 isUnique: true,
                             }),
                         },
@@ -1085,29 +1071,29 @@ class Definitions {
         })
     }
 
-    getConstraint(weapon_tags, buffs, mutations, action_values, target_filters, float_variables, unit_variables, units) {
+    getConstraint(data) {
         return object({
             keys: {
                 destination_unit: this.getDestinationUnit,
                 damage_source: this.getDamageSource,
                 constraint_type: this.getConstraintType,
-                value_a: action_values,
-                value_b: action_values,
+                value_a: data['action_values'],
+                value_b: data['action_values'],
                 comparison_type: this.getComparisonType,
-                bonus_damage_value: action_values,
-                weapon_tag: weapon_tags,
-                float_variable: float_variables,
-                math_operators: this.getMathOperators(action_values),
-                constraints: this.getBuffConstraints(weapon_tags, buffs, mutations, action_values, target_filters, unit_variables, units),
-                unit_constraint: this.getUnitConstraint(weapon_tags, buffs, mutations, action_values, units),
-                target_filter_id: target_filters,
-                compare_value: action_values,
+                bonus_damage_value: data['action_values'],
+                weapon_tag: data['weapon_tags'],
+                float_variable: data['float_variables'],
+                math_operators: this.getMathOperators(data['action_values']),
+                constraints: this.getBuffConstraints(data),
+                unit_constraint: this.getUnitConstraint(data),
+                target_filter_id: data['target_filters'],
+                compare_value: data['action_values'],
                 constraint: object({
                     keys: {
                         constraint_type: this.getConstraintType,
-                        target_filter_id: target_filters,
+                        target_filter_id: data['target_filters'],
                         unit: this.getUnit,
-                        unit_constraint: this.getUnitConstraint(weapon_tags, buffs, mutations, action_values, units),
+                        unit_constraint: this.getUnitConstraint(data),
                         unit_a: this.getUnit,
                         unit_b: this.getUnit,
                     },
@@ -1177,52 +1163,18 @@ class Definitions {
         })
     }
 
-    getTimeActions({
-        weapon_tags: weapon_tags,
-        buffs: buffs,
-        mutations: mutations,
-        npc_rewards: npc_rewards,
-        exotics: exotics,
-        action_values: action_values,
-        target_filters: target_filters,
-        particle_effects: particle_effects,
-        effect_alias_bindings: effect_alias_bindings,
-        units: units,
-        unit_items: unit_items,
-        abilities: abilities,
-        float_variables: float_variables,
-        unit_variables: unit_variables,
-        buff_actions: buff_actions,
-        special_operation_unit_kind: special_operation_unit_kind,
-    }) {
+    getTimeActions(data) {
         return array({
             items: object({
                 keys: {
-                    executions_per_interval_value: action_values,
-                    first_action_delay_time_value: action_values,
-                    execution_interval_value: action_values,
-                    execution_interval_count_value: action_values,
+                    executions_per_interval_value: data['action_values'],
+                    first_action_delay_time_value: data['action_values'],
+                    execution_interval_value: data['action_values'],
+                    execution_interval_count_value: data['action_values'],
                     action_group: object({
                         keys: {
-                            constraint: this.getConstraint(weapon_tags, buffs, mutations, action_values, target_filters, float_variables, unit_variables, units),
-                            actions: this.getActions({
-                                weapon_tags: weapon_tags,
-                                buffs: buffs,
-                                mutations: mutations,
-                                npc_rewards: npc_rewards,
-                                exotics: exotics,
-                                units: units,
-                                unit_items: unit_items,
-                                abilities: abilities,
-                                action_values: action_values,
-                                target_filters: target_filters,
-                                particle_effects: particle_effects,
-                                effect_alias_bindings: effect_alias_bindings,
-                                float_variables: float_variables,
-                                buff_actions: buff_actions,
-                                unit_variables: unit_variables,
-                                special_operation_unit_kind: special_operation_unit_kind,
-                            }),
+                            constraint: this.getConstraint(data),
+                            actions: this.getActions(data),
                         },
                     }),
                 },
@@ -1230,24 +1182,7 @@ class Definitions {
         })
     }
 
-    getActions({
-        weapon_tags: weapon_tags,
-        buffs: buffs,
-        mutations: mutations,
-        npc_rewards: npc_rewards,
-        exotics: exotics,
-        units: units,
-        unit_items: unit_items,
-        abilities: abilities,
-        action_values: action_values,
-        target_filters: target_filters,
-        particle_effects: particle_effects,
-        effect_alias_bindings: effect_alias_bindings,
-        float_variables: float_variables,
-        buff_actions: buff_actions,
-        unit_variables: unit_variables,
-        special_operation_unit_kind: special_operation_unit_kind,
-    }) {
+    getActions(data) {
         return array({
             items: object({
                 keys: {
@@ -1258,16 +1193,16 @@ class Definitions {
                     }),
                     include_radius_origin_unit: boolean(),
                     is_empowered: boolean(),
-                    radius_value: action_values,
+                    radius_value: data['action_values'],
                     gravity_well_origin_unit: this.getGravityWellOriginUnit,
-                    constraint: this.getConstraint(weapon_tags, buffs, mutations, action_values, target_filters, float_variables, unit_variables, units),
+                    constraint: this.getConstraint(data),
                     attractor_unit: object({
                         keys: {
                             unit_type: this.getUnitType,
                         },
                     }),
-                    max_linear_speed_value: action_values,
-                    time_to_max_linear_speed_value: action_values,
+                    max_linear_speed_value: data['action_values'],
+                    time_to_max_linear_speed_value: data['action_values'],
                     strikecraft_carrier_unit: object({
                         keys: {
                             unit_type: this.getUnitType,
@@ -1284,25 +1219,25 @@ class Definitions {
                             unit: this.getUnit,
                         },
                     }),
-                    arc_radius_value: action_values,
-                    arc_angle_value: action_values,
+                    arc_radius_value: data['action_values'],
+                    arc_angle_value: data['action_values'],
                     max_target_count_value: enumerate({
                         items: ['fixed_one'],
                     }),
                     target_sort: this.getTargetSort,
-                    bonus_damage_value: action_values,
-                    operators_constraint: this.getConstraint(weapon_tags, buffs, mutations, action_values, target_filters, float_variables, unit_variables, units),
+                    bonus_damage_value: data['action_values'],
+                    operators_constraint: this.getConstraint(data),
                     buff_constraint: object({
                         keys: {
                             constraint_type: this.getConstraintType,
                             buff: enumerate({
                                 items: ['operand_buff'],
                             }),
-                            mutation: mutations,
+                            mutation: data['mutations'],
                         },
                     }),
                     ability: this.ability(),
-                    max_jump_distance_value: action_values,
+                    max_jump_distance_value: data['action_values'],
                     destination_unit: this.getDestinationUnit,
                     action_type: this.getActionType,
                     buff: enumerate({
@@ -1310,44 +1245,30 @@ class Definitions {
                     }),
                     position: this.getPosition,
                     asset_type: this.getResources,
-                    give_amount_id: action_values,
+                    give_amount_id: data['action_values'],
                     travel_time: object({
                         keys: {
                             travel_time_source: enumerate({
                                 items: ['speed_and_distance', 'explicit_time'],
                             }),
-                            travel_speed_value: action_values,
+                            travel_speed_value: data['action_values'],
                         },
                     }),
-                    damage_prevented_value: action_values,
-                    action_id: buff_actions,
-                    float_variable: float_variables,
-                    math_operators: this.getMathOperators(action_values),
+                    damage_prevented_value: data['action_values'],
+                    action_id: data['buff_actions'],
+                    float_variable: data['float_variables'],
+                    math_operators: this.getMathOperators(data['action_values']),
                     player: object({
                         keys: {
                             player_type: this.getPlayerType,
                         },
                     }),
-                    exotics: this.exotics(exotics),
-                    position_operators: this.getPositionOperators(particle_effects, effect_alias_bindings, units, buffs, special_operation_unit_kind),
-                    npc_rewards: this.npcRewards(npc_rewards),
-                    operators: this.getOperators({
-                        units: units,
-                        unit_items: unit_items,
-                        abilities: abilities,
-                        weapon_tags: weapon_tags,
-                        action_values: action_values,
-                        buffs: buffs,
-                        mutations: mutations,
-                        particle_effects: particle_effects,
-                        effect_alias_bindings: effect_alias_bindings,
-                        target_filters: target_filters,
-                        float_variables: float_variables,
-                        unit_variables: unit_variables,
-                        special_operation_unit_kind: special_operation_unit_kind,
-                    }),
-                    buff_on_created_unit: units,
-                    effect_definition: this.getEffectDefinition(particle_effects, effect_alias_bindings),
+                    exotics: this.exotics(data['exotics']),
+                    position_operators: this.getPositionOperators(data),
+                    npc_rewards: this.npcRewards(data['npc_rewards']),
+                    operators: this.getOperators(data),
+                    buff_on_created_unit: data['units'],
+                    effect_definition: this.getEffectDefinition(data),
                     hyperspace_destination_position: this.getHyperspaceDestinationPosition,
                     is_looping: boolean(),
                 },
@@ -1710,7 +1631,7 @@ class Definitions {
         })
     }
 
-    planet({ properties: properties, meshes: meshes }) {
+    planet({ properties: properties, meshes: meshes, textures: textures }) {
         return object({
             keys: {
                 mesh: meshes,
@@ -1718,10 +1639,10 @@ class Definitions {
                 corona: object({
                     keys: {
                         shader: string(),
-                        color_texture: string(),
+                        color_texture: textures,
                         color: color(),
                         radius_scalar: float(),
-                        noise_texture: string(),
+                        noise_texture: textures,
                         animation_speed: float(),
                         noise_1_zoom: float(),
                         basic_constants: object({
@@ -1744,7 +1665,7 @@ class Definitions {
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                icon: string(),
+                icon: textures,
                 tooltip: this.tooltip(localisation, textures),
                 behavior_definitions: object({
                     keys: {
@@ -1772,7 +1693,7 @@ class Definitions {
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                icon: string(),
+                icon: textures,
                 tooltip: this.tooltip(localisation, textures),
                 text: localisation,
                 alliance_offer_duration_label: localisation,
@@ -2512,7 +2433,7 @@ class UnitModifiers extends Definitions {
         super()
     }
 
-    create({ hasArrayValues: hasArrayValues, prerequisites: prerequisites = {} }, ship_tags, value_id, buff_unit_modifiers) {
+    create({ hasArrayValues: hasArrayValues, prerequisites: prerequisites = {} }, data) {
         let result
 
         if (hasArrayValues)
@@ -2530,18 +2451,18 @@ class UnitModifiers extends Definitions {
             items: object({
                 keys: {
                     is_psuedo_positive_buff: boolean(),
-                    buff_unit_modifier_id: buff_unit_modifiers,
+                    buff_unit_modifier_id: data['buff_unit_modifiers'],
                     modifier_type: enumerate({
                         items: unit_modifier_types(),
                     }),
                     value_behavior: super.getValueBehavior,
-                    value_id: value_id,
+                    value_id: data['action_values'],
                     ...result,
                     tags: array({
-                        items: ship_tags,
+                        items: data['ship_tags'],
                         isUnique: true,
                     }),
-                    tag: ship_tags,
+                    tag: data['ship_tags'],
                     prerequisites,
                 },
             }),
@@ -2554,7 +2475,7 @@ class WeaponModifiers extends Definitions {
         super()
     }
 
-    create({ hasArrayValues: hasArrayValues }, research_subjects, weapon_tags) {
+    create({ hasArrayValues: hasArrayValues }, data) {
         let result
 
         if (hasArrayValues)
@@ -2576,12 +2497,12 @@ class WeaponModifiers extends Definitions {
                         items: weapon_modifier_types(),
                     }),
                     value_behavior: super.getValueBehavior,
-                    buff_weapon_modifier_id: string(),
-                    value_id: string(),
+                    buff_weapon_modifier_id: data['weapon_modifier_ids'],
+                    value_id: data['action_values'],
                     ...result,
-                    prerequisites: research_subjects,
+                    prerequisites: super.getResearchSubjects(data['research_subjects']),
                     tags: array({
-                        items: weapon_tags,
+                        items: data['weapon_tags'],
                         isUnique: true,
                     }),
                 },

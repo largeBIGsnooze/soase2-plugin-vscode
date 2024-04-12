@@ -112,8 +112,7 @@ module.exports = class Weapon extends Definitions {
                     {
                         hasArrayValues: false,
                     },
-                    super.getResearchSubjects(this.cache.research_subjects),
-                    this.cache.weapon_tags
+                    this.cache
                 ),
                 acquire_target_logic: enumerate({
                     items: ['order_target_only', 'order_target_or_best_target_in_range', 'best_target_in_range'],

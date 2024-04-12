@@ -16,25 +16,8 @@ module.exports = class Buff extends Definitions {
                     trigger_event_type: super.getTriggerEventType,
                     action_group: object({
                         keys: {
-                            constraint: super.getConstraint(this.cache.weapon_tags, this.cache.buffs, this.cache.mutations, this.cache.action_values, this.cache.target_filters, this.cache.float_variables, this.cache.unit_variables, this.cache.units),
-                            actions: super.getActions({
-                                weapon_tags: this.cache.weapon_tags,
-                                buffs: this.cache.buffs,
-                                mutations: this.cache.mutations,
-                                npc_rewards: this.cache.npc_rewards,
-                                exotics: this.cache.exotics,
-                                units: this.cache.units,
-                                unit_items: this.cache.unit_items,
-                                abilities: this.cache.abilities,
-                                action_values: this.cache.action_values,
-                                target_filters: this.cache.target_filters,
-                                particle_effects: this.cache.particle_effects,
-                                effect_alias_bindings: this.cache.effect_alias_bindings,
-                                float_variables: this.cache.float_variables,
-                                buff_actions: this.cache.buff_actions,
-                                unit_variables: this.cache.unit_variables,
-                                special_operation_unit_kind: this.cache.special_operation_kinds,
-                            }),
+                            constraint: super.getConstraint(this.cache),
+                            actions: super.getActions(this.cache),
                         },
                     }),
                 },
@@ -77,40 +60,20 @@ module.exports = class Buff extends Definitions {
                         },
                     }),
                 }),
-                time_actions: super.getTimeActions({
-                    weapon_tags: this.cache.weapon_tags,
-                    buffs: this.cache.buffs,
-                    mutations: this.cache.mutations,
-                    npc_rewards: this.cache.npc_rewards,
-                    exotics: this.cache.exotics,
-                    action_values: this.cache.action_values,
-                    target_filters: this.cache.target_filters,
-                    particle_effects: this.cache.particle_effects,
-                    effect_alias_bindings: this.cache.effect_alias_bindings,
-                    units: this.cache.units,
-                    unit_items: this.cache.unit_items,
-                    abilities: this.cache.abilities,
-                    float_variables: this.cache.float_variables,
-                    unit_variables: this.cache.unit_variables,
-                    buff_actions: this.cache.buff_actions,
-                    special_operation_unit_kind: this.cache.special_operation_kinds,
-                }),
+                time_actions: super.getTimeActions(this.cache),
                 trigger_event_actions: this.getTriggerEventActions,
                 unit_modifiers: super.create().modifiers.unit_modifiers.create(
                     {
                         hasArrayValues: false,
                     },
-                    this.cache.ship_tags,
-                    this.cache.action_values,
-                    this.cache.buff_unit_modifiers
+                    this.cache
                 ),
                 planet_modifiers: super.create().modifiers.planet_modifiers.create(this.cache.planet_modifier_ids),
                 weapon_modifiers: super.create().modifiers.weapon_modifiers.create(
                     {
                         hasArrayValues: false,
                     },
-                    super.getResearchSubjects(this.cache.research_subjects),
-                    this.cache.weapon_tags
+                    this.cache
                 ),
                 unit_mutations: array({
                     items: this.cache.mutations,
@@ -129,7 +92,7 @@ module.exports = class Buff extends Definitions {
                         is_visible_within_unit_tooltip: boolean(),
                         is_negative_buff: boolean(),
                         is_expire_time_suppressed: boolean(),
-                        tooltip_line_groups: super.tooltip_line_groups(this.cache.localisation, this.cache.unit_items, this.cache.units, this.cache.action_values, this.cache.buff_unit_modifiers, this.cache.weapon_modifier_ids, this.cache.planet_modifier_ids, this.cache.buff_unit_factory_modifiers),
+                        tooltip_line_groups: super.tooltip_line_groups(this.cache),
                     },
                 }),
             },

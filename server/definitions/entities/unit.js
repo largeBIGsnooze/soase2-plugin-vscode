@@ -656,9 +656,7 @@ module.exports = class Unit extends Definitions {
                         hasArrayValues: false,
                         prerequisites: super.getResearchSubjects(this.cache.research_subjects),
                     },
-                    this.cache.ship_tags,
-                    this.cache.action_values,
-                    this.cache.buff_unit_modifiers
+                    this.cache
                 ),
                 tags: array({
                     items: this.cache.ship_tags,

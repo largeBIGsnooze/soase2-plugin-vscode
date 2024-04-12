@@ -61,7 +61,7 @@ module.exports = class NpcReward extends Definitions {
                         keys: {
                             units: object({
                                 keys: {
-                                    required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                                    required_units: super.getRequiredUnits(this.cache),
                                     random_units: super.units(this.cache.units),
                                     supply: integer(),
                                     bounty_credits: float(),
@@ -98,7 +98,7 @@ module.exports = class NpcReward extends Definitions {
                             spawn_units: object({
                                 keys: {
                                     random_units: super.units(this.cache.units),
-                                    required_units: super.getRequiredUnits(this.cache.units, this.cache.ship_components, this.cache.abilities),
+                                    required_units: super.getRequiredUnits(this.cache),
                                 },
                             }),
                             is_usable_by_player_ai: boolean(),
@@ -111,7 +111,7 @@ module.exports = class NpcReward extends Definitions {
                                         isUnique: true,
                                     }),
                                     ownerships: super.getOwnerships,
-                                    constraints: super.getConstraints(this.cache.weapon_tags, this.cache.buffs, this.cache.mutations, this.cache.action_values, this.cache.units),
+                                    constraints: super.getConstraints(this.cache),
                                 },
                             }),
                             target_alert: enumerate({ items: ['targeted_by_ability'] }),

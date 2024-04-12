@@ -1387,13 +1387,13 @@ class Definitions {
         })
     }
 
-    label_form(localisation, colors, textures) {
+    label_form(data) {
         return object({
             keys: {
-                label_text: localisation,
-                label_color: colors,
-                value_color: colors,
-                icon: textures,
+                label_text: data['localisation'],
+                label_color: data['colors'],
+                value_color: data['colors'],
+                icon: data['textures'],
             },
         })
     }
@@ -1410,12 +1410,12 @@ class Definitions {
         })
     }
 
-    ai_dificulty_definition(localisation, textures) {
+    ai_dificulty_definition(data) {
         return object({
             keys: {
-                icon: textures,
-                name: localisation,
-                description: localisation,
+                icon: data['textures'],
+                name: data['localisation'],
+                description: data['localisation'],
             },
         })
     }
@@ -1495,13 +1495,14 @@ class Definitions {
         })
     }
 
-    window_frame(textures, fonts, colors, { properties: properties } = {}) {
+    window_frame(data, { properties: properties } = {}) {
         return object({
             keys: {
                 layout: this.layout(),
-                overlay: this.background(textures),
-                font: fonts,
-                color: colors,
+                overlay: this.background(data['textures']),
+                frame_overlay: enumerate({ items: ['entry_simple_frame'] }),
+                font: data['fonts'],
+                color: data['colors'],
                 icon_size: this.icon_size(),
                 ...properties,
             },
@@ -1511,6 +1512,12 @@ class Definitions {
     style() {
         return enumerate({
             items: [
+                'npcs_window_influence_points',
+                'fleet_list',
+                'hud_unit_name_large',
+                'hud_title',
+                'hud_icon_large_exotics',
+                'build_exotic_header',
                 'trade_window_points',
                 'trade_window_change_points',
                 'player_victory_dialog_phrase',
@@ -1578,16 +1585,16 @@ class Definitions {
         })
     }
 
-    tooltip(localisation, textures, colors) {
+    tooltip(data) {
         return object({
             keys: {
                 anchor_location_on_button: this.anchor(),
                 anchor_location_on_tooltip: this.anchor(),
-                title_icon: textures,
-                title_text: localisation,
-                description: localisation,
+                title_icon: data['textures'],
+                title_text: data['localisation'],
+                description: data['localisation'],
                 description_blocks: array({
-                    items: this.label_form2(localisation, colors),
+                    items: this.label_form2(data),
                     isUnique: true,
                 }),
             },
@@ -1614,19 +1621,19 @@ class Definitions {
         })
     }
 
-    break_alliance_button(localisation, colors, textures) {
+    break_alliance_button(data) {
         return object({
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                icon: textures,
-                tooltip: this.tooltip(localisation, textures),
-                text: localisation,
-                not_allied_on_team_description: localisation,
-                not_allied_description: localisation,
-                not_allied_color: colors,
-                permanently_allied_color: colors,
-                lock_time_remaining_line: this.label_form(localisation, colors, textures),
+                icon: data['textures'],
+                tooltip: this.tooltip(data),
+                text: data['localisation'],
+                not_allied_on_team_description: data['localisation'],
+                not_allied_description: data['localisation'],
+                not_allied_color: data['colors'],
+                permanently_allied_color: data['colors'],
+                lock_time_remaining_line: this.label_form(data),
             },
         })
     }
@@ -1688,33 +1695,33 @@ class Definitions {
         })
     }
 
-    ok_button(localisation, textures) {
+    ok_button(data) {
         return object({
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                icon: textures,
-                tooltip: this.tooltip(localisation, textures),
-                text: localisation,
-                alliance_offer_duration_label: localisation,
+                icon: data['textures'],
+                tooltip: this.tooltip(data),
+                text: data['localisation'],
+                alliance_offer_duration_label: data['localisation'],
                 behavior_definitions: object({
                     keys: {
                         create_offer: object({
                             keys: {
-                                text: localisation,
-                                description: localisation,
+                                text: data['localisation'],
+                                description: data['localisation'],
                             },
                         }),
                         update_offer: object({
                             keys: {
-                                text: localisation,
-                                description: localisation,
+                                text: data['localisation'],
+                                description: data['localisation'],
                             },
                         }),
                         accept_offer: object({
                             keys: {
-                                text: localisation,
-                                description: localisation,
+                                text: data['localisation'],
+                                description: data['localisation'],
                             },
                         }),
                     },
@@ -1760,6 +1767,10 @@ class Definitions {
                         bar_color: color(),
                     },
                 }),
+                outline_size: float(),
+                outline_color: color(),
+                backdrop_color: color(),
+                bar_color: color(),
             },
         })
     }
@@ -1777,20 +1788,20 @@ class Definitions {
         }
     }
 
-    button(localisation, textures, colors, { isPrefixText: isPrefixText = false, extra_properties: extra_properties } = {}) {
+    button(data, { isPrefixText: isPrefixText = false, extra_properties: extra_properties } = {}) {
         return object({
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                icon: textures,
-                text: isPrefixText ? string() : localisation,
-                name: localisation,
-                tooltip_title_text: localisation,
-                tooltip: this.tooltip(localisation, textures, colors),
+                icon: data['textures'],
+                text: isPrefixText ? string() : data['localisation'],
+                name: data['localisation'],
+                tooltip_title_text: data['localisation'],
+                tooltip: this.tooltip(data),
                 layout_grid_coord: vecInt2(),
-                compressed_icon: textures,
-                uncompressed_icon: textures,
-                tooltip_title_prefix_format: localisation,
+                compressed_icon: data['textures'],
+                uncompressed_icon: data['textures'],
+                tooltip_title_prefix_format: data['localisation'],
                 tooltip_title_prefix_horizontal_gap: float(),
                 ...extra_properties,
             },
@@ -1977,12 +1988,13 @@ class Definitions {
         })
     }
 
-    label(localisation) {
+    label(data) {
         return object({
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                text: localisation,
+                text: data['localisation'],
+                icon: data['textures'],
                 icon_size: this.icon_size(),
             },
         })
@@ -2061,26 +2073,26 @@ class Definitions {
         })
     }
 
-    content_panel(localisation, textures) {
+    content_panel(data) {
         return object({
             keys: {
                 layout: this.layout(),
-                title_label: this.label(localisation),
-                message_label: this.label(localisation),
-                close_button: this.label(localisation),
-                action_name_label: this.label(localisation),
-                input_mapping_label: this.label(localisation),
-                bind_button: this.label(localisation),
-                cancel_button: this.label(localisation),
-                welcome_dialog_list_box: this.list_box(localisation),
-                sins2_link_icon: this.icon(textures),
-                sins2_link_label: this.label(localisation),
+                title_label: this.label(data),
+                message_label: this.label(data),
+                close_button: this.label(data),
+                action_name_label: this.label(data),
+                input_mapping_label: this.label(data),
+                bind_button: this.label(data),
+                cancel_button: this.label(data),
+                welcome_dialog_list_box: this.list_box(data['localisation']),
+                sins2_link_icon: this.icon(data['textures']),
+                sins2_link_label: this.label(data),
                 sins2_link_text_entry: this.text_entry(),
-                sins2_link_open_button: this.button(localisation, textures),
-                discord_link_icon: this.icon(textures),
-                discord_link_label: this.label(localisation),
+                sins2_link_open_button: this.button(data),
+                discord_link_icon: this.icon(data['textures']),
+                discord_link_label: this.label(data),
                 discord_link_text_entry: this.text_entry(),
-                discord_link_open_button: this.button(localisation, textures),
+                discord_link_open_button: this.button(data),
             },
         })
     }
@@ -2180,15 +2192,15 @@ class Definitions {
         })
     }
 
-    background_window(localisation, textures) {
+    background_window(data) {
         return object({
             keys: {
                 layout: this.layout(),
-                content_panel: this.content_panel(localisation, textures),
-                brush: textures,
+                content_panel: this.content_panel(data),
+                brush: data['textures'],
                 brush_render_style: this.brush_render_style(),
                 components: array({
-                    items: this.component(textures),
+                    items: this.component(data['textures']),
                     isUnique: true,
                 }),
             },
@@ -2201,12 +2213,12 @@ class Definitions {
         })
     }
 
-    status_definition(localisation, textures) {
+    status_definition(data) {
         return object({
             keys: {
-                icon: textures,
-                name: localisation,
-                description: localisation,
+                icon: data['textures'],
+                name: data['localisation'],
+                description: data['localisation'],
             },
         })
     }
@@ -2231,11 +2243,11 @@ class Definitions {
             },
         })
     }
-    label_form2(localisation, color) {
+    label_form2(data) {
         return object({
             keys: {
-                text: localisation,
-                color: color,
+                text: data['localisation'],
+                color: data['colors'],
             },
         })
     }
@@ -2387,14 +2399,14 @@ class Definitions {
         })
     }
 
-    drop_box(localisation, colors) {
+    drop_box(data) {
         return object({
             keys: {
                 layout: this.layout(),
                 style: this.style(),
-                ffa_name: localisation,
-                teams_postfix: localisation,
-                drag_and_drop_hint_description: this.label_form2(localisation, colors),
+                ffa_name: data['localisation'],
+                teams_postfix: data['localisation'],
+                drag_and_drop_hint_description: this.label_form2(data),
             },
         })
     }

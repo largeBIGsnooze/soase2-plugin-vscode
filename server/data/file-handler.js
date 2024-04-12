@@ -378,8 +378,8 @@ module.exports = class FileHandler {
             return [
                 ...this.readEntities(['entities/*.action_data_source'])
                     .map((e) => JSON.parse(e.content)?.buff_weapon_modifiers?.flatMap((y) => y?.buff_weapon_modifier_id))
-                    .flat()
-                    .filter((e) => e !== undefined),
+                    .filter((e) => e !== undefined)
+                    .flat(),
                 ...weapon_modifier_types(),
             ]
         } catch (e) {
@@ -591,6 +591,14 @@ module.exports = class FileHandler {
         }
     }
 
+    readShieldEffects() {
+        try {
+            return this.readEntities(['effects/*.shield_effect']).map((e) => e?.name)
+        } catch (e) {
+            return ''
+        }
+    }
+
     readShipTags() {
         const vanilla_tags = ['planet', 'torpedo', 'star', 'buff_agent', 'asteroid', 'loot', 'debris', 'gravity_well', 'phase_lane', 'cannon_shell']
         try {
@@ -756,22 +764,17 @@ module.exports = class FileHandler {
     }
 
     readGravityWellFillings(type) {
-        const readFixtures = () => {
-            try {
-                return this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_fixture_fillings?.map((e) => e?.name))
-            } catch (e) {
-                return ''
-            }
-        }
+        const fillings = { fillings: [], random_fillings: [], random_fixtures: [], fixtures: [] }
 
-        const fillings = { fillings: [], random: [], fixtures: readFixtures() }
         try {
+            this.readUniform('galaxy_generator', 'fillings', (e) => e?.fixture_fillings?.map((e) => fillings['fixtures'].push(e?.name)))
+            this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_fixture_fillings?.map((e) => fillings['random_fixtures'].push(e?.name)))
             this.readUniform('galaxy_generator', 'fillings', (e) => e?.gravity_well_fillings?.map((e) => fillings['fillings'].push(e?.name)))
-            this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_gravity_well_fillings?.map((e) => fillings['random'].push(e?.name)))
-            if (type === 'all') return new Set([...fillings['fillings'], ...fillings['random']])
+            this.readUniform('galaxy_generator', 'fillings', (e) => e?.random_gravity_well_fillings?.map((e) => fillings['random_fillings'].push(e?.name)))
+            if (type === 'all') return new Set([...fillings['fillings'], ...fillings['random_fillings'], ...fillings['fixtures'], ...fillings['random_fixtures']])
             return new Set(fillings[type])
         } catch (e) {
-            return { fillings: [], random: [], fixtures: [] }
+            return { fillings: [], random_fillings: [], random_fixtures: [], fixtures: [] }
         }
     }
 

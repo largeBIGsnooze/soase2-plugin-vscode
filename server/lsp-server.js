@@ -68,6 +68,7 @@ module.exports = class Lsp {
         Log.info(`${CONSTANTS.source} initialized, version: ${CONSTANTS.version}`)
         Log.info('Operational files: ', JSON.stringify(results, null, 4))
 
+
         Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
 
         this.options.connection.onRequest(

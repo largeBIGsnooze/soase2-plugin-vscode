@@ -39,7 +39,7 @@
         "sins 2",
         "sins of a solar empire"
     ],
-    "main": "./server/client",
+    "main": "./server/extension",
     "contributes": {
         "configuration": {
             "title": "SOASE2 configuration",

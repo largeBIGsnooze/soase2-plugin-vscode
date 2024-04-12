@@ -12,7 +12,7 @@ module.exports = class HudUnitNameLargeTextEntryBoxStyle extends Definitions {
         return schema({
             keys: {
                 font: this.cache.fonts,
-                selected_text_color: this.cache.colors,
+                selected_text_color: color(),
                 selected_rect_fill_color: color(),
                 hover_action_icon: this.cache.textures,
                 hover_action_layout: super.layout(),

@@ -22,14 +22,14 @@ module.exports = class HudChatWindow extends Definitions {
                                 prefix_spacing: float(),
                                 prefix_definitions: object({
                                     keys: {
-                                        all: super.label_form2(this.cache.localisation, this.cache.colors),
-                                        allies: super.label_form2(this.cache.localisation, this.cache.colors),
-                                        player: super.label_form2(this.cache.localisation, this.cache.colors),
+                                        all: super.label_form2(this.cache),
+                                        allies: super.label_form2(this.cache),
+                                        player: super.label_form2(this.cache),
                                     },
                                 }),
                             },
                         }),
-                        ping_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        ping_button: super.button(this.cache, {
                             extra_properties: {
                                 tooltip_titles: object({
                                     keys: {

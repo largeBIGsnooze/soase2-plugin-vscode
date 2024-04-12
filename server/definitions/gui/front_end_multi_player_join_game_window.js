@@ -12,8 +12,8 @@ module.exports = class FrontEndMultiPlayerJoinGameWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
-                cancel_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                background_window: super.background_window(this.cache),
+                cancel_button: super.button(this.cache),
                 game_server_picker_list_box: object({
                     keys: {
                         layout: super.layout(),
@@ -33,11 +33,11 @@ module.exports = class FrontEndMultiPlayerJoinGameWindow extends Definitions {
                         background: super.background(this.cache.textures),
                     },
                 }),
-                refresh_game_servers_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                join_picked_game_server_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                rejoin_game_server_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                join_game_server_with_code_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                quick_join_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                refresh_game_servers_button: super.button(this.cache),
+                join_picked_game_server_button: super.button(this.cache),
+                rejoin_game_server_button: super.button(this.cache),
+                join_game_server_with_code_button: super.button(this.cache),
+                quick_join_button: super.button(this.cache),
             },
         })
     }

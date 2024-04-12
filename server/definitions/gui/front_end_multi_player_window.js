@@ -18,9 +18,9 @@ module.exports = class FrontEndMultiPlayerWindow extends Definitions {
                     keys: {
                         layout: super.layout(),
                         orientation: super.orientation(),
-                        join_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        host_new_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        host_saved_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        join_game_button: super.button(this.cache),
+                        host_new_game_button: super.button(this.cache),
+                        host_saved_game_button: super.button(this.cache),
                     },
                 }),
                 view_windows_panel: object({

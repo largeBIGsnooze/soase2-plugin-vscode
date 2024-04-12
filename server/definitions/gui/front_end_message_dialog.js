@@ -54,7 +54,7 @@ module.exports = class FrontEndMessageDialog extends Definitions {
             keys: {
                 layout: super.layout(),
                 dim_color: color(),
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
                 join_game_result_title: this.cache.localisation,
                 join_game_result_messages: this.join_game_result_messages(),
                 join_game_mods_differ_message: this.cache.localisation,

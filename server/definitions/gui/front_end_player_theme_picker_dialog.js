@@ -38,13 +38,13 @@ module.exports = class FrontEndPlayerThemePickerDialog extends Definitions {
                                         random_icon: this.cache.textures,
                                     },
                                 }),
-                                header_name_label: super.label(this.cache.localisation),
-                                race_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                header_name_label: super.label(this.cache),
+                                race_button: super.button(this.cache, {
                                     extra_properties: {
                                         random_player_race_name: this.cache.localisation,
                                     },
                                 }),
-                                faction_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                faction_button: super.button(this.cache),
                                 mesh_preview_window: object({
                                     keys: {
                                         layout: super.layout(),
@@ -58,7 +58,7 @@ module.exports = class FrontEndPlayerThemePickerDialog extends Definitions {
                                                 center: this.cache.textures,
                                             },
                                         }),
-                                        minimal_team_color_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                        minimal_team_color_button: super.button(this.cache, {
                                             extra_properties: {
                                                 enabled_text: this.cache.localisation,
                                                 disabled_text: this.cache.localisation,
@@ -66,12 +66,12 @@ module.exports = class FrontEndPlayerThemePickerDialog extends Definitions {
                                                 disabled_description: this.cache.localisation,
                                             },
                                         }),
-                                        cycle_mesh_backward_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        cycle_mesh_forward_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        cycle_mesh_backward_button: super.button(this.cache),
+                                        cycle_mesh_forward_button: super.button(this.cache),
                                     },
                                 }),
-                                apply_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                close_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                apply_button: super.button(this.cache),
+                                close_button: super.button(this.cache),
                                 color_group_buttons_panel: super.buttons_panel(this.cache.textures),
                                 secondary_color_buttons_panel: super.buttons_panel(this.cache.textures),
                                 icon_buttons_panel: object({

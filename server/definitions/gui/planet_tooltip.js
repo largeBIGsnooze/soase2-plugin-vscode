@@ -30,18 +30,18 @@ module.exports = class PlanetTooltip extends Definitions {
     create() {
         return schema({
             keys: {
-                shield_points: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                planet_level: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                health_points: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                shield_points: super.label_form(this.cache),
+                planet_level: super.label_form(this.cache),
+                health_points: super.label_form(this.cache),
                 structure_slot_label_texts: this.structure_slot(),
                 future_max_structure_slots_value_color: this.cache.colors,
                 max_potential_structure_slot_label_texts: this.structure_slot(),
-                component_slots: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                max_potential_component_slots: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                component_slots: super.label_form(this.cache),
+                max_potential_component_slots: super.label_form(this.cache),
                 upgrade_planet_track_level: object({
                     keys: {
-                        future_level_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        upgrade_progress_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                        future_level_line: super.label_form(this.cache),
+                        upgrade_progress_line: super.label_form(this.cache),
                         status_color_when_already_max_level: this.cache.colors,
                         base_property_value_color: this.cache.colors,
                         negative_base_property_value_color: this.cache.colors,
@@ -137,14 +137,14 @@ module.exports = class PlanetTooltip extends Definitions {
                 max_potential_sub_header_text: this.cache.localisation,
                 metal_asteroid_counts_label_text: this.cache.localisation,
                 crystal_asteroid_counts_label_text: this.cache.localisation,
-                upgrade_duration_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                upgrade_duration_line: super.label_form(this.cache),
                 upgrade_excavation_track_reward_chances_header_label: this.cache.localisation,
                 upgrade_excavation_track_reward_chance_color: this.cache.colors,
                 upgrade_excavation_track_reward_assets_label: this.cache.localisation,
                 upgrade_excavation_track_reward_unit_items_label: this.cache.localisation,
                 planet_track_mutation_current_level_color: this.cache.colors,
                 planet_track_mutation_future_level_color: this.cache.colors,
-                destroyed_planet_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                destroyed_planet_description: super.label_form2(this.cache),
                 home_planet_income_rate_labels: object({
                     keys: {
                         credits: this.cache.localisation,
@@ -152,7 +152,7 @@ module.exports = class PlanetTooltip extends Definitions {
                         crystal: this.cache.localisation,
                     },
                 }),
-                last_detected_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                last_detected_description: super.label_form2(this.cache),
                 garrison_behavior_label_text: this.cache.localisation,
                 garrison_behavior_names: object({
                     keys: {
@@ -163,12 +163,12 @@ module.exports = class PlanetTooltip extends Definitions {
                 }),
                 garrison_behavior_descriptions: object({
                     keys: {
-                        hold: super.label_form2(this.cache.localisation, this.cache.colors),
-                        roam_defensive: super.label_form2(this.cache.localisation, this.cache.colors),
-                        roam_offensive: super.label_form2(this.cache.localisation, this.cache.colors),
+                        hold: super.label_form2(this.cache),
+                        roam_defensive: super.label_form2(this.cache),
+                        roam_offensive: super.label_form2(this.cache),
                     },
                 }),
-                buildable_planet_components_header_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                buildable_planet_components_header_line: super.label_form(this.cache),
                 buildable_item_color: this.cache.colors,
                 buildable_item_when_need_research_color: this.cache.colors,
             },

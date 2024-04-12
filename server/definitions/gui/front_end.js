@@ -37,13 +37,13 @@ module.exports = class FrontEnd extends Definitions {
                                 buttons_panel: object({
                                     keys: {
                                         layout: super.layout(),
-                                        single_player_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        multi_player_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        single_player_button: super.button(this.cache),
+                                        multi_player_button: super.button(this.cache),
                                         multi_player_status_window: object({
                                             keys: {
                                                 layout: super.layout(),
-                                                gdpr_not_accepted_description: super.label_form2(this.cache.localisation, this.cache.colors),
-                                                login_error_message_color: color(),
+                                                gdpr_not_accepted_description: super.label_form2(this.cache),
+                                                login_error_message_color: this.cache.colors,
                                                 status_definitions: object({
                                                     keys: {
                                                         logged_out: object({
@@ -78,10 +78,10 @@ module.exports = class FrontEnd extends Definitions {
                                                 }),
                                             },
                                         }),
-                                        lan_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        watching_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        modding_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        open_escape_menu_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        lan_button: super.button(this.cache),
+                                        watching_button: super.button(this.cache),
+                                        modding_button: super.button(this.cache),
+                                        open_escape_menu_button: super.button(this.cache),
                                     },
                                 }),
                             },
@@ -98,30 +98,30 @@ module.exports = class FrontEnd extends Definitions {
                         layout: super.layout(),
                     },
                 }),
-                version_label: super.label(this.cache.localisation),
-                lobby_chat_window_restore_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                version_label: super.label(this.cache),
+                lobby_chat_window_restore_button: super.button(this.cache),
                 social_link_buttons_panel: object({
                     keys: {
                         layout: super.layout(),
                         orientation: super.orientation(),
                         children_gap: float(),
-                        tips_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        tips_button: super.button(this.cache, {
                             extra_properties: {
                                 tip_id_prefix: string(),
                                 tooltip_title_label: this.cache.localisation,
                             },
                         }),
-                        discord_link_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        discord_link_button: super.button(this.cache, {
                             extra_properties: {
                                 url: string(),
                             },
                         }),
-                        forums_link_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        forums_link_button: super.button(this.cache, {
                             extra_properties: {
                                 url: string(),
                             },
                         }),
-                        player_guide_link_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        player_guide_link_button: super.button(this.cache, {
                             extra_properties: {
                                 url: string(),
                             },

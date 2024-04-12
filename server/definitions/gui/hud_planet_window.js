@@ -12,23 +12,23 @@ module.exports = class HudPlanetWindow extends Definitions {
         return schema({
             keys: super.window(this.cache.textures, {
                 properties: {
-                    player_ownership_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                    picture_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors, {
+                    player_ownership_window: super.window_frame(this.cache),
+                    picture_window: super.window_frame(this.cache, {
                         properties: {
                             unit_bar_layout: super.layout(),
                             name_text_entry_box: super.entry_box(this.cache.textures),
                             name_text_entry_underlay: super.entry_box(this.cache.textures),
-                            level_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                            level_window: super.window_frame(this.cache),
                             unknown_picture: this.cache.textures,
                         },
                     }),
-                    home_planet_indicator_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors, {
+                    home_planet_indicator_window: super.window_frame(this.cache, {
                         properties: {
                             icon: this.cache.textures,
                             tooltip_title: this.cache.localisation,
                         },
                     }),
-                    culture_indicator_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors, {
+                    culture_indicator_window: super.window_frame(this.cache, {
                         properties: {
                             icon: this.cache.textures,
                             blink_duration: float(),
@@ -58,7 +58,7 @@ module.exports = class HudPlanetWindow extends Definitions {
                             layout_grid: super.layout_grid(),
                         },
                     }),
-                    toggle_structures_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    toggle_structures_window_button: super.button(this.cache, {
                         extra_properties: {
                             highlighted_icon: this.cache.textures,
                             tooltip_title_text: this.cache.localisation,
@@ -66,17 +66,17 @@ module.exports = class HudPlanetWindow extends Definitions {
                             auto_structure_placement_tooltip_description: this.cache.localisation,
                         },
                     }),
-                    toggle_advanced_planet_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    toggle_advanced_planet_window_button: super.button(this.cache, {
                         extra_properties: {
                             highlighted_icon: this.cache.textures,
                         },
                     }),
-                    toggle_unit_factory_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    toggle_unit_factory_window_button: super.button(this.cache, {
                         extra_properties: {
                             highlighted_icon: this.cache.textures,
                         },
                     }),
-                    toggle_carrier_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    toggle_carrier_window_button: super.button(this.cache, {
                         extra_properties: {
                             squadron_counts_overlay_layout: super.layout(),
                             squadron_counts_overlay_font: this.cache.fonts,
@@ -144,7 +144,7 @@ module.exports = class HudPlanetWindow extends Definitions {
                         },
                     }),
                     planet_components_panel: super.panel(this.cache.localisation, this.cache.colors, this.cache.textures),
-                    increase_bounty_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    increase_bounty_button: super.button(this.cache, {
                         extra_properties: {
                             increase_amount_label: this.cache.localisation,
                         },

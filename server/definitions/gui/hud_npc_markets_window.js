@@ -28,7 +28,7 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
+                                title_label: super.label(this.cache),
                                 market_windows_panel: object({
                                     keys: {
                                         layout: super.layout(),
@@ -36,8 +36,8 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                                         market_window_shared_definition: object({
                                             keys: {
                                                 size: vecInt2(),
-                                                name_label: super.label(this.cache.localisation),
-                                                theme_icon_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                                name_label: super.label(this.cache),
+                                                theme_icon_window: super.window_frame(this.cache),
                                                 portrait_window: object({
                                                     keys: {
                                                         layout: super.layout(),
@@ -47,8 +47,8 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                                                         has_lost_alpha_multiply: float(),
                                                         unknown_npc_portrait: this.cache.textures,
                                                         unknown_npc_frame: this.cache.textures,
-                                                        not_discovered_market_npc_player_description: super.label_form2(this.cache.localisation, this.cache.colors),
-                                                        no_market_npc_player_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                                                        not_discovered_market_npc_player_description: super.label_form2(this.cache),
+                                                        no_market_npc_player_description: super.label_form2(this.cache),
                                                     },
                                                 }),
                                             },
@@ -66,13 +66,13 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                                                     keys: {
                                                         layout: super.layout(),
                                                         background: super.background(this.cache.textures),
-                                                        buy_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                        sell_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                        buy_button: super.button(this.cache),
+                                                        sell_button: super.button(this.cache),
                                                         demand_window: object({
                                                             keys: {
                                                                 layout: super.layout(),
                                                                 background: super.background(this.cache.textures),
-                                                                name: super.label(this.cache.localisation),
+                                                                name: super.label(this.cache),
                                                                 icon: super.icon(this.cache.textures),
                                                             },
                                                         }),
@@ -93,13 +93,13 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                                                     keys: {
                                                         layout: super.layout(),
                                                         background: super.background(this.cache.textures),
-                                                        buy_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                        sell_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                        buy_button: super.button(this.cache),
+                                                        sell_button: super.button(this.cache),
                                                         demand_window: object({
                                                             keys: {
                                                                 layout: super.layout(),
                                                                 background: super.background(this.cache.textures),
-                                                                name: super.label(this.cache.localisation),
+                                                                name: super.label(this.cache),
                                                                 icon: super.icon(this.cache.textures),
                                                             },
                                                         }),
@@ -120,7 +120,7 @@ module.exports = class HudNpcMarketsWindow extends Definitions {
                                                     keys: {
                                                         layout: super.layout(),
                                                         background: super.background(this.cache.textures),
-                                                        label: super.label(this.cache.localisation),
+                                                        label: super.label(this.cache),
                                                         sell_exotic_buttons_panel: object({
                                                             keys: {
                                                                 layout: super.layout(),

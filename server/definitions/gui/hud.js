@@ -34,12 +34,12 @@ module.exports = class Hud extends Definitions {
                         }),
                         carrier: object({
                             keys: {
-                                no_carrier_selected_tooltip_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                                no_carrier_selected_tooltip_line: super.label_form(this.cache),
                             },
                         }),
                         unit_factory: object({
                             keys: {
-                                no_factory_selected_tooltip_line: super.label_form2(this.cache.localisation, this.cache.colors),
+                                no_factory_selected_tooltip_line: super.label_form2(this.cache),
                             },
                         }),
                         research_window_text_filter: object({

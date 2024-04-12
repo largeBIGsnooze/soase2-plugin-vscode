@@ -11,9 +11,9 @@ module.exports = class FrontEndModdingBrowseServiceProviderWindow extends Defini
     create() {
         return schema({
             keys: {
-                not_authenticated_label: super.label(this.cache.localisation),
-                terms_of_use_text_label: super.label(this.cache.localisation),
-                accept_terms_of_use_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                not_authenticated_label: super.label(this.cache),
+                terms_of_use_text_label: super.label(this.cache),
+                accept_terms_of_use_button: super.button(this.cache),
                 filter_window: object({
                     keys: {
                         layout: super.layout(),
@@ -23,15 +23,15 @@ module.exports = class FrontEndModdingBrowseServiceProviderWindow extends Defini
                                 background: super.background(this.cache.textures),
                                 icon: super.icon(this.cache.textures),
                                 text_entry: super.text_entry(),
-                                clear_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                clear_button: super.button(this.cache),
                             },
                         }),
-                        has_current_compatibility_version_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        has_current_compatibility_version_button: super.button(this.cache, {
                             extra_properties: {
                                 highlighted_icon: this.cache.textures,
                             },
                         }),
-                        current_compatiblity_version_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                        current_compatiblity_version_line: super.label_form(this.cache),
                         sort_field_drop_box: object({
                             keys: {
                                 layout: super.layout(),
@@ -52,7 +52,7 @@ module.exports = class FrontEndModdingBrowseServiceProviderWindow extends Defini
                                 header_label_layout: super.layout(),
                                 header_label_style: super.header_label_style(),
                                 tag_buttons_layout_grid: super.layout_grid(),
-                                tag_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                tag_button: super.button(this.cache, {
                                     extra_properties: {
                                         enabled_icon: this.cache.textures,
                                         disabled_icon: this.cache.textures,

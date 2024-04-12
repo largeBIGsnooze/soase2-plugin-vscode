@@ -28,15 +28,24 @@ module.exports = class HudNpcsWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
+                                title_label: super.label(this.cache),
+                                influence_points_window: object({
+                                    keys: {
+                                        layout: super.layout(),
+                                        background: super.background(this.cache.textures),
+                                        header_label: super.label(this.cache),
+                                        points_label: super.label(this.cache),
+                                        point_progress_bar: super.progress_bar(),
+                                    },
+                                }),
                                 npc_player_windows_panel: {
                                     layout: super.layout(),
                                     player_windows_gap: float(),
                                     player_window_shared_definition: object({
                                         keys: {
                                             size: vecInt2(),
-                                            name_label: super.label(this.cache.localisation),
-                                            theme_icon_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                            name_label: super.label(this.cache),
+                                            theme_icon_window: super.window_frame(this.cache),
                                             portrait_window: object({
                                                 keys: {
                                                     layout: super.layout(),
@@ -81,10 +90,10 @@ module.exports = class HudNpcsWindow extends Definitions {
                                                             background: super.background(this.cache.textures),
                                                         },
                                                     }),
-                                                    asset_bid_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                    exotic_bid_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                                    asset_bid_button: super.button(this.cache),
+                                                    exotic_bid_button: super.button(this.cache, {
                                                         extra_properties: {
-                                                            will_not_accept_exotics_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                                                            will_not_accept_exotics_description: super.label_form2(this.cache),
                                                         },
                                                     }),
                                                     progress_bar: super.progress_bar(),

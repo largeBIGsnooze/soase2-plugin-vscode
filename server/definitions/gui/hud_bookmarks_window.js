@@ -24,7 +24,7 @@ module.exports = class HudBookmarksWindow extends Definitions {
                 layout: super.layout(),
                 top_bar_overlap_offset_y: float(false),
                 drop_area_border_color: color(),
-                add_bookmark_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                add_bookmark_button: super.button(this.cache),
                 bookmark_window_definition: object({
                     keys: {
                         height: float(),

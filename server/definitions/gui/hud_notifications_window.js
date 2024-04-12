@@ -1,4 +1,4 @@
-const { schema, string, object, integer, float, vecInt2 } = require('../data_types')
+const { schema, string, object, integer, float, vecInt2, color } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class HudNotificationsWindow extends Definitions {
@@ -39,6 +39,11 @@ module.exports = class HudNotificationsWindow extends Definitions {
                 acceleration: float(),
                 drop_secondary_icon_easing_function: super.getEasingFunctons,
                 drop_secondary_icon_duration: float(),
+                npc_auction_bid_amount_icon: this.cache.textures,
+                npc_auction_bid_amount_icon_layout: super.layout(),
+                npc_auction_bid_amount_text_layout: super.layout(),
+                npc_auction_bid_amount_text_font: this.cache.fonts,
+                npc_auction_bid_amount_text_color: this.cache.colors,
                 pressed_sound: this.cache.ogg,
                 progress_bar: object({
                     keys: {

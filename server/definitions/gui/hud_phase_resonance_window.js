@@ -28,9 +28,9 @@ module.exports = class HudPhaseResonanceWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
-                                available_points_label: super.label(this.cache.localisation),
-                                available_points_value_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                title_label: super.label(this.cache),
+                                available_points_label: super.label(this.cache),
+                                available_points_value_window: super.window_frame(this.cache),
                                 level_labels_panel: object({
                                     keys: {
                                         layout: super.layout(),
@@ -78,7 +78,7 @@ module.exports = class HudPhaseResonanceWindow extends Definitions {
                                                                 utility: this.cache.textures,
                                                             },
                                                         }),
-                                                        track_level_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                                        track_level_button: super.button(this.cache, {
                                                             extra_properties: {
                                                                 increase_level_icon: this.cache.textures,
                                                                 background: this.cache.textures,

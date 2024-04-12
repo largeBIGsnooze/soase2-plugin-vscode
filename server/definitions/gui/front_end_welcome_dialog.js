@@ -13,7 +13,7 @@ module.exports = class FrontEndWelcomeDialog extends Definitions {
             keys: {
                 layout: super.layout(),
                 dim_color: color(),
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
             },
         })
     }

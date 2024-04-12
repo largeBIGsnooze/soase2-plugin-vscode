@@ -36,16 +36,16 @@ module.exports = class HudEmpireUnitsWindow extends Definitions {
                                     fleet_view_window: object({
                                         keys: {
                                             height: float(),
-                                            picture_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                            picture_window: super.window_frame(this.cache),
                                             name_text_entry_box_style: super.style(),
                                             name_text_entry_box_layout: super.layout(),
-                                            delete_fleet_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                            delete_fleet_button: super.button(this.cache),
                                         },
                                     }),
                                     capital_ship_view_window: object({
                                         keys: {
                                             height: float(),
-                                            picture_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                            picture_window: super.window_frame(this.cache),
                                             name_text_entry_box_style: super.style(),
                                             name_text_entry_box_layout: super.layout(),
                                             ability_buttons_panel: object({
@@ -67,8 +67,8 @@ module.exports = class HudEmpireUnitsWindow extends Definitions {
                                     starbase_view_window: object({
                                         keys: {
                                             height: float(),
-                                            gravity_well_fixture_picture_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                            starbase_picture_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                            gravity_well_fixture_picture_window: super.window_frame(this.cache),
+                                            starbase_picture_window: super.window_frame(this.cache),
                                             planet_name_label_style: super.style(),
                                             planet_name_layout: super.layout(),
                                             ship_components_panel: object({
@@ -111,14 +111,14 @@ module.exports = class HudEmpireUnitsWindow extends Definitions {
                                         layout: super.layout(),
                                         orientation: 'horizontal',
                                         children_gap: 5,
-                                        capital_ship_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        starbase_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        capital_ship_view_button: super.button(this.cache),
+                                        starbase_view_button: super.button(this.cache),
                                     },
                                 }),
-                                toggle_auto_level_up_abilities_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                toggle_auto_level_up_abilities_button: super.button(this.cache, {
                                     extra_properties: {
-                                        enabled_text: super.label_form2(this.cache.localisation, this.cache.colors),
-                                        disabled_text: super.label_form2(this.cache.localisation, this.cache.colors),
+                                        enabled_text: super.label_form2(this.cache),
+                                        disabled_text: super.label_form2(this.cache),
                                     },
                                 }),
                             },

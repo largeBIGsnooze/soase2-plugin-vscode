@@ -19,21 +19,21 @@ module.exports = class HudAdvancedShipWindow extends Definitions {
                 content_window: object({
                     keys: {
                         layout: super.layout(),
-                        fleet_ownership_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                        fleet_ownership_window: super.window_frame(this.cache),
                         fleet_name_text_entry_box: super.text_entry(),
                         button_layout_grid: super.layout_grid(),
-                        set_rally_point_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        set_rally_point_button: super.button(this.cache, {
                             extra_properties: {
                                 layout_grid_coord: vecInt2(),
                                 highlighted_icon: this.cache.textures,
                             },
                         }),
-                        leave_fleet_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        scuttle_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        rotate_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        leave_fleet_button: super.button(this.cache),
+                        scuttle_button: super.button(this.cache),
+                        rotate_button: super.button(this.cache, {
                             extra_properties: {
                                 layout_grid_coord: vecInt2(),
-                                spin_structure_plate_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                                spin_structure_plate_description: super.label_form2(this.cache),
                             },
                         }),
                     },

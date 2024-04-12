@@ -21,11 +21,11 @@ module.exports = class FrontEndModdingManageWindow extends Definitions {
                         layout: super.layout(),
                     },
                 }),
-                move_mod_up_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                move_mod_down_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                apply_changes_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                no_changes_to_apply_description: super.label_form2(this.cache.localisation, this.cache.colors),
-                installing_mods_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                move_mod_up_button: super.button(this.cache),
+                move_mod_down_button: super.button(this.cache),
+                apply_changes_button: super.button(this.cache),
+                no_changes_to_apply_description: super.label_form2(this.cache),
+                installing_mods_description: super.label_form2(this.cache),
             },
         })
     }

@@ -13,14 +13,14 @@ module.exports = class HudPlayerVictoryDialog extends Definitions {
             keys: {
                 layout: super.layout(),
                 dim_color: color(),
-                background: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                background: super.window_frame(this.cache),
                 content_window: object({
                     keys: {
                         layout: super.layout(),
-                        status_label: super.label(this.cache.localisation),
-                        phrase_label: super.label(this.cache.localisation),
-                        quit_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        continue_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        status_label: super.label(this.cache),
+                        phrase_label: super.label(this.cache),
+                        quit_button: super.button(this.cache),
+                        continue_button: super.button(this.cache),
                     },
                 }),
             },

@@ -28,7 +28,7 @@ module.exports = class HudExoticFactoryWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                title_label: super.button(this.cache),
                                 build_exotic_windows_panel: object({
                                     keys: {
                                         layout: super.layout(),
@@ -71,11 +71,11 @@ module.exports = class HudExoticFactoryWindow extends Definitions {
                                                 picture_button: super.layout(),
                                             },
                                         }),
-                                        build_exotic_window_0: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                        build_exotic_window_1: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                        build_exotic_window_2: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                        build_exotic_window_3: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                        build_exotic_window_4: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                        build_exotic_window_0: super.window_frame(this.cache),
+                                        build_exotic_window_1: super.window_frame(this.cache),
+                                        build_exotic_window_2: super.window_frame(this.cache),
+                                        build_exotic_window_3: super.window_frame(this.cache),
+                                        build_exotic_window_4: super.window_frame(this.cache),
                                     },
                                 }),
                                 factory_count_window: object({

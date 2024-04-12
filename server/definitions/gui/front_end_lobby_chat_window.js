@@ -13,8 +13,8 @@ module.exports = class FrontEndLobbyChatWindow extends Definitions {
             keys: {
                 layout: super.layout(),
                 background: super.background(this.cache.textures),
-                title_label: super.label(this.cache.localisation),
-                minimize_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                title_label: super.label(this.cache),
+                minimize_button: super.button(this.cache),
                 chat_entry_box: super.entry_box(this.cache.textures),
                 chat_messages_box: super.messages_box(this.cache.localisation, this.cache.colors),
             },

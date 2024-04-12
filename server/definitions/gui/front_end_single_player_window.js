@@ -12,14 +12,14 @@ module.exports = class FrontEndSinglePlayerWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
                 overlay_window: super.background(this.cache.textures),
                 view_buttons_panel: object({
                     keys: {
                         orientation: super.orientation(),
                         layout: super.layout(),
-                        new_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        load_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        new_game_button: super.button(this.cache),
+                        load_game_button: super.button(this.cache),
                     },
                 }),
                 view_windows_panel: object({

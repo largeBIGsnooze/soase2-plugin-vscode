@@ -28,9 +28,9 @@ module.exports = class HudNpcInteractionWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
-                                ok_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                break_alliance_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                title_label: super.label(this.cache),
+                                ok_button: super.button(this.cache),
+                                break_alliance_button: super.button(this.cache),
                                 portrait_window: object({
                                     keys: {
                                         layout: super.layout(),

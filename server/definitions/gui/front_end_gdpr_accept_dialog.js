@@ -19,10 +19,10 @@ module.exports = class FrontEndGdprAcceptDialog extends Definitions {
                         content_panel: object({
                             keys: {
                                 layout: super.layout(),
-                                gdpr_accept_dialog_list_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                accept_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                decline_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                show_privacy_policy_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                gdpr_accept_dialog_list_box: super.button(this.cache),
+                                accept_button: super.button(this.cache),
+                                decline_button: super.button(this.cache),
+                                show_privacy_policy_button: super.button(this.cache),
                             },
                         }),
                     },

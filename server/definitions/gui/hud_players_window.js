@@ -28,16 +28,16 @@ module.exports = class HudPlayerWindow extends Definitions {
                         }),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
-                                victory_conditions_label: super.label(this.cache.localisation),
+                                title_label: super.label(this.cache),
+                                victory_conditions_label: super.label(this.cache),
                                 player_panels_panel: super.panel(this.cache.localisation, this.cache.colors, this.cache.textures, {
                                     extra_properties: {
                                         player_panel_definition: object({
                                             keys: {
                                                 size: vecInt2(),
-                                                name_label: super.label(this.cache.localisation),
-                                                theme_icon_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
-                                                portraint_window: super.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors, {
+                                                name_label: super.label(this.cache),
+                                                theme_icon_window: super.window_frame(this.cache),
+                                                portraint_window: super.window_frame(this.cache, {
                                                     properties: {
                                                         allied_frame: this.cache.textures,
                                                         not_allied_frame: this.cache.textures,

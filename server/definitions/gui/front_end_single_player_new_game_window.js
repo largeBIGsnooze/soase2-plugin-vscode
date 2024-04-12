@@ -13,7 +13,7 @@ module.exports = class FrontEndSinglePlayerNewGameWindow extends Definitions {
             keys: {
                 layout: super.layout(),
                 background_window: object({ keys: {} }),
-                create_lobby_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                create_lobby_button: super.button(this.cache),
                 scenario_picker_window_frame: object({
                     keys: {
                         layout: super.layout(),

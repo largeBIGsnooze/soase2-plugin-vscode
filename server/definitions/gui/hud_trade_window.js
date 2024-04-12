@@ -21,20 +21,20 @@ module.exports = class HudTradeWindow extends Definitions {
                         background: super.background(this.cache.textures),
                         content_window: object({
                             keys: {
-                                title_label: super.label(this.cache.localisation),
+                                title_label: super.label(this.cache),
                                 import_points_window: object({
                                     keys: {
                                         layout: super.layout(),
                                         background: super.background(this.cache.textures),
-                                        header_label: super.label(this.cache.localisation),
-                                        points_label: super.label(this.cache.localisation),
+                                        header_label: super.label(this.cache),
+                                        points_label: super.label(this.cache),
                                     },
                                 }),
                                 export_asset_windows_panel: super.panel(this.cache.localisation, this.cache.colors, this.cache.textures, {
                                     extra_properties: {
                                         asset_window_shared_definition: object({
                                             keys: {
-                                                portrait_window: this.window_frame(this.cache.textures, this.cache.fonts, this.cache.colors),
+                                                portrait_window: this.window_frame(this.cache),
                                                 points_window: object({
                                                     keys: {
                                                         layout: super.layout(),
@@ -85,8 +85,8 @@ module.exports = class HudTradeWindow extends Definitions {
                                                         }),
                                                     },
                                                 }),
-                                                increase_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, { isPrefixText: true }),
-                                                decrease_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, { isPrefixText: true }),
+                                                increase_button: super.button(this.cache, { isPrefixText: true }),
+                                                decrease_button: super.button(this.cache, { isPrefixText: true }),
                                             },
                                         }),
                                     },

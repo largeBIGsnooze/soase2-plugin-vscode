@@ -33,10 +33,10 @@ module.exports = class DebugWatchPlayerWindow extends Definitions {
                             keys: {
                                 layout: super.layout(),
                                 orientation: super.orientation(),
-                                properties_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                missions_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                theme_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                purchase_requests_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                properties_view_button: super.button(this.cache),
+                                missions_view_button: super.button(this.cache),
+                                theme_view_button: super.button(this.cache),
+                                purchase_requests_view_button: super.button(this.cache),
                             },
                         }),
                         view_container_window: object({
@@ -64,8 +64,8 @@ module.exports = class DebugWatchPlayerWindow extends Definitions {
                         theme_window: object({
                             keys: {
                                 layout: super.layout(),
-                                primary_color_drop_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                secondary_color_drop_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                primary_color_drop_box: super.button(this.cache),
+                                secondary_color_drop_box: super.button(this.cache),
                             },
                         }),
                     },

@@ -12,8 +12,8 @@ module.exports = class FrontEndSinglePlayerLoadGameWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
-                load_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                background_window: super.background_window(this.cache),
+                load_game_button: super.button(this.cache),
                 saved_game_picker_window_frame: object({
                     keys: {
                         layout: super.layout(),

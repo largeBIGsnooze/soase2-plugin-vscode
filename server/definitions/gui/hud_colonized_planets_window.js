@@ -95,17 +95,17 @@ module.exports = class HudColonizedPlanetsWindow extends Definitions {
                                                         layout: super.layout(),
                                                     },
                                                 }),
-                                                defense_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                commerce_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                mining_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                excavation_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                logistics_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                defense_track_button: super.button(this.cache),
+                                                commerce_track_button: super.button(this.cache),
+                                                mining_track_button: super.button(this.cache),
+                                                excavation_track_button: super.button(this.cache),
+                                                logistics_track_button: super.button(this.cache),
                                             },
                                         }),
                                         planet_components_view_window: object({
                                             keys: {
-                                                logistics_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                structure_slots_window: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                logistics_track_button: super.button(this.cache),
+                                                structure_slots_window: super.button(this.cache),
                                                 planet_components_panel: object({
                                                     keys: {
                                                         layout: super.layout(),
@@ -129,14 +129,14 @@ module.exports = class HudColonizedPlanetsWindow extends Definitions {
                                                         layout: super.layout(),
                                                     },
                                                 }),
-                                                structure_slots_window: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                structure_slots_window: super.button(this.cache),
                                                 structure_stacks_panel: super.stacks_panel(),
                                             },
                                         }),
                                         civilian_structures_view_window: object({
                                             keys: {
-                                                logistics_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                structure_slots_window: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                logistics_track_button: super.button(this.cache),
+                                                structure_slots_window: super.button(this.cache),
                                                 structure_stacks_panel: super.stacks_panel(),
                                                 asteroids_panel: object({
                                                     keys: {
@@ -148,8 +148,8 @@ module.exports = class HudColonizedPlanetsWindow extends Definitions {
                                         }),
                                         military_structures_view_window: object({
                                             keys: {
-                                                defense_track_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                                structure_slots_window: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                                defense_track_button: super.button(this.cache),
+                                                structure_slots_window: super.button(this.cache),
                                                 structure_stacks_panel: super.stacks_panel(),
                                                 asteroids_panel: object({
                                                     keys: {
@@ -177,10 +177,10 @@ module.exports = class HudColonizedPlanetsWindow extends Definitions {
                                         layout: super.layout(),
                                         orientation: super.orientation(),
                                         children_gap: integer(),
-                                        summary_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        planet_components_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        civilian_structures_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                        military_structures_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        summary_view_button: super.button(this.cache),
+                                        planet_components_view_button: super.button(this.cache),
+                                        civilian_structures_view_button: super.button(this.cache),
+                                        military_structures_view_button: super.button(this.cache),
                                     },
                                 }),
                             },

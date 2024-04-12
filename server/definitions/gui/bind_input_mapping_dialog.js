@@ -18,7 +18,7 @@ module.exports = class BindInputMappingDialog extends Definitions {
                         layout: super.layout(),
                     },
                 }),
-                content_panel: super.content_panel(this.cache.localisation, this.cache.textures),
+                content_panel: super.content_panel(this.cache),
             },
         })
     }

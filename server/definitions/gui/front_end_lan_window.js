@@ -12,15 +12,15 @@ module.exports = class FrontEndLanWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: this.background_window(this.cache.localisation, this.cache.textures),
-                overlay_window: this.background_window(this.cache.localisation, this.cache.textures),
+                background_window: this.background_window(this.cache),
+                overlay_window: this.background_window(this.cache),
                 view_buttons_panel: object({
                     keys: {
                         layout: super.layout(),
                         orientation: super.orientation(),
-                        join_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        host_new_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        host_saved_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        join_game_button: super.button(this.cache),
+                        host_new_game_button: super.button(this.cache),
+                        host_saved_game_button: super.button(this.cache),
                     },
                 }),
                 view_windows_panel: object({

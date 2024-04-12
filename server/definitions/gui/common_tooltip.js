@@ -51,7 +51,7 @@ module.exports = class CommonTooltip extends Definitions {
                 minutes_duration_postfix: this.cache.localisation,
                 seconds_ago_postfix: this.cache.localisation,
                 minutes_ago_postfix: this.cache.localisation,
-                input_mappings: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                input_mappings: super.label_form(this.cache),
                 unit_count_prefix: string(),
                 count_postfix: string(),
                 gravity_well_distance_postfix: string(),
@@ -86,9 +86,9 @@ module.exports = class CommonTooltip extends Definitions {
                 list_truncated_text: string(),
                 player_alliance_simple_relationship_names: object({
                     keys: {
-                        friendly: this.label_form2(this.cache.localisation, this.cache.colors),
-                        enemy: this.label_form2(this.cache.localisation, this.cache.colors),
-                        neutral: this.label_form2(this.cache.localisation, this.cache.colors),
+                        friendly: this.label_form2(this.cache),
+                        enemy: this.label_form2(this.cache),
+                        neutral: this.label_form2(this.cache),
                     },
                 }),
             },

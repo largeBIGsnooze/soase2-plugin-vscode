@@ -12,8 +12,8 @@ module.exports = class HudReplayWindow extends Definitions {
         return schema({
             keys: super.window(this.cache.textures, {
                 properties: {
-                    active_player_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                    full_visibility_toggle_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                    active_player_button: super.button(this.cache),
+                    full_visibility_toggle_button: super.button(this.cache, {
                         extra_properties: {
                             highlighted_icon: this.cache.textures,
                             full_visibility_active_tooltip_title: this.cache.localisation,

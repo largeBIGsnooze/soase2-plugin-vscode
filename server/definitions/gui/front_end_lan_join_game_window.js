@@ -19,14 +19,14 @@ module.exports = class FrontEndLanJoinGameWindow extends Definitions {
                         }),
                     },
                 }),
-                ip_address_label: super.label(this.cache.localisation),
+                ip_address_label: super.label(this.cache),
                 ip_address_entry_box: object({
                     keys: {
                         layout: super.layout(),
                     },
                 }),
-                join_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                cancel_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                join_game_button: super.button(this.cache),
+                cancel_button: super.button(this.cache),
             },
         })
     }

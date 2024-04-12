@@ -19,8 +19,8 @@ module.exports = class DebugWatchUnitWindow extends Definitions {
                         header_window: object({
                             keys: {
                                 layout: super.layout(),
-                                unit_id_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                track_selected_unit_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                unit_id_box: super.button(this.cache),
+                                track_selected_unit_button: super.button(this.cache),
                                 focus_on_watched_unit_button: object({
                                     keys: {
                                         layout: super.layout(),
@@ -34,13 +34,13 @@ module.exports = class DebugWatchUnitWindow extends Definitions {
                             keys: {
                                 layout: super.layout(),
                                 orientation: super.orientation(),
-                                properties_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                orders_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                segments_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                buffs_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                weapons_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                sounds_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                tweaks_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                properties_view_button: super.button(this.cache),
+                                orders_view_button: super.button(this.cache),
+                                segments_view_button: super.button(this.cache),
+                                buffs_view_button: super.button(this.cache),
+                                weapons_view_button: super.button(this.cache),
+                                sounds_view_button: super.button(this.cache),
+                                tweaks_view_button: super.button(this.cache),
                             },
                         }),
                         view_container_window: object({
@@ -53,7 +53,7 @@ module.exports = class DebugWatchUnitWindow extends Definitions {
                                 layout: super.layout(),
                             },
                         }),
-                        orders_list_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        orders_list_box: super.button(this.cache),
                         sounds_list_box: object({
                             keys: {
                                 style: super.style(),
@@ -61,10 +61,10 @@ module.exports = class DebugWatchUnitWindow extends Definitions {
                                 layout: super.layout(),
                             },
                         }),
-                        segments_list_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        buffs_list_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        weapons_list_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        weapon_reflect_box: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        segments_list_box: super.button(this.cache),
+                        buffs_list_box: super.button(this.cache),
+                        weapons_list_box: super.button(this.cache),
+                        weapon_reflect_box: super.button(this.cache),
                         tweaks_window: super.tweaks_window(),
                     },
                 }),

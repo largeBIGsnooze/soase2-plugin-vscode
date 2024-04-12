@@ -24,6 +24,7 @@ module.exports = class FrontEndGameSummaryDialog extends Definitions {
                                 metal: this.cache.localisation,
                                 crystal: this.cache.localisation,
                                 research: this.cache.localisation,
+                                building: this.cache.localisation,
                                 npc_market: this.cache.localisation,
                                 other: this.cache.localisation,
                             },
@@ -104,8 +105,8 @@ module.exports = class FrontEndGameSummaryDialog extends Definitions {
                         content_panel: object({
                             keys: {
                                 layout: super.layout(),
-                                close_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                watch_recorded_game_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                close_button: super.button(this.cache),
+                                watch_recorded_game_button: super.button(this.cache),
                                 statistic_item_list_box: object({
                                     keys: {
                                         style: super.style(),
@@ -124,7 +125,7 @@ module.exports = class FrontEndGameSummaryDialog extends Definitions {
                                         is_centered: boolean(),
                                         children_gap: float(),
                                         layout: super.layout(),
-                                        button_shared_definition: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        button_shared_definition: super.button(this.cache),
                                     },
                                 }),
                                 statistic_chart: object({

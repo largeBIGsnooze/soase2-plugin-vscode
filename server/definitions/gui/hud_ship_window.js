@@ -132,19 +132,19 @@ module.exports = class HudShipWindow extends Definitions {
                                                 }),
                                             },
                                         }),
-                                        is_synchronize_formation_movement_enabled_toggle_on_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                                        is_synchronize_formation_movement_enabled_toggle_off_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                                        is_wide_move_enabled_toggle_on_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                                        is_synchronize_formation_movement_enabled_toggle_on_line: super.label_form(this.cache),
+                                        is_synchronize_formation_movement_enabled_toggle_off_line: super.label_form(this.cache),
+                                        is_wide_move_enabled_toggle_on_line: super.label_form(this.cache),
                                     },
                                 }),
-                                attack_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                attack_button: super.button(this.cache, {
                                     extra_properties: {
                                         highlighted_icon: this.cache.textures,
                                         fleet_icon: this.cache.textures,
                                         highlighted_fleet_icon: this.cache.textures,
                                     },
                                 }),
-                                ai_auto_order_mode_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                ai_auto_order_mode_button: super.button(this.cache, {
                                     extra_properties: {
                                         mode_definitions: object({
                                             keys: {
@@ -176,7 +176,7 @@ module.exports = class HudShipWindow extends Definitions {
                                         }),
                                     },
                                 }),
-                                ai_auto_order_mode_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                ai_auto_order_mode_button: super.button(this.cache, {
                                     extra_properties: {
                                         mode_definitions: object({
                                             keys: {
@@ -208,7 +208,7 @@ module.exports = class HudShipWindow extends Definitions {
                                         }),
                                     },
                                 }),
-                                stop_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                                stop_button: super.button(this.cache, {
                                     extra_properties: {
                                         fleet_icon: this.cache.textures,
                                     },
@@ -242,12 +242,12 @@ module.exports = class HudShipWindow extends Definitions {
                             },
                         }),
                         items_panel: super.panel(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        toggle_advanced_ship_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        toggle_advanced_ship_window_button: super.button(this.cache, {
                             extra_properties: {
                                 highlighted_icon: this.cache.textures,
                             },
                         }),
-                        toggle_carrier_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        toggle_carrier_window_button: super.button(this.cache, {
                             extra_properties: {
                                 highlighted_icon: this.cache.textures,
                                 squadron_counts_overlay_layout: super.layout(),
@@ -255,7 +255,7 @@ module.exports = class HudShipWindow extends Definitions {
                                 squadron_counts_overlay_color: this.cache.colors,
                             },
                         }),
-                        toggle_unit_factory_window_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                        toggle_unit_factory_window_button: super.button(this.cache, {
                             extra_properties: {
                                 highlighted_icon: this.cache.textures,
                             },
@@ -266,10 +266,10 @@ module.exports = class HudShipWindow extends Definitions {
                     keys: {
                         layout: super.layout(),
                         stack_panel: super.panel(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        ability_0_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        ability_1_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        ability_2_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        ability_3_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        ability_0_button: super.button(this.cache),
+                        ability_1_button: super.button(this.cache),
+                        ability_2_button: super.button(this.cache),
+                        ability_3_button: super.button(this.cache),
                     },
                 }),
             },

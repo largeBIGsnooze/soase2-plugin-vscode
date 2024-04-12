@@ -19,13 +19,13 @@ module.exports = class FrontEndAddModDialog extends Definitions {
                         content_panel: object({
                             keys: {
                                 layout: super.layout(),
-                                title_label: super.label(this.cache.localisation),
+                                title_label: super.label(this.cache),
                                 mods_list_box: object({
                                     keys: {
                                         layout: super.layout(),
                                     },
                                 }),
-                                add_mod_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                add_mod_button: super.button(this.cache),
                             },
                         }),
                     },

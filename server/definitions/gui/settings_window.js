@@ -17,15 +17,15 @@ module.exports = class SettingsWindow extends Definitions {
                     keys: {
                         layout: super.layout(),
                         background: super.background(this.cache.textures),
-                        close_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        close_button: super.button(this.cache),
                         view_buttons_panel: object({
                             keys: {
                                 layout: super.layout(),
                                 orientation: super.orientation(),
-                                graphic_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                sound_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                ui_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                                input_mapping_view_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                graphic_view_button: super.button(this.cache),
+                                sound_view_button: super.button(this.cache),
+                                ui_view_button: super.button(this.cache),
+                                input_mapping_view_button: super.button(this.cache),
                             },
                         }),
                         view_frame: object({
@@ -38,7 +38,7 @@ module.exports = class SettingsWindow extends Definitions {
                 graphic_settings_window: object({
                     keys: {
                         layout: super.layout(),
-                        resolution_label: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        resolution_label: super.button(this.cache),
                         resolution_drop_box: object({
                             keys: {
                                 layout: super.layout(),
@@ -54,7 +54,7 @@ module.exports = class SettingsWindow extends Definitions {
                                 description: this.cache.localisation,
                             },
                         }),
-                        apply_changes_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        apply_changes_button: super.button(this.cache),
                     },
                 }),
                 sound_settings_window: object({
@@ -81,7 +81,7 @@ module.exports = class SettingsWindow extends Definitions {
                 input_mapping_settings_window: object({
                     keys: {
                         layout: super.layout(),
-                        reset_all_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        reset_all_button: super.button(this.cache),
                         list_box: super.settings_list_box(this.cache.localisation, this.cache.textures),
                     },
                 }),
@@ -106,7 +106,7 @@ module.exports = class SettingsWindow extends Definitions {
                                 keys: {
                                     layout: super.layout(),
                                     auto_scaled_dpi_text_color: this.cache.colors,
-                                    auto_scaled_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                                    auto_scaled_description: super.label_form2(this.cache),
                                 },
                             }),
                         },

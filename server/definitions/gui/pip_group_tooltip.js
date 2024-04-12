@@ -15,7 +15,7 @@ module.exports = class PipGroupTooltip extends Definitions {
                 enemy_ships_player_name_postfix: this.cache.localisation,
                 fleet_moving_to_gravity_well_title_postfix: this.cache.localisation,
                 fleet_deliverables_title_postfix: this.cache.localisation,
-                last_detected_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                last_detected_description: super.label_form2(this.cache),
             },
         })
     }

@@ -11,10 +11,10 @@ module.exports = class FleetTooltip extends Definitions {
     create() {
         return schema({
             keys: {
-                remote_ships_header_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                fleet_deliverables_header_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                remote_ships_header_line: super.label_form(this.cache),
+                fleet_deliverables_header_line: super.label_form(this.cache),
                 empty_fleet_description_blocks: array({
-                    items: super.label_form2(this.cache.localisation, this.cache.colors),
+                    items: super.label_form2(this.cache),
                 }),
             },
         })

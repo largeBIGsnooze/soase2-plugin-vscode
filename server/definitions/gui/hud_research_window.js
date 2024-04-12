@@ -40,8 +40,8 @@ module.exports = class HudResearchWindow extends Definitions {
                                     },
                                 }),
                                 domain_name_postfix: this.cache.localisation,
-                                header_label: super.label(this.cache.localisation),
-                                view_is_compressed_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                header_label: super.label(this.cache),
+                                view_is_compressed_button: super.button(this.cache),
                                 text_filter: object({
                                     keys: {
                                         layout: super.layout(),
@@ -58,9 +58,9 @@ module.exports = class HudResearchWindow extends Definitions {
                                                 style: super.style(),
                                             },
                                         }),
-                                        clear_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                                        clear_button: super.button(this.cache),
                                         tooltip_header_label: this.cache.localisation,
-                                        tooltip_description: super.label_form2(this.cache.localisation, this.cache.colors),
+                                        tooltip_description: super.label_form2(this.cache),
                                     },
                                 }),
                                 tier_buttons_panel: object({

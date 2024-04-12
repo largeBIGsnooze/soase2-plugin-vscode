@@ -24,7 +24,7 @@ module.exports = class FrontEndLanHostSavedGameWindow extends Definitions {
                         layout: super.layout(),
                     },
                 }),
-                create_lobby_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                create_lobby_button: super.button(this.cache),
             },
         })
     }

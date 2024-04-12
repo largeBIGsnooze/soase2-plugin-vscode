@@ -1,4 +1,4 @@
-const { schema, string, object, integer } = require('../data_types')
+const { schema } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class BuffTooltip extends Definitions {
@@ -14,8 +14,8 @@ module.exports = class BuffTooltip extends Definitions {
                 duration_color: this.cache.colors,
                 positive_mutation_color: this.cache.colors,
                 negative_mutation_color: this.cache.colors,
-                unit_positive_buffs_title: this.label_form2(this.cache.localisation, this.cache.colors),
-                unit_negative_buffs_title: this.label_form2(this.cache.localisation, this.cache.colors),
+                unit_positive_buffs_title: this.label_form2(this.cache),
+                unit_negative_buffs_title: this.label_form2(this.cache),
             },
         })
     }

@@ -48,12 +48,12 @@ module.exports = class HudCarrierWindow extends Definitions {
                         }),
                     },
                 }),
-                launch_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                launch_button: super.button(this.cache, {
                     extra_properties: {
                         highlighted_icon: this.cache.textures,
                     },
                 }),
-                dock_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors, {
+                dock_button: super.button(this.cache, {
                     extra_properties: {
                         highlighted_icon: this.cache.textures,
                     },

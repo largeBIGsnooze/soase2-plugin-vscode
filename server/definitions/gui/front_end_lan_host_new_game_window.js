@@ -11,9 +11,9 @@ module.exports = class FrontEndLanHostNewGameWindow extends Definitions {
     create() {
         return schema({
             keys: {
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
                 layout: super.layout(),
-                create_lobby_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                create_lobby_button: super.button(this.cache),
                 scenario_picker_window_frame: object({
                     keys: {
                         layout: super.layout(),

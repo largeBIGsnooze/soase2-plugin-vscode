@@ -11,13 +11,13 @@ module.exports = class FrontEndMultiPlayerHostNewGameWindow extends Definitions 
     create() {
         return schema({
             keys: {
-                background_window: super.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
                 layout: super.layout(),
-                is_browsable_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                is_rejoin_to_other_human_slots_enabled_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                is_rejoin_to_ai_slots_enabled_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                is_ai_takeover_enabled_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                create_online_server_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                is_browsable_button: super.button(this.cache),
+                is_rejoin_to_other_human_slots_enabled_button: super.button(this.cache),
+                is_rejoin_to_ai_slots_enabled_button: super.button(this.cache),
+                is_ai_takeover_enabled_button: super.button(this.cache),
+                create_online_server_button: super.button(this.cache),
                 scenario_picker_window_frame: object({
                     keys: {
                         layout: super.layout(),

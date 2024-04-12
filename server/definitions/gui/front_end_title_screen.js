@@ -13,7 +13,7 @@ module.exports = class FrontEndTitleScreen extends Definitions {
             keys: {
                 layout: super.layout(),
                 fill_color: color(),
-                label: super.label(this.cache.localisation),
+                label: super.label(this.cache),
                 background: super.background(this.cache.textures),
             },
         })

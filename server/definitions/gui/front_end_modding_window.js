@@ -12,8 +12,8 @@ module.exports = class FrontEndModdingWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: this.background_window(this.cache.localisation, this.cache.textures),
-                overlay_window: this.background_window(this.cache.localisation, this.cache.textures),
+                background_window: super.background_window(this.cache),
+                overlay_window: super.background_window(this.cache),
                 mods_list_box_shared_definition: object({
                     keys: {
                         list_box_style: super.list_box_styles(),
@@ -29,15 +29,15 @@ module.exports = class FrontEndModdingWindow extends Definitions {
                         logo_size: vecInt2(),
                         logo_margins: super.margins(),
                         description_color: this.cache.colors,
-                        version_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        not_compatible_description: super.label_form2(this.cache.localisation, this.cache.colors),
-                        current_compatiblity_version_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        mod_compatiblity_version_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        will_change_simulation_description: super.label_form2(this.cache.localisation, this.cache.colors),
-                        popularity_rank_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        downloads_total_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        subscribers_total_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
-                        rating_line: super.label_form(this.cache.localisation, this.cache.colors, this.cache.textures),
+                        version_line: super.label_form(this.cache),
+                        not_compatible_description: super.label_form2(this.cache),
+                        current_compatiblity_version_line: super.label_form(this.cache),
+                        mod_compatiblity_version_line: super.label_form(this.cache),
+                        will_change_simulation_description: super.label_form2(this.cache),
+                        popularity_rank_line: super.label_form(this.cache),
+                        downloads_total_line: super.label_form(this.cache),
+                        subscribers_total_line: super.label_form(this.cache),
+                        rating_line: super.label_form(this.cache),
                         rating_color_when_positive: this.cache.colors,
                         rating_color_when_negative: this.cache.colors,
                         rating_color_when_unrated: this.cache.colors,
@@ -75,9 +75,9 @@ module.exports = class FrontEndModdingWindow extends Definitions {
                     keys: {
                         layout: super.layout(),
                         orientation: super.orientation(),
-                        manage_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        browse_service_provider_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
-                        browse_local_filesystem_button: super.button(this.cache.localisation, this.cache.textures, this.cache.colors),
+                        manage_button: super.button(this.cache),
+                        browse_service_provider_button: super.button(this.cache),
+                        browse_local_filesystem_button: super.button(this.cache),
                     },
                 }),
                 view_windows_panel: object({

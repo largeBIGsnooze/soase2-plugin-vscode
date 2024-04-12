@@ -8,9 +8,9 @@ module.exports = async (modFolder) => {
     const cache = {}
     const modCache = new FileHandler(modFolder)
 
-    const setFileWatcher = (folder, { subfolder: subfolder = 'entities' }, callback) => {
+    const setFileWatcher = ({ subfolder: subfolder = 'entities' }, callback) => {
         return chokidar
-            .watch(path.resolve(folder, subfolder), {
+            .watch(path.resolve(modFolder, subfolder), {
                 persistent: true,
                 ignorePermissionErrors: true,
                 ignoreInitial: true,
@@ -127,56 +127,56 @@ module.exports = async (modFolder) => {
     cache.planet_artifacts = enumerate({ items: modCache.readPlanetArtifacts() })
     cache.modLogos = enumerate({ items: modCache.readModLogos() })
 
-    setFileWatcher(modFolder, { subfolder: 'effects/*.shield_effect' }, () => (cache.shield_effects = enumerate({ items: modCache.readShieldEffects() })))
-    setFileWatcher(modFolder, { subfolder: 'scenarios/*.scenario' }, () => (cache.scenarios = enumerate({ items: modCache.readScenarios() })))
-    setFileWatcher(modFolder, { subfolder: 'gui/input_actions.gui' }, () => (cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })))
-    setFileWatcher(modFolder, { subfolder: 'uniforms/target_filter.uniforms' }, () => (cache.target_filters_uniforms = enumerate({ items: modCache.readTargetFilters().uniform })))
+    setFileWatcher({ subfolder: 'effects/*.shield_effect' }, () => (cache.shield_effects = enumerate({ items: modCache.readShieldEffects() })))
+    setFileWatcher({ subfolder: 'scenarios/*.scenario' }, () => (cache.scenarios = enumerate({ items: modCache.readScenarios() })))
+    setFileWatcher({ subfolder: 'gui/input_actions.gui' }, () => (cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })))
+    setFileWatcher({ subfolder: 'uniforms/target_filter.uniforms' }, () => (cache.target_filters_uniforms = enumerate({ items: modCache.readTargetFilters().uniform })))
 
-    setFileWatcher(modFolder, { subfolder: 'gui/hud_bookmarks_window.gui' }, () => (cache.pip_groups = enumerate({ items: modCache.readPipGroups() })))
+    setFileWatcher({ subfolder: 'gui/hud_bookmarks_window.gui' }, () => (cache.pip_groups = enumerate({ items: modCache.readPipGroups() })))
 
-    setFileWatcher(modFolder, { subfolder: 'effects/*.exhaust_trail_effect' }, () => (cache.exhaust_trail_effects = enumerate({ items: modCache.readExhaustTrailEffects() })))
+    setFileWatcher({ subfolder: 'effects/*.exhaust_trail_effect' }, () => (cache.exhaust_trail_effects = enumerate({ items: modCache.readExhaustTrailEffects() })))
 
-    setFileWatcher(modFolder, { subfolder: 'gravity_well_props/*.gravity_well_props' }, () => (cache.gravity_well_props = enumerate({ items: modCache.readGravityWellProps() })))
-    setFileWatcher(modFolder, { subfolder: 'texture_animations/*.texture_animation' }, () => (cache.texture_animations = enumerate({ items: modCache.readTextureAnimations() })))
-    setFileWatcher(modFolder, { subfolder: 'entities/*.player' }, () => {
+    setFileWatcher({ subfolder: 'gravity_well_props/*.gravity_well_props' }, () => (cache.gravity_well_props = enumerate({ items: modCache.readGravityWellProps() })))
+    setFileWatcher({ subfolder: 'texture_animations/*.texture_animation' }, () => (cache.texture_animations = enumerate({ items: modCache.readTextureAnimations() })))
+    setFileWatcher({ subfolder: 'entities/*.player' }, () => {
         cache.unit_group_names = enumerate({ items: modCache.readUnitNames() })
         cache.research_fields = (type) => enumerate({ items: modCache.readResearchFields(type) })
     })
-    setFileWatcher(modFolder, { subfolder: 'skyboxes/*.skybox' }, () => (cache.skyboxes = enumerate({ items: modCache.readSkyboxes() })))
-    setFileWatcher(modFolder, { subfolder: 'player_icons/*.player_icon' }, () => {
+    setFileWatcher({ subfolder: 'skyboxes/*.skybox' }, () => (cache.skyboxes = enumerate({ items: modCache.readSkyboxes() })))
+    setFileWatcher({ subfolder: 'player_icons/*.player_icon' }, () => {
         cache.player_icons = enumerate({
             items: modCache.readPlayerIcons(),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/special_operation_unit.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/special_operation_unit.uniforms' }, () => {
         cache.special_operation_kinds = enumerate({
             items: modCache.readSpecialOperationUnitKinds(),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'player_portraits/*.player_portrait' }, () => {
+    setFileWatcher({ subfolder: 'player_portraits/*.player_portrait' }, () => {
         cache.player_portraits = enumerate({
             items: modCache.readPlayerPortraits(),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/player.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/player.uniforms' }, () => {
         cache.npc_tags = enumerate({
             items: modCache.readNpcTags(),
         })
     })
-    setFileWatcher(modFolder, { subfolder: './*.png' }, () => (cache.modLogos = enumerate({ items: modCache.readModLogos() })))
-    setFileWatcher(modFolder, { subfolder: 'mesh_materials/*.mesh_material' }, () => (cache.mesh_materials = enumerate({ items: modCache.readMeshMaterials() })))
-    setFileWatcher(modFolder, { subfolder: 'uniforms/main_view.uniforms' }, () => (cache.mainview_groups = enumerate({ items: modCache.readMainviewGroups() })))
-    setFileWatcher(modFolder, { subfolder: 'meshes/*.mesh' }, () => (cache.meshes = enumerate({ items: modCache.readMeshes() })))
-    setFileWatcher(modFolder, { subfolder: 'localized_text/*.localized_text' }, () => {
+    setFileWatcher({ subfolder: './*.png' }, () => (cache.modLogos = enumerate({ items: modCache.readModLogos() })))
+    setFileWatcher({ subfolder: 'mesh_materials/*.mesh_material' }, () => (cache.mesh_materials = enumerate({ items: modCache.readMeshMaterials() })))
+    setFileWatcher({ subfolder: 'uniforms/main_view.uniforms' }, () => (cache.mainview_groups = enumerate({ items: modCache.readMainviewGroups() })))
+    setFileWatcher({ subfolder: 'meshes/*.mesh' }, () => (cache.meshes = enumerate({ items: modCache.readMeshes() })))
+    setFileWatcher({ subfolder: 'localized_text/*.localized_text' }, () => {
         cache.localisation = enumerate({ items: modCache.readLocalisation() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*' }, () => {
+    setFileWatcher({ subfolder: 'entities/*' }, () => {
         cache.entities = enumerate({ items: modCache.readEntities(['entities/*'], { readFile: false })?.map((e) => e?.name) })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.research_subject' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.research_subject' }, () => {
         cache.research_subjects = enumerate({ items: modCache.readResearchSubjects() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.unit_item' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.unit_item' }, () => {
         cache.planet_components = enumerate({
             items: modCache.readComponents({
                 component: 'planet_component',
@@ -192,18 +192,18 @@ module.exports = async (modFolder) => {
         cache.planet_bonuses = enumerate({ items: modCache.readPlanetBonuses() })
         cache.planet_artifacts = enumerate({ items: modCache.readPlanetArtifacts() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.unit' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.unit' }, () => {
         cache.strikecraft_units = enumerate({ items: modCache.readStrikecraftUnits() })
         cache.metal_asteroids = enumerate({ items: modCache.readMetalAsteroids() })
         cache.crystal_asteroids = enumerate({ items: modCache.readCrystalAsteroids() })
         cache.fleet_units = enumerate({ items: modCache.readFleetUnits() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.unit_skin' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.unit_skin' }, () => {
         cache.unit_skins = enumerate({ items: modCache.readUnitSkins() })
         cache.effect_alias_bindings = enumerate({ items: modCache.readEffectAliasBindings() })
         cache.child_meshes = enumerate({ items: modCache.readChildMeshes() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.action_data_source' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.action_data_source' }, () => {
         cache.target_filters = enumerate({ items: modCache.readTargetFilters() })
         cache.action_values = enumerate({ items: modCache.readActionValues() })
         cache.float_variables = enumerate({ items: modCache.readFloatVariables() })
@@ -214,17 +214,16 @@ module.exports = async (modFolder) => {
         cache.planet_modifier_ids = enumerate({ items: modCache.readBuffPlanetModifiers() })
         cache.buff_unit_factory_modifiers = enumerate({ items: modCache.readBuffUnitFactoryModifiers() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/debris.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/debris.uniforms' }, () => {
         cache.debris = enumerate({ items: modCache.readDebrisUniform() })
     })
-    setFileWatcher(modFolder, {}, () => {
+    setFileWatcher({}, () => {
         cache.ttf = enumerate({ items: modCache.readFontsTtf() })
     })
-    setFileWatcher(modFolder, { subfolder: 'effects/*.particle_effect' }, () => {
+    setFileWatcher({ subfolder: 'effects/*.particle_effect' }, () => {
         cache.particle_effects = enumerate({ items: modCache.readParticleEffects() })
     })
     setFileWatcher(
-        modFolder,
         {
             subfolder: 'death_sequences/*.death_sequence_group',
         },
@@ -234,69 +233,68 @@ module.exports = async (modFolder) => {
             })
         }
     )
-    setFileWatcher(modFolder, { subfolder: 'death_sequences/*.death_sequence' }, () => {
+    setFileWatcher({ subfolder: 'death_sequences/*.death_sequence' }, () => {
         cache.death_sequences = enumerate({ items: modCache.readDeathSequences() })
     })
-    setFileWatcher(modFolder, { subfolder: 'fonts/*.font' }, () => {
+    setFileWatcher({ subfolder: 'fonts/*.font' }, () => {
         cache.fonts = enumerate({ items: modCache.readEntities(['fonts/*.font'])?.map((e) => e?.name) })
     })
-    setFileWatcher(modFolder, { subfolder: 'brushes/*.brushes' }, () => {
+    setFileWatcher({ subfolder: 'brushes/*.brushes' }, () => {
         cache.brushes = enumerate({ items: modCache.readBrushes() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.planet' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.planet' }, () => {
         cache.planet_files = enumerate({ items: modCache.readPlanetFiles() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/*.weapon' }, () => {
+    setFileWatcher({ subfolder: 'entities/*.weapon' }, () => {
         cache.weapons = enumerate({ items: modCache.readWeapons() })
     })
-    setFileWatcher(modFolder, { subfolder: 'textures/*' }, () => {
+    setFileWatcher({ subfolder: 'textures/*' }, () => {
         cache.textures = enumerate({ items: modCache.readTextures() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/planet.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/planet.uniforms' }, () => {
         cache.planets = enumerate({ items: modCache.readPlanets() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/unit_build.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/unit_build.uniforms' }, () => {
         cache.build_kinds = enumerate({ items: modCache.readUnitBuildKinds() })
     })
-    setFileWatcher(modFolder, { subfolder: 'player_colors/*.player_color_group' }, () => {
+    setFileWatcher({ subfolder: 'player_colors/*.player_color_group' }, () => {
         cache.color_groups = enumerate({ items: modCache.readColorGroups() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/exotic.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/exotic.uniforms' }, () => {
         cache.exotics = enumerate({ items: modCache.readExotics() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/unit.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/unit.entity_manifest' }, () => {
         cache.units = enumerate({ items: modCache.readUnits() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/buff.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/buff.entity_manifest' }, () => {
         cache.buffs = enumerate({
             items: modCache.readBuffs(),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'colors/named_colors.named_colors' }, () => {
+    setFileWatcher({ subfolder: 'colors/named_colors.named_colors' }, () => {
         cache.colors = enumerate({ items: modCache.readColors() })
     })
-    setFileWatcher(modFolder, { subfolder: 'sounds/*.sound' }, () => {
+    setFileWatcher({ subfolder: 'sounds/*.sound' }, () => {
         cache.sounds = enumerate({
             items: modCache.readSounds({
                 ext: 'sound',
             }),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'sounds/*.ogg' }, () => {
+    setFileWatcher({ subfolder: 'sounds/*.ogg' }, () => {
         cache.ogg = enumerate({
             items: modCache.readSounds({
                 ext: 'ogg',
             }),
         })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/ability.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/ability.entity_manifest' }, () => {
         cache.abilities = enumerate({ items: modCache.readAbilities() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/galaxy_generator.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/galaxy_generator.uniforms' }, () => {
         cache.fillings = (type) => enumerate({ items: modCache.readGravityWellFillings(type) })
     })
     setFileWatcher(
-        modFolder,
         {
             subfolder: 'uniforms/attack_target_type_group.uniforms',
         },
@@ -305,29 +303,29 @@ module.exports = async (modFolder) => {
             cache.attack_target_type_groups = enumerate({ items: modCache.readAttackTargetTypeGroups() })
         }
     )
-    setFileWatcher(modFolder, { subfolder: 'uniforms/unit_tag.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/unit_tag.uniforms' }, () => {
         cache.ship_tags = enumerate({ items: modCache.readShipTags() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/npc_reward.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/npc_reward.entity_manifest' }, () => {
         cache.npc_rewards = enumerate({ items: modCache.readNpcRewards() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/formation.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/formation.entity_manifest' }, () => {
         cache.formations = enumerate({ items: modCache.readFormations() })
     })
 
-    setFileWatcher(modFolder, { subfolder: 'uniforms/unit_mutation.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/unit_mutation.uniforms' }, () => {
         cache.mutations = enumerate({ items: modCache.readUnitMutations() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/player.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/player.entity_manifest' }, () => {
         cache.players = enumerate({ items: modCache.readPlayers() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/strikecraft.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/strikecraft.uniforms' }, () => {
         cache.strikecraft_kinds = enumerate({ items: modCache.readStrikecraft() })
     })
-    setFileWatcher(modFolder, { subfolder: 'entities/action_data_source.entity_manifest' }, () => {
+    setFileWatcher({ subfolder: 'entities/action_data_source.entity_manifest' }, () => {
         cache.action_data_sources = enumerate({ items: modCache.readActionDataSources() })
     })
-    setFileWatcher(modFolder, { subfolder: 'uniforms/weapon_tags.uniforms' }, () => {
+    setFileWatcher({ subfolder: 'uniforms/weapon_tags.uniforms' }, () => {
         cache.weapon_tags = enumerate({
             items: modCache.readWeaponTags(),
         })

@@ -52,7 +52,7 @@ module.exports = class NotificationUniform extends Definitions {
                 name: this.cache.localisation,
                 name_postfix: this.cache.localisation,
                 description: this.cache.localisation,
-                sound: string(),
+                sound: this.cache.ogg,
                 suppress_duplicates_duration: float(),
                 duration: enumerate({
                     items: ['brief'],
@@ -65,8 +65,8 @@ module.exports = class NotificationUniform extends Definitions {
     create() {
         return schema({
             keys: {
-                default_sound: string(),
-                npc_pirates_tag: string(),
+                default_sound: this.cache.ogg,
+                npc_pirates_tag: this.cache.npc_tags,
                 types: object({
                     keys: {
                         enemy_planet_made_dead_from_bombing: this.type(),
@@ -152,8 +152,8 @@ module.exports = class NotificationUniform extends Definitions {
                     items: this.cache.build_kinds,
                     isUnique: true,
                 }),
-                metal_market_context_icon: string(),
-                crystal_market_context_icon: string(),
+                metal_market_context_icon: this.cache.textures,
+                crystal_market_context_icon: this.cache.textures,
                 ping_received_names: object({
                     keys: {
                         attention: this.cache.localisation,
@@ -164,8 +164,8 @@ module.exports = class NotificationUniform extends Definitions {
                 derelict_loot_collected_levels: array({
                     items: object({
                         keys: {
-                            icon: string(),
-                            tooltip_picture: string(),
+                            icon: this.cache.textures,
+                            tooltip_picture: this.cache.textures,
                         },
                     }),
                 }),

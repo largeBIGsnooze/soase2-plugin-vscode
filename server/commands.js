@@ -1,7 +1,6 @@
 const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri } = require('vscode')
-const { Log } = require('./utils/logger')
 const path = require('path')
-const { mkdirSync, writeFileSync, existsSync, rmdir, unlinkSync } = require('fs')
+const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync } = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
@@ -100,10 +99,15 @@ module.exports = class Command {
 
     async getAvaliableScenarioQuickpicks() {
         const quickpicks = []
-        const scenarios = new FileHandler(await this.getInstallationFolder()).readEntities(['scenarios/*.scenario']).map((e) => e?.name)
+        const scenarios = new FileHandler(await this.getInstallationFolder())
+            .readEntities(['scenarios/*.scenario'])
+            .map((e) => {
+                return { label: e?.name, detail: e?.entityUri }
+            })
+            .sort()
 
         for (const scenario of scenarios) {
-            quickpicks.push({ label: scenario })
+            quickpicks.push({ label: scenario.label, detail: scenario.detail })
         }
         return quickpicks
     }
@@ -160,7 +164,7 @@ module.exports = class Command {
                 isValidating = false
                 return results
             } catch (err) {
-                Log.error('Response failed: ', err)
+                this.client.debug('Response failed: ', err)
             }
         })
         return {
@@ -215,9 +219,13 @@ module.exports = class Command {
             }
         } else {
             try {
+                if (!existsSync(zipPath)) {
+                    window.showErrorMessage('Cannot zip the selected scenario. Try unzipping it first')
+                    return
+                }
                 execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) => (err ? this.client.debug(err) : null)).on('exit', () => {
-                    readdirSync(zipPath).map((e) => unlinkSync(path.resolve(zipPath, e)))
-                    rmdir(zipPath)
+                    readdirSync(zipPath)?.map((e) => unlinkSync(path.resolve(zipPath, e)))
+                    rmdirSync(zipPath)
                 })
             } catch (e) {
                 window.showErrorMessage(`Packing scenario failed: ${e.message}`)
@@ -244,6 +252,7 @@ module.exports = class Command {
     showQuickpicks(picks, callback) {
         window
             .showQuickPick(picks, {
+                ignoreFocusOut: true,
                 placeHolder: 'Type your option...',
             })
             .then((option) => callback(option.label, picks))
@@ -258,7 +267,7 @@ module.exports = class Command {
                 }
 
                 await this.updateWorkspaceAndCache(dir)
-                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding!`)
+                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
             })
         })
     }
@@ -272,6 +281,7 @@ module.exports = class Command {
             switch (e) {
                 case 'Yes': {
                     await this.updateWorkspaceAndCache(folderPath)
+                    window.showInformationMessage('Happy modding! 🙂')
                     break
                 }
                 case 'Reveal in explorer': {

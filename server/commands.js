@@ -1,15 +1,18 @@
 const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri } = require('vscode')
 const { Log } = require('./utils/logger')
 const path = require('path')
-const { mkdirSync, writeFileSync, existsSync } = require('fs')
+const { mkdirSync, writeFileSync, existsSync, rmdir, unlinkSync } = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
-const { exec } = require('child_process')
+const { execFile } = require('child_process')
 const { readdirSync } = require('fs')
+const FileHandler = require('./data/file-handler')
 
 module.exports = class Command {
     constructor(client) {
         this.client = client
+
+        this.winrarPath = path.resolve(process.env.ProgramFiles, 'winrar/winrar.exe')
     }
 
     openConfiguration() {
@@ -86,6 +89,7 @@ module.exports = class Command {
 
     async showInput(placeholder, callback) {
         const value = await window.showInputBox({
+            ignoreFocusOut: true,
             placeHolder: placeholder,
             validateInput: (e) => (CONSTANTS.folderRegex.test(e) ? null : 'Invalid name'),
         })
@@ -94,19 +98,25 @@ module.exports = class Command {
         }
     }
 
+    async getAvaliableScenarioQuickpicks() {
+        const quickpicks = []
+        const scenarios = new FileHandler(await this.getInstallationFolder()).readEntities(['scenarios/*.scenario']).map((e) => e?.name)
+
+        for (const scenario of scenarios) {
+            quickpicks.push({ label: scenario })
+        }
+        return quickpicks
+    }
+
     zipScenarioCommand(commandName) {
         commands.registerCommand(commandName, async () => {
-            await this.showInput('Type the scenario...', async (value) => {
-                await this.zipScenario(value)
-            })
+            this.showQuickpicks(await this.getAvaliableScenarioQuickpicks(), async (option) => await this.manageScenario(option, { mode: 'zip' }))
         })
     }
 
     unzipScenarioCommand(commandName) {
         commands.registerCommand(commandName, async () => {
-            await this.showInput('Type the scenario...', async (value) => {
-                await this.extractScenario(value)
-            })
+            this.showQuickpicks(await this.getAvaliableScenarioQuickpicks(), async (option) => await this.manageScenario(option, { mode: 'unzip' }))
         })
     }
 
@@ -177,34 +187,41 @@ module.exports = class Command {
             })
     }
 
-    async zipScenario(zip) {
-        const winrar = path.join(process.env.ProgramFiles, 'winrar/winrar.exe')
+    async manageScenario(zip, { mode: mode }) {
         const gamePath = await this.getInstallationFolder()
-        if (!existsSync(path.join(gamePath, 'scenarios'))) window.showErrorMessage('Scenarios not found')
-        const zipPath = path.join(gamePath, 'scenarios', zip)
-        try {
-            if (!existsSync(zipPath)) window.showErrorMessage('No files to zip')
-            exec(`cmd.exe /c ""${winrar}" a -afzip -m0 -inul -ep1 "${zipPath}.scenario" "${zipPath}/*""`)
-        } catch (e) {}
-    }
 
-    async extractScenario(zip) {
-        const winrar = path.join(process.env.ProgramFiles, 'winrar/winrar.exe')
-        const gamePath = await this.getInstallationFolder()
+        if (!existsSync(this.winrarPath)) {
+            window.showErrorMessage('Make sure you have winrar installed on your computer')
+            return
+        }
+
         if (!existsSync(path.resolve(gamePath, 'scenarios'))) {
             window.showErrorMessage('Scenarios not found')
             return
         }
         const zipPath = path.resolve(gamePath, 'scenarios', zip)
-        try {
-            if (!existsSync(`${zipPath}.scenario`)) {
-                window.showErrorMessage('Scenario not found')
-                return
+
+        if (!existsSync(`${zipPath}.scenario`)) {
+            window.showErrorMessage('Scenario not found')
+            return
+        }
+
+        if (mode === 'unzip') {
+            try {
+                mkdirSync(path.join(gamePath, 'scenarios', zip))
+                execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) => (err ? this.client.debug(err) : null))
+            } catch (e) {
+                window.showErrorMessage(`Scenario: ${zipPath}, already exists`)
             }
-            mkdirSync(path.join(gamePath, 'scenarios', zip))
-            exec(`cmd.exe /c ""${winrar}" e -ep1 -inul -o "${zipPath}.scenario" "${zipPath}/""`)
-        } catch (e) {
-            window.showErrorMessage(`Folder: ${zipPath}, already exists`)
+        } else {
+            try {
+                execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) => (err ? this.client.debug(err) : null)).on('exit', () => {
+                    readdirSync(zipPath).map((e) => unlinkSync(path.resolve(zipPath, e)))
+                    rmdir(zipPath)
+                })
+            } catch (e) {
+                window.showErrorMessage(`Packing scenario failed: ${e.message}`)
+            }
         }
     }
 
@@ -241,6 +258,7 @@ module.exports = class Command {
                 }
 
                 await this.updateWorkspaceAndCache(dir)
+                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding!`)
             })
         })
     }
@@ -250,9 +268,18 @@ module.exports = class Command {
     }
 
     showModCreatedDialog(folderPath) {
-        window.showInformationMessage(`Mod created: ${folderPath}, would you like to set it as the current working folder?`, 'Yes', 'No').then(async (e) => {
-            if (e === 'Yes') {
-                await this.updateWorkspaceAndCache(folderPath)
+        window.showInformationMessage(`Mod created: ${folderPath}, would you like to set it as the current working folder?`, 'Yes', 'No', 'Reveal in explorer').then(async (e) => {
+            switch (e) {
+                case 'Yes': {
+                    await this.updateWorkspaceAndCache(folderPath)
+                    break
+                }
+                case 'Reveal in explorer': {
+                    commands.executeCommand('revealFileInOS', Uri.file(folderPath))
+                    break
+                }
+                default: {
+                }
             }
         })
     }

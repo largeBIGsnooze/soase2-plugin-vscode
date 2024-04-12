@@ -117,7 +117,7 @@ module.exports = class Parser {
                 diagnostics: [].concat(generalDiagnostics, EntityDefinition.diagnostics),
             })
         } catch (err) {
-            Log.error(`Error during processing file: ${err.message}`)
+            Log.error(`Error during processing file: '${path.basename(filePath)}' with error: ${err.message}`)
         }
     }
     /**

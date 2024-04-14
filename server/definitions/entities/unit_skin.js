@@ -34,7 +34,7 @@ module.exports = class UnitSkin extends Definitions {
                             unit_mesh: object({
                                 keys: {
                                     mesh: this.cache.meshes,
-                                    shader: string(),
+                                    shader: super.getShaders,
                                     is_shadow_blocker: boolean(),
                                 },
                             }),
@@ -47,7 +47,7 @@ module.exports = class UnitSkin extends Definitions {
                                                 object({
                                                     keys: {
                                                         mesh: this.cache.meshes,
-                                                        shader: string(),
+                                                        shader: super.getShaders,
                                                         is_shadow_blocker: boolean(),
                                                     },
                                                 }),
@@ -64,7 +64,7 @@ module.exports = class UnitSkin extends Definitions {
                                 properties: {
                                     atmosphere: object({
                                         keys: {
-                                            shader: string(),
+                                            shader: super.getShaders,
                                             material: this.cache.mesh_materials,
                                             noise_texture: this.cache.textures,
                                         },
@@ -77,14 +77,14 @@ module.exports = class UnitSkin extends Definitions {
                                 properties: {
                                     city: object({
                                         keys: {
-                                            shader: string(),
+                                            shader: super.getShaders,
                                             city_material: this.cache.mesh_materials,
                                             city_level_texture: this.cache.textures,
                                         },
                                     }),
                                     atmosphere: object({
                                         keys: {
-                                            shader: string(),
+                                            shader: super.getShaders,
                                             cloud_material: this.cache.mesh_materials,
                                             cloud_noise_texture: this.cache.textures,
                                             cloud_rotation_speed: float(),
@@ -158,7 +158,7 @@ module.exports = class UnitSkin extends Definitions {
                                                 object({
                                                     keys: {
                                                         particle_effect: this.cache.particle_effects,
-                                                        beam: string(),
+                                                        beam: this.cache.beam_effects,
                                                         sounds: array({
                                                             items: this.cache.sounds,
                                                             isUnique: true,

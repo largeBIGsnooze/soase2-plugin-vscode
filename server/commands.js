@@ -1,4 +1,4 @@
-const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri } = require('vscode')
+const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri, ProgressLocation } = require('vscode')
 const path = require('path')
 const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync } = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
@@ -242,11 +242,15 @@ module.exports = class Command {
     }
 
     async updateWorkspaceAndCache(dir) {
-        await this.client.sendRequest('function/clearDiagnostics')
-        await this.setWorkspace(dir)
-        window.showInformationMessage('Reloading cache...')
-        await this.client.sendRequest('function/clearCache')
-        window.showInformationMessage('Cache reloaded successfully')
+        window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (prog) => {
+            prog.report({
+                message: 'Reloading cache...',
+            })
+            await this.client.sendRequest('function/clearDiagnostics')
+            await this.setWorkspace(dir)
+            await this.client.sendRequest('function/clearCache')
+            window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
+        })
     }
 
     showQuickpicks(picks, callback) {
@@ -267,7 +271,6 @@ module.exports = class Command {
                 }
 
                 await this.updateWorkspaceAndCache(dir)
-                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
             })
         })
     }

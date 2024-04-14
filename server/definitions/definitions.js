@@ -291,6 +291,12 @@ class Definitions {
         })
     }
 
+    get getShaders() {
+        return enumerate({
+            items: ['ship', 'planet_corona', 'planet_city', 'planet_atmosphere', 'star_atmosphere', 'star_corona'],
+        })
+    }
+
     get getBlink() {
         return object({
             keys: {
@@ -1645,7 +1651,7 @@ class Definitions {
                 ...properties,
                 corona: object({
                     keys: {
-                        shader: string(),
+                        shader: this.getShaders,
                         color_texture: textures,
                         color: color(),
                         radius_scalar: float(),
@@ -2021,7 +2027,7 @@ class Definitions {
                         layout: this.layout(),
                     },
                 }),
-                overlay: string(),
+                overlay: enumerate({ items: ['entry_simple_frame'] }),
             },
         })
     }

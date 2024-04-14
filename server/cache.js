@@ -110,6 +110,7 @@ module.exports = async (modFolder) => {
     cache.strikecraft_kinds = enumerate({ items: modCache.readStrikecraft() })
     cache.action_data_sources = enumerate({ items: modCache.readActionDataSources() })
     cache.target_filters = enumerate({ items: [...modCache.readTargetFilters().target_filters, ...modCache.readTargetFilters().uniform] })
+    cache.beam_effects = enumerate({ items: modCache.readBeamEffects() })
     cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })
     cache.target_filters_uniforms = enumerate({ items: modCache.readTargetFilters().uniform })
     cache.buff_actions = enumerate({ items: modCache.readBuffActions() })
@@ -127,6 +128,7 @@ module.exports = async (modFolder) => {
     cache.planet_artifacts = enumerate({ items: modCache.readPlanetArtifacts() })
     cache.modLogos = enumerate({ items: modCache.readModLogos() })
 
+    setFileWatcher({ subfolder: 'efffects/*.beam_effect' }, () => (cache.beam_effects = enumerate({ items: modCache.readBeamEffects() })))
     setFileWatcher({ subfolder: 'effects/*.shield_effect' }, () => (cache.shield_effects = enumerate({ items: modCache.readShieldEffects() })))
     setFileWatcher({ subfolder: 'scenarios/*.scenario' }, () => (cache.scenarios = enumerate({ items: modCache.readScenarios() })))
     setFileWatcher({ subfolder: 'gui/input_actions.gui' }, () => (cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })))
@@ -217,7 +219,7 @@ module.exports = async (modFolder) => {
     setFileWatcher({ subfolder: 'uniforms/debris.uniforms' }, () => {
         cache.debris = enumerate({ items: modCache.readDebrisUniform() })
     })
-    setFileWatcher({}, () => {
+    setFileWatcher({ subfolder: 'fonts/*.ttf' }, () => {
         cache.ttf = enumerate({ items: modCache.readFontsTtf() })
     })
     setFileWatcher({ subfolder: 'effects/*.particle_effect' }, () => {

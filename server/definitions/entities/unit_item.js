@@ -147,7 +147,7 @@ module.exports = class UnitItem extends Definitions {
                 ),
                 trade_capacity: this.tradeCapacity(),
                 item_level_count: float(),
-                item_level_source: string(),
+                item_level_source: enumerate({ items: ['research_prerequisites_per_level'] }),
                 item_level_prerequisites: array({
                     items: super.getResearchSubjects(this.cache.research_subjects),
                     isUnique: true,

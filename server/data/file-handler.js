@@ -514,6 +514,14 @@ module.exports = class FileHandler {
         }
     }
 
+    readBeamEffects() {
+        try {
+            return this.readEntities(['effects/*.beam_effect']).map((e) => e?.name)
+        } catch (e) {
+            return ''
+        }
+    }
+
     readPlanetFiles() {
         try {
             return this.readEntities(['entities/*_planet.unit']).map((e) => e?.name)

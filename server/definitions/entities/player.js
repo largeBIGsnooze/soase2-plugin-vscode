@@ -444,220 +444,218 @@ module.exports = class Player extends Definitions {
                         }),
                     },
                 }),
-                npc: this.json.hasOwnProperty('npc')
-                    ? object({
-                          keys: {
-                              visuals: array({
-                                  items: object({
-                                      keys: {
-                                          name: this.cache.localisation,
-                                          description: this.cache.localisation,
-                                          portrait: this.cache.player_portraits,
-                                          icon: this.cache.player_icons,
-                                          color_group: this.cache.color_groups,
-                                      },
-                                  }),
-                              }),
-                              ai_params: object({
-                                  keys: {
-                                      will_fleet_colonize: boolean(),
-                                      max_jumps_from_home_planet_for_fleets: integer(),
-                                      max_fleet_supply: float(),
-                                      pick_another_buildable_attack_ship_type_interval_in_minutes: vecInt2(),
-                                      desired_explore_ship_count: object({
-                                          keys: {
-                                              type: enumerate({ items: ['constant'] }),
-                                              value: integer(),
-                                          },
-                                          required: ['type', 'value'],
-                                      }),
-                                  },
-                                  required: ['desired_explore_ship_count', 'max_jumps_from_home_planet_for_fleets', 'max_fleet_supply', 'pick_another_buildable_attack_ship_type_interval_in_minutes'],
-                              }),
-                              metal_market: object({
-                                  keys: {
-                                      sell_price: float(),
-                                      buy_price: float(),
-                                  },
-                              }),
-                              npc_tags: array({
-                                  items: this.cache.npc_tags,
-                                  isUnique: true,
-                              }),
-                              events: array({
-                                  items: object({
-                                      keys: {
-                                          weight: float(),
-                                          initial_cooldown: vector2(),
-                                          cooldown_duration: vector2(),
-                                          event_type: enumerate({
-                                              items: ['raid'],
-                                          }),
-                                          running_duration: float(),
-                                          raid_levels: array({
-                                              items: object({
-                                                  keys: {
-                                                      raid: object({
-                                                          keys: {
-                                                              units: object({
-                                                                  keys: {
-                                                                      required_units: super.getRequiredUnits(this.cache),
-                                                                      random_units: super.units(this.cache.units),
-                                                                  },
-                                                              }),
-                                                              supply: float(),
-                                                          },
-                                                      }),
-                                                  },
-                                              }),
-                                          }),
-                                      },
-                                  }),
-                              }),
-                              culture_reward: object({
-                                  keys: {
-                                      has_player_restrictions: boolean(),
-                                      reward: this.cache.npc_rewards,
-                                  },
-                              }),
-                              start_allied_to_playable_players: boolean(),
-                              start_allied_to_other_npc_players: boolean(),
-                              start_allied_to_militia_npc_players: boolean(),
-                              militia: object({
-                                  keys: {
-                                      militia_spawn_units: array({
-                                          items: object({
-                                              keys: {
-                                                  spawned_units: object({
-                                                      keys: {
-                                                          required_units: super.getRequiredUnits(this.cache),
-                                                          random_units: super.units(this.cache.units),
-                                                      },
-                                                  }),
-                                                  supply_threshold: float(),
-                                              },
-                                          }),
-                                      }),
-                                  },
-                              }),
-                              auctions: array({
-                                  items: object({
-                                      keys: {
-                                          weight: float(),
-                                          bid_asset_type: super.getResources,
-                                          bid_exotic_type: this.cache.exotics,
-                                          bid_duration: float(),
-                                          winner_reputation_points: float(),
-                                          reward: this.cache.npc_rewards,
-                                          rewards: array({ items: this.cache.npc_rewards }),
-                                          constraint: super.getConstraintType,
-                                      },
-                                  }),
-                              }),
-                              simple_can_ever_be_colonized_planet_types: array({
-                                  items: this.cache.planets,
-                                  isUnique: true,
-                              }),
-                              crystal_market: object({
-                                  keys: {
-                                      sell_price: float(),
-                                      buy_price: float(),
-                                  },
-                              }),
-                              exotic_market: object({
-                                  keys: {
-                                      exotic_types: array({
-                                          items: array({
-                                              items: [
-                                                  this.cache.exotics,
-                                                  object({
-                                                      keys: {
-                                                          sell_credits_amount: float(),
-                                                      },
-                                                  }),
-                                              ],
-                                          }),
-                                      }),
-                                  },
-                              }),
-                              simple_planet_tracks: object({
-                                  keys: {
-                                      defense: this.npc_track(),
-                                      logistics: this.npc_track(),
-                                      mining: this.npc_track(),
-                                      commerce: this.npc_track(),
-                                      excavation: object({
-                                          keys: {},
-                                      }),
-                                      civilian_research: object({
-                                          keys: {},
-                                      }),
-                                      military_research: object({
-                                          keys: {},
-                                      }),
-                                  },
-                              }),
-                              simple_trade_capacity: object({
-                                  keys: {
-                                      export_points: object({
-                                          keys: {
-                                              credits: integer(),
-                                              metal: integer(),
-                                              crystal: integer(),
-                                          },
-                                      }),
-                                  },
-                              }),
-                              reputation: object({
-                                  keys: {
-                                      rewards: array({
-                                          items: {
-                                              reward: this.cache.npc_rewards,
-                                              required_reputation_level: integer(),
-                                              influence_point_cost: integer(),
-                                              cooldown_duration: float(),
-                                          },
-                                      }),
-                                      levels: array({
-                                          items: object({
-                                              keys: {
-                                                  points_needed: float(),
-                                                  reward: this.cache.npc_rewards,
-                                                  reward_level: integer(),
-                                                  npc_modifiers: object({
-                                                      keys: {
-                                                          sell_crystal_credits_received: object({
-                                                              keys: {
-                                                                  value_behavior: super.getValueBehavior,
-                                                                  value: float(),
-                                                              },
-                                                          }),
-                                                          sell_metal_credits_received: object({
-                                                              keys: {
-                                                                  value_behavior: super.getValueBehavior,
-                                                                  value: float(),
-                                                              },
-                                                          }),
-                                                          sell_exotic_credits_received: object({
-                                                              keys: {
-                                                                  value_behavior: super.getValueBehavior,
-                                                                  value: float(),
-                                                              },
-                                                          }),
-                                                      },
-                                                  }),
-                                              },
-                                          }),
-                                      }),
-                                      abilities: array({
-                                          items: this.cache.abilities,
-                                          isUnique: true,
-                                      }),
-                                  },
-                              }),
-                          },
-                      })
-                    : {},
+                npc: object({
+                    keys: {
+                        visuals: array({
+                            items: object({
+                                keys: {
+                                    name: this.cache.localisation,
+                                    description: this.cache.localisation,
+                                    portrait: this.cache.player_portraits,
+                                    icon: this.cache.player_icons,
+                                    color_group: this.cache.color_groups,
+                                },
+                            }),
+                        }),
+                        ai_params: object({
+                            keys: {
+                                will_fleet_colonize: boolean(),
+                                max_jumps_from_home_planet_for_fleets: integer(),
+                                max_fleet_supply: float(),
+                                pick_another_buildable_attack_ship_type_interval_in_minutes: vecInt2(),
+                                desired_explore_ship_count: object({
+                                    keys: {
+                                        type: enumerate({ items: ['constant'] }),
+                                        value: integer(),
+                                    },
+                                    required: ['type', 'value'],
+                                }),
+                            },
+                            required: ['desired_explore_ship_count', 'max_jumps_from_home_planet_for_fleets', 'max_fleet_supply', 'pick_another_buildable_attack_ship_type_interval_in_minutes'],
+                        }),
+                        metal_market: object({
+                            keys: {
+                                sell_price: float(),
+                                buy_price: float(),
+                            },
+                        }),
+                        npc_tags: array({
+                            items: this.cache.npc_tags,
+                            isUnique: true,
+                        }),
+                        events: array({
+                            items: object({
+                                keys: {
+                                    weight: float(),
+                                    initial_cooldown: vector2(),
+                                    cooldown_duration: vector2(),
+                                    event_type: enumerate({
+                                        items: ['raid'],
+                                    }),
+                                    running_duration: float(),
+                                    raid_levels: array({
+                                        items: object({
+                                            keys: {
+                                                raid: object({
+                                                    keys: {
+                                                        units: object({
+                                                            keys: {
+                                                                required_units: super.getRequiredUnits(this.cache),
+                                                                random_units: super.units(this.cache.units),
+                                                            },
+                                                        }),
+                                                        supply: float(),
+                                                    },
+                                                }),
+                                            },
+                                        }),
+                                    }),
+                                },
+                            }),
+                        }),
+                        culture_reward: object({
+                            keys: {
+                                has_player_restrictions: boolean(),
+                                reward: this.cache.npc_rewards,
+                            },
+                        }),
+                        start_allied_to_playable_players: boolean(),
+                        start_allied_to_other_npc_players: boolean(),
+                        start_allied_to_militia_npc_players: boolean(),
+                        militia: object({
+                            keys: {
+                                militia_spawn_units: array({
+                                    items: object({
+                                        keys: {
+                                            spawned_units: object({
+                                                keys: {
+                                                    required_units: super.getRequiredUnits(this.cache),
+                                                    random_units: super.units(this.cache.units),
+                                                },
+                                            }),
+                                            supply_threshold: float(),
+                                        },
+                                    }),
+                                }),
+                            },
+                        }),
+                        auctions: array({
+                            items: object({
+                                keys: {
+                                    weight: float(),
+                                    bid_asset_type: super.getResources,
+                                    bid_exotic_type: this.cache.exotics,
+                                    bid_duration: float(),
+                                    winner_reputation_points: float(),
+                                    reward: this.cache.npc_rewards,
+                                    rewards: array({ items: this.cache.npc_rewards }),
+                                    constraint: super.getConstraintType,
+                                },
+                            }),
+                        }),
+                        simple_can_ever_be_colonized_planet_types: array({
+                            items: this.cache.planets,
+                            isUnique: true,
+                        }),
+                        crystal_market: object({
+                            keys: {
+                                sell_price: float(),
+                                buy_price: float(),
+                            },
+                        }),
+                        exotic_market: object({
+                            keys: {
+                                exotic_types: array({
+                                    items: array({
+                                        items: [
+                                            this.cache.exotics,
+                                            object({
+                                                keys: {
+                                                    sell_credits_amount: float(),
+                                                },
+                                            }),
+                                        ],
+                                    }),
+                                }),
+                            },
+                        }),
+                        simple_planet_tracks: object({
+                            keys: {
+                                defense: this.npc_track(),
+                                logistics: this.npc_track(),
+                                mining: this.npc_track(),
+                                commerce: this.npc_track(),
+                                excavation: object({
+                                    keys: {},
+                                }),
+                                civilian_research: object({
+                                    keys: {},
+                                }),
+                                military_research: object({
+                                    keys: {},
+                                }),
+                            },
+                        }),
+                        simple_trade_capacity: object({
+                            keys: {
+                                export_points: object({
+                                    keys: {
+                                        credits: integer(),
+                                        metal: integer(),
+                                        crystal: integer(),
+                                    },
+                                }),
+                            },
+                        }),
+                        reputation: object({
+                            keys: {
+                                rewards: array({
+                                    items: {
+                                        reward: this.cache.npc_rewards,
+                                        required_reputation_level: integer(),
+                                        influence_point_cost: integer(),
+                                        cooldown_duration: float(),
+                                    },
+                                }),
+                                levels: array({
+                                    items: object({
+                                        keys: {
+                                            points_needed: float(),
+                                            reward: this.cache.npc_rewards,
+                                            reward_level: integer(),
+                                            npc_modifiers: object({
+                                                keys: {
+                                                    sell_crystal_credits_received: object({
+                                                        keys: {
+                                                            value_behavior: super.getValueBehavior,
+                                                            value: float(),
+                                                        },
+                                                    }),
+                                                    sell_metal_credits_received: object({
+                                                        keys: {
+                                                            value_behavior: super.getValueBehavior,
+                                                            value: float(),
+                                                        },
+                                                    }),
+                                                    sell_exotic_credits_received: object({
+                                                        keys: {
+                                                            value_behavior: super.getValueBehavior,
+                                                            value: float(),
+                                                        },
+                                                    }),
+                                                },
+                                            }),
+                                        },
+                                    }),
+                                }),
+                                abilities: array({
+                                    items: this.cache.abilities,
+                                    isUnique: true,
+                                }),
+                            },
+                        }),
+                    },
+                }),
                 research: object({
                     keys: {
                         research_domains: object({

@@ -1,7 +1,11 @@
+## 0.3.2
+
+-  Improved the filewatching
+
 ## 0.3.0
 
--  Scenarios will now get listed when using the menu command `SOASE2: Configuration`
--  Minor improvements
+-   Scenarios will now get listed when using the menu command `SOASE2: Configuration`
+-   Minor improvements
 
 ## 0.2.5
 

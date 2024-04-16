@@ -19,7 +19,7 @@ const GameRendererUniform = require('./uniforms/game_renderer')
 const GuiUniform = require('./uniforms/gui')
 const NamedColors = require('./colors/named_colors')
 const Icons = require('./player_icons/icons')
-const PlayerColorGroup = require('./player_colors/player_color_group').default
+const PlayerColorGroup = require('./player_colors/player_color_group')
 const Skybox = require('./skybox/skybox')
 const Font = require('./font/font')
 const GravityWellProps = require('./gravity_well_props/gravity_well_props')
@@ -561,12 +561,7 @@ module.exports = class EntityDefinition extends Document {
     defineSchema(schema) {
         return this.languageService.configure({
             validate: true,
-            schemas: [
-                {
-                    fileMatch: ['*'],
-                    schema: schema,
-                },
-            ],
+            schemas: [{ fileMatch: ['*'], schema: schema }],
         })
     }
 
@@ -574,18 +569,7 @@ module.exports = class EntityDefinition extends Document {
         const Entity = EntityDefinition.files[`${fileName}.${fileExt}`] || EntityDefinition.files[fileExt] || EntityDefinition.files[fileName]
         try {
             if (Entity) {
-                return this.defineSchema(
-                    new Entity(
-                        {
-                            fileText: fileText,
-                            fileExt: fileExt,
-                            fileName: fileName,
-                        },
-                        EntityDefinition.diagnostics,
-                        gameInstallationFolder,
-                        cache
-                    ).create()
-                )
+                return this.defineSchema(new Entity({ fileText: fileText, fileExt: fileExt, fileName: fileName }, EntityDefinition.diagnostics, gameInstallationFolder, cache).create())
             } else return this.defineSchema(this.DEFAULT_SCHEMA)
         } catch (err) {
             // Log.error('Error during schema configuration', err)

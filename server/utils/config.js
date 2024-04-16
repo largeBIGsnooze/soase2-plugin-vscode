@@ -7,11 +7,11 @@ module.exports = class Config {
         return workspace.getConfiguration('soase2-plugin')
     }
 
-    static get(data) {
-        return this.config().get(data)
+    static async get(data) {
+        return await this.config().get(data)
     }
 
-    static update(data, update) {
-        return this.config().update(data, update, ConfigurationTarget.Global)
+    static async update(data, update) {
+        return await this.config().update(data, update, ConfigurationTarget.Global)
     }
 }

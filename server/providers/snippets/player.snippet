@@ -1,0 +1,284 @@
+{
+    "Generate player body": {
+        "name": "Generate player",
+        "description": "Creates a generic player structure for modding",
+        "body": [
+            {
+                "version": 0,
+                "race": "$1",
+                "home_planet": {
+                    "random_fixture_filling": "",
+                    "levels": [],
+                    "starting_track_levels": {
+                        "logistics": 0,
+                        "commerce": 0,
+                        "mining": 0
+                    },
+                    "starting_planet_components": [],
+                    "establish_price": {
+                        "credits": 0,
+                        "metal": 0,
+                        "crystal": 0
+                    }
+                },
+                "influence": {
+                    "reveal_npc_point_costs": [],
+                    "increase_npc_reputation_level_point_costs": []
+                },
+                "planet_levels": [],
+                "planet_excavation_levels": [],
+                "starting_free_unit_build_kinds": [],
+                "starting_units_in_formations": [],
+                "fleet": "",
+                "unit_build_groups": [],
+                "buildable_units": [],
+                "faction_buildable_units": [],
+                "buildable_strikecraft": [],
+                "structure_build_groups": [],
+                "structure_builder": {
+                    "ship": "",
+                    "special_operation_unit_kind": ""
+                },
+                "structures": [],
+                "faction_structures": [],
+                "ability_created_units": [],
+                "unit_limits": {
+                    "global": [],
+                    "star": [],
+                    "planet": []
+                },
+                "research": {
+                    "research_domains": {
+                        "civilian": {
+                            "research_tiers": [],
+                            "research_fields": [],
+                            "full_name": "",
+                            "partial_name": "",
+                            "research_points_name": "",
+                            "planet_track_name": "",
+                            "planet_track_description": "",
+                            "planet_track_max_level_label": "",
+                            "planet_track_current_level_label": "",
+                            "button_background": "",
+                            "compressed_research_field_picture": "",
+                            "hud_icon": ""
+                        },
+                        "military": {
+                            "research_tiers": [],
+                            "research_fields": [],
+                            "full_name": "",
+                            "partial_name": "",
+                            "research_points_name": "",
+                            "planet_track_name": "",
+                            "planet_track_description": "",
+                            "planet_track_max_level_label": "",
+                            "planet_track_current_level_label": "",
+                            "button_background": "",
+                            "compressed_research_field_picture": "",
+                            "hud_icon": ""
+                        }
+                    },
+                    "research_subjects": [],
+                    "faction_research_subjects": []
+                },
+                "missing_ship_component_shop_build_time_scalar": 0,
+                "ship_components": [],
+                "ship_component_build_groups": [],
+                "planet_components": [],
+                "planet_component_build_groups": [],
+                "first_capital_ship_item": "",
+                "planet_types": [],
+                "default_starting_assets": {
+                    "credits": 0,
+                    "metal": 0,
+                    "crystal": 0
+                },
+                "asteroid_extraction_rates": {
+                    "metal": 0,
+                    "crystal": 0
+                },
+                "planet_bombing_recovery_cooldown": 0,
+                "colonize_starting_health_percent": 0,
+                "colonize_starting_shield_percent": 0,
+                "culture": {
+                    "decay_rates": [],
+                    "propagation_rates": [],
+                    "friendly_planet_modifiers": [],
+                    "enemy_planet_modifiers": [],
+                    "npc_modifiers": [],
+                    "planet_track_level_culture_providers": [
+                        {
+                            "track_type": "",
+                            "minimum_level": 0,
+                            "prerequisites": [],
+                            "rate": 0
+                        }
+                    ],
+                    "insurgency": {
+                        "prerequisites": [],
+                        "special_operation_unit_kind": "",
+                        "spawn_units": {
+                            "random_units": []
+                        },
+                        "supply": 0,
+                        "cooldown": 0,
+                        "spawn_at_gravity_well_count_percentage": 0
+                    }
+                },
+                "find_npc_explore_prerequisites": [],
+                "buildable_exotics": [],
+                "garrison": {
+                    "spawn_type": "",
+                    "special_operation_unit_kind": "",
+                    "build_kinds": [],
+                    "factory_build_time_scalar": 0,
+                    "units": {
+                        "random_units": []
+                    },
+                    "base_max_supply": 0
+                },
+                "trade": {
+                    "trade_income_rates": {
+                        "credits": 0,
+                        "metal": 0,
+                        "crystal": 0
+                    },
+                    "trade_ship_death_assets": {
+                        "credits": 0
+                    },
+                    "trade_ship_escorts": []
+                },
+                "max_supply": {
+                    "levels": []
+                },
+                "unit_starting_experience": {
+                    "levels": []
+                },
+                "auto_add_initial_home_planet_bookmark": true,
+                "gui": {
+                    "race_name": "",
+                    "race_description": "",
+                    "faction_name": "",
+                    "faction_description": "",
+                    "faction_icon": "",
+                    "load_screen_character_brush": ""
+                },
+                "unit_names": [],
+                "victory_gui": {
+                    "types": {
+                        "military": {
+                            "won_pictures": [],
+                            "lost_pictures": [],
+                            "won_texts": [],
+                            "lost_texts": []
+                        },
+                        "home_planet": {
+                            "won_pictures": [],
+                            "lost_pictures": [],
+                            "won_texts": [],
+                            "lost_texts": []
+                        },
+                        "diplomatic": {
+                            "won_pictures": [],
+                            "lost_pictures": [],
+                            "won_texts": [],
+                            "lost_texts": []
+                        },
+                        "colonization": {
+                            "won_pictures": [],
+                            "lost_pictures": [],
+                            "won_texts": [],
+                            "lost_texts": []
+                        }
+                    }
+                },
+                "sounds": {
+                    "user_interface_sounds": {
+                        "set_rally_point": "",
+                        "set_unit_factory_deliverable_destination": "",
+                        "build_structure": "",
+                        "set_planet_structure_plate_spin": "",
+                        "ping_attention": "",
+                        "ping_attack": "",
+                        "ping_defend": "",
+                        "join_fleet": "",
+                        "research_completed": "",
+                        "planet_being_bombed": "",
+                        "planet_colonized": "",
+                        "planet_lost": "",
+                        "ally_planet_lost": "",
+                        "planet_artifact_excavated": "",
+                        "planet_bonus_excavated": "",
+                        "planet_track_upgrade_completed": "",
+                        "enemy_units_incoming": "",
+                        "enemy_units_arrived": "",
+                        "enemy_planet_made_dead_from_bombing": "",
+                        "pirate_units_arrived": "",
+                        "insufficient_credits": "",
+                        "insufficient_metal": "",
+                        "insufficient_crystal": "",
+                        "insufficient_civilian_structure_slots": "",
+                        "insufficient_military_structure_slots": "",
+                        "insufficient_antimatter": "",
+                        "research_prerequisites_not_met": "",
+                        "insufficient_civilian_research_points": "",
+                        "insufficient_military_research_points": "",
+                        "position_has_overlapped_unit": "",
+                        "click_failed": "",
+                        "generic_order_issued": "",
+                        "generic_attack_order_issued": "",
+                        "generic_joined_fleet": "",
+                        "sell_npc_market_asset": "",
+                        "buy_npc_market_asset": "",
+                        "capital_ship_shields_down": "",
+                        "capital_ship_hull_severely_damaged": "",
+                        "capital_ship_lost": "",
+                        "ally_capital_ship_lost": "",
+                        "titan_shields_down": "",
+                        "titan_hull_severely_damaged": "",
+                        "titan_lost": "",
+                        "ally_titan_lost": "",
+                        "ally_titan_built": "",
+                        "enemy_titan_built": "",
+                        "fleet_under_attack": "",
+                        "destroy_planet_rewards_given": ""
+                    }
+                },
+                "ai": {
+                    "names": {
+                        "id_prefix": ""
+                    },
+                    "alliance_offer_decline_reasons": {
+                        "give_away_home_or_last_planet": "",
+                        "insufficient_assets": "",
+                        "insufficient_exotics": "",
+                        "not_allied": ""
+                    }
+                },
+                "portraits": [],
+                "icons": [],
+                "planet_elevators": {
+                    "elevator_meshes": [],
+                    "starting_elevator_count": 0,
+                    "per_level_elevator_count": 0,
+                    "explosion_effect": "",
+                    "explosion_sound": "",
+                    "car_count_per_elevator_connection": 0,
+                    "car_max_travel_time": 0,
+                    "car_max_travel_time_offset": 0,
+                    "car_tangent_offset_distance": 0,
+                    "car_path_count": 0,
+                    "car_path_min_t_delta": 0,
+                    "cars_texture_animation": "",
+                    "car_width": 0,
+                    "car_height": 0,
+                    "car_basic_constants": {
+                        "emissive_factor": 0
+                    }
+                },
+                "theme_picker_mesh_preview_units": [],
+                "theme_picker_skybox": ""
+            }
+        ]
+    }
+}

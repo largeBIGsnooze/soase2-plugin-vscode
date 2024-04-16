@@ -6,11 +6,11 @@ const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
 const { readdirSync } = require('fs')
 const FileHandler = require('./data/file-handler')
+const Config = require('./utils/config')
 
 module.exports = class Command {
     constructor(client) {
         this.client = client
-
         this.winrarPath = path.resolve(process.env.ProgramFiles, 'winrar/winrar.exe')
     }
 
@@ -110,6 +110,14 @@ module.exports = class Command {
             quickpicks.push({ label: scenario.label, detail: scenario.detail })
         }
         return quickpicks
+    }
+
+    toggleSnippetsCommand(commandName) {
+        commands.registerCommand(commandName, async () => {
+            const toggled = await Config.get('snippets.enabled')
+            await Config.update(toggled, !toggled, ConfigurationTarget.Global)
+            window.showInformationMessage(`Snippet visibility changed: ${toggled.toString().toUpperCase()}`)
+        })
     }
 
     zipScenarioCommand(commandName) {
@@ -234,11 +242,11 @@ module.exports = class Command {
     }
 
     async getInstallationFolder() {
-        return await workspace.getConfiguration('soase2-plugin').get('cache.game')
+        return await Config.get('cache.game')
     }
 
     async setWorkspace(dir) {
-        return await workspace.getConfiguration('soase2-plugin').update(`cache.game`, dir, ConfigurationTarget.Global)
+        return await Config.update(`cache.game`, dir, ConfigurationTarget.Global)
     }
 
     async updateWorkspaceAndCache(dir) {

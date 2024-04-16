@@ -88,6 +88,12 @@
                     "default": 4,
                     "minimum": 0,
                     "description": "Identation when formatting the file - default: 4"
+                },
+                "soase2-plugin.snippets.enabled": {
+                    "type": "boolean",
+                    "scope": "application",
+                    "default": false,
+                    "description": "Enable definition snippets"
                 }
             }
         },
@@ -182,6 +188,10 @@
             {
                 "command": "soase2-plugin.zip-scenario",
                 "title": "SOASE2: Zips scenario"
+            },
+            {
+                "command": "soase2-plugin.toggle-snippets",
+                "title": "SOASE2: Toggle snippet visibility"
             }
         ]
     },

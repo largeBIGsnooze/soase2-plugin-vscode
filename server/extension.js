@@ -52,22 +52,23 @@ async function activate(ctx) {
             client.onRequest('ignore/extensions', () => workspace.getConfiguration('soase2-plugin').get('extensions.ignore'))
             client.onRequest('formatter/tabs', () => workspace.getConfiguration('soase2-plugin').get('formatter.tabs'))
             client.onRequest('validation/language', () => workspace.getConfiguration('soase2-plugin').get('language'))
+            client.onRequest('validation/snippets_enabled', () => workspace.getConfiguration('soase2-plugin').get('snippets.enabled'))
         })
         .catch((err) => Log.error(err))
-
-    const openConfiguration = command.openConfiguration()
-
-    const validateButton = command.validateFilesCommand('soase2-plugin.validateFilesButton')
-    const changeWorkspace = command.changeWorkspaceCommand('soase2-plugin.changeWorkspace')
-    const createMod = command.createModCommand('soase2-plugin.create-mod')
-    const unzipScenario = command.unzipScenarioCommand('soase2-plugin.unzip-scenario')
-    const zipScenario = command.zipScenarioCommand('soase2-plugin.zip-scenario')
 
     // setTimeout(() => {
     // 	validateButton.exec()
     // }, 2000)
 
-    ctx.subscriptions.push(openConfiguration, validateButton.command, changeWorkspace, createMod, unzipScenario, zipScenario)
+    ctx.subscriptions.push(
+        command.openConfiguration(),
+        command.validateFilesCommand('soase2-plugin.validateFilesButton').command,
+        command.changeWorkspaceCommand('soase2-plugin.changeWorkspace'),
+        command.createModCommand('soase2-plugin.create-mod'),
+        command.unzipScenarioCommand('soase2-plugin.unzip-scenario'),
+        command.zipScenarioCommand('soase2-plugin.zip-scenario'),
+        command.toggleSnippetsCommand('soase2-plugin.toggle-snippets')
+    )
 
     return api
 }

@@ -20,7 +20,7 @@ module.exports = async (modFolder) => {
             })
             .on('change', (e) => {
                 Log.info('Entity updated:', e)
-                if (typeof func === 'function') callback(e)
+                if (typeof callback === 'function') return callback(e)
             })
             .on('add', (e) => {
                 if (entities.length === 0) return
@@ -145,6 +145,13 @@ module.exports = async (modFolder) => {
     cache.planet_artifacts = enumerate({ items: modCache.readPlanetArtifacts() })
     cache.modLogos = enumerate({ items: modCache.readModLogos() })
 
+    setFileWatcher(
+        {
+            glob: ['localized_text/en.localized_text'],
+            func: () => (cache.localisation.enum = modCache.readLocalisation()),
+        },
+        cache.localisation
+    )
     setFileWatcher({ glob: ['effects/*.beam_effect'] }, cache.beam_effects)
     setFileWatcher({ glob: ['effects/*.shield_effect'] }, cache.shield_effects)
     setFileWatcher({ glob: ['scenarios/*.scenario'] }, cache.scenarios)
@@ -174,7 +181,6 @@ module.exports = async (modFolder) => {
     setFileWatcher({ glob: ['mesh_materials/*.mesh_material'] }, cache.mesh_materials)
     setFileWatcher({ glob: ['uniforms/main_view.uniforms'], func: () => (cache.mainview_groups.enum = modCache.readMainviewGroups()) })
     setFileWatcher({ glob: ['meshes/*.mesh'] }, cache.meshes)
-    setFileWatcher({ glob: ['localized_text/*.localized_text'], func: () => (cache.localisation.enum = modCache.readLocalisation()) }, cache.localisation)
     setFileWatcher({ glob: ['entities/*'] }, cache.entities)
     setFileWatcher({ glob: ['entities/*.research_subject'] }, cache.research_subjects)
     setFileWatcher(

@@ -1,3 +1,8 @@
+## 0.3.5
+
+-  Added snippets for various entity types
+-  Bug fixes
+
 ## 0.3.2
 
 -  Improved the filewatching

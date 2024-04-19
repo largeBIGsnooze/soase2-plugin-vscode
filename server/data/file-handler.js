@@ -145,6 +145,17 @@ module.exports = class FileHandler {
         }
     }
 
+    readBuffModifierIds() {
+        try {
+            return this.readEntities(['entities/*.action_data_source'])
+                ?.map((e) => JSON.parse(e.content)?.buff_empire_modifiers?.map((e) => e?.buff_empire_modifier_id))
+                .filter((e) => e !== undefined)
+                .flat()
+        } catch (e) {
+            return ''
+        }
+    }
+
     readComponents({ component: component }) {
         try {
             return new Set(

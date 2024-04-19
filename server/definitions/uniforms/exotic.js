@@ -14,7 +14,7 @@ module.exports = class ExoticUniform {
                     items: object({
                         keys: {
                             name: string(),
-                            entity: this.cache.entities,
+                            entity: this.cache.exotic_entities,
                         },
                     }),
                 }),

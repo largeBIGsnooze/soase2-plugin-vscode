@@ -191,7 +191,7 @@ module.exports = class Unit extends Definitions {
                 }),
                 phase_lane: object({
                     keys: {
-                        is_gravity_well_existance_known_when_other_explored: boolean(),
+                        is_gravity_well_existence_known_when_other_explored: boolean(),
                         unit_group_distance_tolerance: float(),
                     },
                 }),
@@ -249,6 +249,7 @@ module.exports = class Unit extends Definitions {
                 culture_provider: object({
                     keys: {
                         base_culture_rate: float(),
+                        has_ability_providing_culture_rate: boolean(),
                         research_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
                     },
                 }),
@@ -278,6 +279,13 @@ module.exports = class Unit extends Definitions {
                 }),
                 ai: object({
                     keys: {
+                        pursuit: object({
+                            keys: {
+                                min_target_speed: float(),
+                                min_distance_to_target: float(),
+                            },
+                            required: ['min_target_speed', 'min_distance_to_target'],
+                        }),
                         behaviors: array({
                             items: enumerate({
                                 items: ['auto_follow_unit_attacking_any', 'auto_bomb_planet', 'auto_follow_unit_attacking_any_or_is_damaged', 'auto_follow_unit_attacking_threat'],

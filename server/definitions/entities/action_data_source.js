@@ -1,6 +1,6 @@
 const { string, schema, float, integer, array, object, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
-const { planet_modifier_types, unit_modifier_types, weapon_modifier_types, unit_factory_modifier_types } = require('../modifier_types')
+const { planet_modifier_types, unit_modifier_types, weapon_modifier_types, unit_factory_modifier_types, empire_modifier_types } = require('../modifier_types')
 
 module.exports = class ActionDataSource extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -45,6 +45,22 @@ module.exports = class ActionDataSource extends Definitions {
                                         items: super.getExemptions,
                                         isUnique: true,
                                     }),
+                                },
+                            }),
+                        },
+                    }),
+                }),
+                buff_empire_modifiers: array({
+                    items: object({
+                        keys: {
+                            buff_empire_modifier_id: string(),
+                            buff_empire_modifier: object({
+                                keys: {
+                                    modifier_type: enumerate({
+                                        items: empire_modifier_types(),
+                                    }),
+                                    value_behavior: super.getValueBehavior,
+                                    value_id: this.cache.action_values,
                                 },
                             }),
                         },

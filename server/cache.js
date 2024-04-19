@@ -40,7 +40,7 @@ module.exports = async (modFolder) => {
             })
     }
 
-    cache.entities = enumerate({
+    cache.exotic_entities = enumerate({
         items: modCache.readEntities(['entities/*.exotic'], { readFile: false }).map((e) => e?.name),
     })
     cache.player_icons = enumerate({
@@ -127,6 +127,7 @@ module.exports = async (modFolder) => {
     cache.strikecraft_kinds = enumerate({ items: modCache.readStrikecraft() })
     cache.action_data_sources = enumerate({ items: modCache.readActionDataSources() })
     cache.target_filters = enumerate({ items: [...modCache.readTargetFilters().target_filters, ...modCache.readTargetFilters().uniform] })
+    cache.buff_empire_ids = enumerate({ items: modCache.readBuffModifierIds() })
     cache.beam_effects = enumerate({ items: modCache.readBeamEffects() })
     cache.gui_actions = enumerate({ items: modCache.readAbilityGuiActions() })
     cache.target_filters_uniforms = enumerate({ items: modCache.readTargetFilters().uniform })
@@ -181,7 +182,7 @@ module.exports = async (modFolder) => {
     setFileWatcher({ glob: ['mesh_materials/*.mesh_material'] }, cache.mesh_materials)
     setFileWatcher({ glob: ['uniforms/main_view.uniforms'], func: () => (cache.mainview_groups.enum = modCache.readMainviewGroups()) })
     setFileWatcher({ glob: ['meshes/*.mesh'] }, cache.meshes)
-    setFileWatcher({ glob: ['entities/*'] }, cache.entities)
+    setFileWatcher({ glob: ['entities/*.exotic'] }, cache.exotic_entities)
     setFileWatcher({ glob: ['entities/*.research_subject'] }, cache.research_subjects)
     setFileWatcher(
         {
@@ -242,6 +243,7 @@ module.exports = async (modFolder) => {
             cache.weapon_modifier_ids.enum = modCache.readBuffWeaponModifiers()
             cache.planet_modifier_ids.enum = modCache.readBuffPlanetModifiers()
             cache.buff_unit_factory_modifiers.enum = modCache.readBuffUnitFactoryModifiers()
+            cache.buff_empire_ids.enum = modCache.readBuffModifierIds()
         },
     })
     setFileWatcher({ glob: ['uniforms/debris.uniforms'], func: () => (cache.debris.enum = modCache.readDebrisUniform()) })
@@ -253,7 +255,7 @@ module.exports = async (modFolder) => {
     setFileWatcher({ glob: ['brushes/*.brushes'] }, cache.brushes)
     setFileWatcher({ glob: ['entities/*.planet'] }, cache.planet_files)
     setFileWatcher({ glob: ['entities/*.weapon'] }, cache.weapons)
-    setFileWatcher({ glob: ['textures/*'] }, cache.textures)
+    setFileWatcher({ glob: ['textures/*.png', 'textures/*.dds'] }, cache.textures)
     setFileWatcher({ glob: ['uniforms/planet.uniforms'], func: () => (cache.planets.enum = modCache.readPlanets()) })
     setFileWatcher({ glob: ['uniforms/unit_build.uniforms'], func: () => (cache.build_kinds.enum = modCache.readUnitBuildKinds()) })
     setFileWatcher({ glob: ['player_colors/*.player_color_group'] }, cache.color_groups)

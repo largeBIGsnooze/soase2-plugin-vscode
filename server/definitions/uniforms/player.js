@@ -64,7 +64,7 @@ module.exports = class PlayerUniform extends Definitions {
                 colonization_victory_planet_count_percentage: percentage(),
                 time_between_notify_enemy_player_when_entering_gravity_well: float(),
                 auto_upgrade_planet_track_price_threshold_multiplier: float(),
-                max_research_time_scalar: float(false),
+                max_research_rate_scalar: float(false),
                 max_research_points_overflow: float(),
                 research_overflow_tier_nth_root_modifier: float(),
                 alliance: object({

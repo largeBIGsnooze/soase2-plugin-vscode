@@ -57,6 +57,7 @@ module.exports = class Ability extends Definitions {
                             keys: {
                                 unit: this.cache.units,
                                 max_count_in_gravity_well: this.cache.action_values,
+                                max_count_in_empire: this.cache.action_values,
                                 special_operation_unit_kind: this.cache.special_operation_kinds,
                                 gravity_well_primary_planet_target_filter: this.cache.target_filters,
                             },

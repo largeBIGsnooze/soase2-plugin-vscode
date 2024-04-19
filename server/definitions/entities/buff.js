@@ -35,6 +35,14 @@ module.exports = class Buff extends Definitions {
                 make_dead_when_no_child_buffs_exist: boolean(),
                 make_dead_when_no_child_buffs_exist_delay_time: this.cache.action_values,
                 provides_detection: boolean(),
+                empire_modifiers: array({
+                    items: object({
+                        keys: {
+                            buff_empire_modifier_id: this.cache.buff_empire_ids,
+                        },
+                        required: ['buff_empire_modifier_id'],
+                    }),
+                }),
                 make_dead_on_distance_to_parent_buff_exceeded: object({
                     keys: {
                         distance: this.cache.action_values,
@@ -93,6 +101,13 @@ module.exports = class Buff extends Definitions {
                         is_negative_buff: boolean(),
                         is_expire_time_suppressed: boolean(),
                         tooltip_line_groups: super.tooltip_line_groups(this.cache),
+                        apply_damage: object({
+                            keys: {
+                                damage_value: this.cache.action_values,
+                                penetration_value: this.cache.action_values,
+                                bypass_shields_chance_value: this.cache.action_values,
+                            },
+                        }),
                     },
                 }),
             },

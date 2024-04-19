@@ -1,5 +1,5 @@
 const { integer, string, vector2, enumerate, object, array, boolean, percentage, IfMap, color, vecInt2, If, float } = require('./data_types')
-const { planet_modifier_types, weapon_modifier_types, unit_modifier_types, unit_factory_modifier_types } = require('./modifier_types')
+const { planet_modifier_types, weapon_modifier_types, unit_modifier_types, unit_factory_modifier_types, empire_modifier_types } = require('./modifier_types')
 
 class Definitions {
     constructor() {}
@@ -201,6 +201,7 @@ class Definitions {
                     label_text: data['localisation'],
                     value_float_format: this.value_float_format,
                     unit_factory_modifier_id: data['buff_unit_factory_modifiers'],
+                    empire_modifier_id: data['buff_empire_ids'],
                     value_suffix_text: data['localisation'],
                     unit_modifier_id: data['buff_unit_modifiers'],
                     value_id: data['action_values'],
@@ -542,6 +543,16 @@ class Definitions {
         })
     }
 
+    sound(data) {
+        return object({
+            keys: {
+                sound: data['ogg'],
+                is_dialogue: boolean(),
+            },
+            required: ['sound', 'is_dialogue'],
+        })
+    }
+
     get getDamageSource() {
         return enumerate({
             items: ['ability', 'weapon'],
@@ -721,7 +732,7 @@ class Definitions {
 
     get getEasingFunctons() {
         return enumerate({
-            items: ['linear', 'in_cubic', 'out_cubic'],
+            items: ['linear', 'in_cubic', 'out_cubic', 'in_out_sine'],
         })
     }
 
@@ -960,7 +971,7 @@ class Definitions {
 
     get rendering_type() {
         return enumerate({
-            items: ['unit_icon_and_name', 'unit_item_value', 'single_value', 'buff_weapon_modifier', 'buff_unit_factory_modifier', 'buff_unit_modifier', 'buff_planet_modifier', 'buff_trade_capacity'],
+            items: ['buff_empire_modifier', 'unit_icon_and_name', 'unit_item_value', 'single_value', 'buff_weapon_modifier', 'buff_unit_factory_modifier', 'buff_unit_modifier', 'buff_planet_modifier', 'buff_trade_capacity'],
         })
     }
 
@@ -2468,7 +2479,7 @@ class UnitModifiers extends Definitions {
         return array({
             items: object({
                 keys: {
-                    is_psuedo_positive_buff: boolean(),
+                    is_pseudo_positive_buff: boolean(),
                     buff_unit_modifier_id: data['buff_unit_modifiers'],
                     modifier_type: enumerate({
                         items: unit_modifier_types(),
@@ -2719,30 +2730,13 @@ class EmpireModifiers extends Definitions {
         super()
     }
 
-    get getEmpireModifierTypes() {
-        return enumerate({
-            items: [
-                'influence_points_recharge_rate',
-                'max_influence_points',
-                'crystal_income_rate',
-                'metal_income_rate',
-                'credit_income_rate',
-                'research_time',
-                'bounty_increase',
-                'npc_reputation_rate_from_dominant_culture',
-                'percentage_of_other_players_total_credit_income',
-                'trade_credits_income_rate',
-                'trade_metal_income_rate',
-                'trade_crystal_income_rate',
-            ],
-        })
-    }
-
     create() {
         return array({
             items: object({
                 keys: {
-                    modifier_type: this.getEmpireModifierTypes,
+                    modifier_type: enumerate({
+                        items: empire_modifier_types(),
+                    }),
                     value_behavior: super.getValueBehavior,
                     value: float(false),
                 },

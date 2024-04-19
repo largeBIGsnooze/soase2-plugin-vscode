@@ -15,7 +15,7 @@ class Log {
     }
 
     static info(...messages) {
-        return console.log(` [ ❕ Info - ${this.timeStamp()}]: %s`, ...messages)
+        return console.log(` [ 🛈 Info - ${this.timeStamp()}]: %s`, ...messages)
     }
 
     static timeStamp = () => new Date().toLocaleTimeString('en-US')

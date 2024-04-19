@@ -51,8 +51,28 @@ const unit_modifier_types = () => {
         'phase_resonance_bonus_duration',
     ]
 }
+
+const empire_modifier_types = () => {
+    return [
+        'research_rate',
+        'influence_points_recharge_rate',
+        'max_influence_points',
+        'crystal_income_rate',
+        'metal_income_rate',
+        'credit_income_rate',
+        'research_time',
+        'bounty_increase',
+        'npc_reputation_rate_from_dominant_culture',
+        'percentage_of_other_players_total_credit_income',
+        'trade_credits_income_rate',
+        'trade_metal_income_rate',
+        'trade_crystal_income_rate',
+    ]
+}
+
 const planet_modifier_types = () => {
     return [
+        'research_rate',
         'research_time',
         'max_influence_points',
         'factory_exotic_build_time',
@@ -97,4 +117,5 @@ module.exports = {
     unit_modifier_types,
     planet_modifier_types,
     unit_factory_modifier_types,
+    empire_modifier_types,
 }

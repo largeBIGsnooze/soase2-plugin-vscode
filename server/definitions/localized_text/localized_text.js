@@ -1,4 +1,4 @@
-const { object } = require('../data_types')
+const { object, string } = require('../data_types')
 
 module.exports = class LocalizedText {
     /* eslint-disable no-unused-vars */
@@ -6,8 +6,10 @@ module.exports = class LocalizedText {
 
     create() {
         return object({
-            keys: {},
-            additionalProperties: true,
+            pkeys: {
+                '.*': string(),
+            },
+            additionalProperties: false,
         })
     }
 }

@@ -139,6 +139,7 @@ module.exports = class NotificationUniform extends Definitions {
                         ally_titan_built: this.type(),
                         enemy_titan_built: this.type(),
                         fleet_under_attack: this.type(),
+                        planet_conversion_started: this.type(),
                     },
                 }),
                 fleet_under_attack_notification_suppress_duplicates_duration: float(),

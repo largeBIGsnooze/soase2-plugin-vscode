@@ -413,6 +413,7 @@ module.exports = class MainViewUniform extends Definitions {
                         line_types: object({
                             keys: {
                                 move: this.line_type(),
+                                retreat: this.line_type(),
                                 attack: this.line_type(),
                                 use_ability: this.line_type(),
                                 hyperspace: this.line_type(),

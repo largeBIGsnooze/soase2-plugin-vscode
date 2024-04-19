@@ -29,8 +29,11 @@ const string = () => ({
     type: 'string',
 })
 
-const object = ({ keys: keys, required: required = [], additionalProperties: additionalProperties = false, condition: condition = [] }) => ({
+const object = ({ keys: keys, pkeys: pkeys = {}, required: required = [], additionalProperties: additionalProperties = false, condition: condition = [] }) => ({
     type: 'object',
+    patternProperties: {
+        ...pkeys,
+    },
     properties: {
         ...keys,
     },

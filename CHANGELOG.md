@@ -1,3 +1,8 @@
+## 0.4.0
+
+- Updated to 1.23.3 version of the game
+- Bug fixes
+
 ## 0.3.5
 
 -  Added snippets for various entity types

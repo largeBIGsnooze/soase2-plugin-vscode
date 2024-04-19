@@ -1,6 +1,6 @@
 const path = require('path')
 const { pathToFileURL } = require('url')
-const { readdirSync, lstatSync, readFileSync } = require('fs')
+const fs = require('fs')
 const EntityDefinition = require('./definitions/entity_definition')
 const DiagnosticStorage = require('./data/diagnostic-storage')
 const { Log } = require('./utils/logger')
@@ -11,7 +11,8 @@ module.exports = class Parser {
      * @param {connection} connection
      * @param {languageService} languageService
      * @param {schemaService} schemaService
-     * @param {string} gameInstallationFolder
+     * @param {String} gameInstallationFolder
+     * @param {Array} filesWithDiagnostics
      */
     constructor(connection, languageService, schemaService, gameInstallationFolder, { filesWithDiagnostics: filesWithDiagnostics }) {
         this.connection = connection
@@ -35,15 +36,14 @@ module.exports = class Parser {
     }
     /**
      * Validates all files against their relevant schemas
-     * @param {string} file
      */
     async validate() {
-        const requests = await this.fetchRequests()
+        await Parser.clearDiagnostics(this.filesWithDiagnostics, this.connection)
+        const { folders, extensions } = await this.fetchRequests()
         const cache = await require('./cache')(this.gameInstallationFolder)
         const start = process.hrtime()
 
-        await Parser.clearDiagnostics(this.filesWithDiagnostics, this.connection)
-        await this.processFolder(this.gameInstallationFolder, requests.folders, requests.extensions, cache, { filesWithDiagnostics: this.filesWithDiagnostics })
+        await this.processFolder(this.gameInstallationFolder, folders, extensions, cache)
 
         Log.info('Execution time:', `${process.hrtime(start)[0]}s`)
         return process.hrtime(start)[0]
@@ -53,33 +53,33 @@ module.exports = class Parser {
      * @param {string} filePath
      * @param {array} filterFolders
      * @param {array} filterExtensions
+     * @param {cache} cache
      */
     async processFolder(filePath, filterFolders, filterExtensions, cache) {
         const isIgnoredFolder = (arr, filePath) => {
             return arr.some((e) => filePath.endsWith(e))
         }
-        const isIgnoredExtension = (file) => {
-            const validExtensions = readFileSync(path.resolve(__dirname, '../package.json'), 'utf-8')
-            return JSON.parse(validExtensions).contributes.languages[0].extensions.some((value) => file.includes(value))
+        const isValidExtension = (file) => {
+            return require('../package.json').contributes.languages[0].extensions.some((value) => file.includes(value))
         }
 
         try {
-            for (const file of readdirSync(filePath)) {
+            for (const file of fs.readdirSync(filePath)) {
                 const currentFilePath = path.resolve(filePath, file)
-                const lstat = lstatSync(currentFilePath)
+                const lstat = fs.lstatSync(currentFilePath)
 
                 if (currentFilePath.endsWith('textures') || currentFilePath.endsWith('meshes')) continue
                 if (isIgnoredFolder(filterFolders, currentFilePath)) continue
                 if (lstat.isDirectory()) await this.processFolder(currentFilePath, filterFolders, filterExtensions, cache)
                 else {
-                    if (isIgnoredExtension(file)) {
+                    if (isValidExtension(file)) {
                         if (isIgnoredFolder(filterExtensions, currentFilePath)) continue
 
                         const start = process.hrtime()
                         await this.processFile(currentFilePath, cache)
 
                         Log.info(file, `- ${(process.hrtime(start)[1] / 1000000).toFixed(3)}ms`)
-                    } else Log.warn(`Invalid file or JSON: ${file}`)
+                    } else Log.info(`Skipping: ${file}`)
                 }
             }
         } catch (err) {
@@ -93,7 +93,8 @@ module.exports = class Parser {
      */
     async processFile(filePath, cache) {
         try {
-            const fileText = readFileSync(filePath, 'utf-8')
+            const fileText = fs.readFileSync(filePath, 'utf-8')
+
             EntityDefinition.diagnostics = []
             const diagStorage = new DiagnosticStorage(fileText, EntityDefinition.diagnostics)
 
@@ -110,7 +111,7 @@ module.exports = class Parser {
             )
             const generalDiagnostics = await this.entityDefinition.jsonDoValidation(fileText, filePath)
 
-            if (generalDiagnostics[0] || EntityDefinition.diagnostics) this.filesWithDiagnostics.push(filePath)
+            if (generalDiagnostics[0] || Array.from(EntityDefinition.diagnostics).length > 0) this.filesWithDiagnostics.push(filePath)
 
             await this.connection.sendDiagnostics({
                 uri: pathToFileURL(filePath).href,
@@ -122,17 +123,12 @@ module.exports = class Parser {
     }
     /**
      * Clears all diagnostics from files
-     * @param {string} filePath
+     * @param {Array} files
      * @param {connection} connection
      */
     static async clearDiagnostics(files, connection) {
         if (files.length === 0) return
-        for (const file of files) {
-            await connection.sendDiagnostics({
-                uri: pathToFileURL(file).href,
-                diagnostics: [],
-            })
-        }
-        files = []
+        for (const file of files) await connection.sendDiagnostics({ uri: pathToFileURL(file).href, diagnostics: [] })
+        files.length = 0
     }
 }

@@ -183,28 +183,6 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
         })
     }
 
-    random_skybox_fillings() {
-        return array({
-            items: object({
-                keys: {
-                    name: string(),
-                    filling: object({
-                        keys: {
-                            items: array({
-                                items: object({
-                                    keys: {
-                                        skybox: this.cache.skyboxes,
-                                        probability: float(),
-                                    },
-                                }),
-                            }),
-                        },
-                    }),
-                },
-            }),
-        })
-    }
-
     create() {
         return schema({
             keys: {
@@ -239,7 +217,6 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                 }),
                 fillings: object({
                     keys: {
-                        random_skybox_fillings: this.random_skybox_fillings(),
                         npc_fillings: this.npc_fillings(),
                         random_gravity_well_fillings: this.random_gravity_well_fillings(),
                         gravity_well_fillings: this.gravity_well_fillings(),

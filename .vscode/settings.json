@@ -1,13 +1,11 @@
 {
     "json.schemas": [
         {
-            "fileMatch": [
-                "/*.snippet"
-            ],
+            "fileMatch": ["/*.snippet"],
             "url": "./server/providers/snippets/schema.snippet.json"
         }
     ],
     "files.associations": {
-        "*.snippet": "json",
-    },
+        "*.snippet": "json"
+    }
 }

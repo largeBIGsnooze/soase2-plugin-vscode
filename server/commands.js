@@ -115,7 +115,7 @@ module.exports = class Command {
     toggleSnippetsCommand(commandName) {
         commands.registerCommand(commandName, async () => {
             const toggled = await Config.get('snippets.enabled')
-            await Config.update('snippets.enabled', !toggled,  ConfigurationTarget.Global)
+            await Config.update('snippets.enabled', !toggled, ConfigurationTarget.Global)
             window.showInformationMessage(`Snippet visibility changed: ${toggled.toString().toUpperCase()}`)
         })
     }

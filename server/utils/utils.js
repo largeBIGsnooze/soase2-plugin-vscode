@@ -18,10 +18,6 @@ module.exports = class Utils {
         }
     }
 
-    static exists(arr1, callback) {
-        return arr1.filter((y) => callback(y))
-    }
-
     static reference(arr, callback) {
         for (const e of arr) callback(e)
     }

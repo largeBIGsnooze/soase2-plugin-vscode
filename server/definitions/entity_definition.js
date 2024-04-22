@@ -249,6 +249,7 @@ const BeamEffect = require('./effects/beam_effect')
 const ShieldEffect = require('./effects/shield_effect')
 const ExhaustTrailEffect = require('./effects/exhaust_trail_effect')
 const HudSkinUniform = require('./uniforms/hud_skin')
+const RandomSkyboxFillingUniforms = require('./uniforms/random_skybox_filling')
 
 module.exports = class EntityDefinition extends Document {
     static diagnostics = []
@@ -288,6 +289,7 @@ module.exports = class EntityDefinition extends Document {
         ['exotic.uniforms']: ExoticUniform,
         ['special_operation_unit.uniforms']: SpecialOperationUnit,
         ['hud_skin.uniforms']: HudSkinUniform,
+        ['random_skybox_filling.uniforms']: RandomSkyboxFillingUniforms,
     }
 
     static gui = {

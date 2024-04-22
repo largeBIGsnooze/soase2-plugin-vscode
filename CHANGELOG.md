@@ -1,16 +1,21 @@
+## 0.4.1
+
+-  Added entity manifest autocompletion
+-  Added `random_skybox_filling.uniforms`
+
 ## 0.4.0
 
-- Updated to 1.23.3 version of the game
-- Bug fixes
+-   Updated to 1.23.3 version of the game
+-   Bug fixes
 
 ## 0.3.5
 
--  Added snippets for various entity types
--  Bug fixes
+-   Added snippets for various entity types
+-   Bug fixes
 
 ## 0.3.2
 
--  Improved the filewatching
+-   Improved the filewatching
 
 ## 0.3.0
 

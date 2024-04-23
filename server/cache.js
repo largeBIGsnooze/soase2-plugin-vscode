@@ -19,7 +19,6 @@ module.exports = async (modFolder) => {
                 cwd: modFolder,
             })
             .on('change', (e) => {
-                Log.info('Entity updated:', e)
                 if (typeof callback === 'function') return callback(e)
             })
             .on('add', (e) => {
@@ -27,7 +26,6 @@ module.exports = async (modFolder) => {
                 for (const entity of entities) {
                     entity.enum.push(basename(e))
                 }
-                Log.info('Entity changed:', e)
             })
             .on('unlink', (e) => {
                 if (entities.length === 0) return
@@ -36,12 +34,11 @@ module.exports = async (modFolder) => {
                     const idx = entity.enum.findIndex((e) => e === name)
                     entity.enum.splice(idx, 1)
                 }
-                Log.info('Entity deleted:', e)
             })
     }
 
     cache.exotic_entities = enumerate({
-        items: modCache.readEntities(['entities/*.exotic'], { readFile: false }).map((e) => e?.name),
+        items: modCache.readEntityManifest('exotic'),
     })
     cache.player_icons = enumerate({
         items: modCache.readPlayerIcons(),
@@ -182,7 +179,6 @@ module.exports = async (modFolder) => {
     setFileWatcher({ glob: ['mesh_materials/*.mesh_material'] }, cache.mesh_materials)
     setFileWatcher({ glob: ['uniforms/main_view.uniforms'], func: () => (cache.mainview_groups.enum = modCache.readMainviewGroups()) })
     setFileWatcher({ glob: ['meshes/*.mesh'] }, cache.meshes)
-    setFileWatcher({ glob: ['entities/*.exotic'] }, cache.exotic_entities)
     setFileWatcher({ glob: ['entities/*.research_subject'] }, cache.research_subjects)
     setFileWatcher(
         {
@@ -260,12 +256,24 @@ module.exports = async (modFolder) => {
     setFileWatcher({ glob: ['uniforms/unit_build.uniforms'], func: () => (cache.build_kinds.enum = modCache.readUnitBuildKinds()) })
     setFileWatcher({ glob: ['player_colors/*.player_color_group'] }, cache.color_groups)
     setFileWatcher({ glob: ['uniforms/exotic.uniforms'], func: () => (cache.exotics.enum = modCache.readExotics()) })
+
+    // Entity Manifests
+    setFileWatcher({ glob: ['entities/unit_skin.entity_manifest'], func: () => (cache.unit_skins.enum = modCache.readUnitSkins()) })
     setFileWatcher({ glob: ['entities/unit.entity_manifest'], func: () => (cache.units.enum = modCache.readUnits()) })
     setFileWatcher({ glob: ['entities/buff.entity_manifest'], func: () => (cache.buffs.enum = modCache.readBuffs()) })
+    setFileWatcher({ glob: ['entities/research_subject.entity_manifest'], func: () => (cache.buffs.enum = modCache.readResearchSubjects()) })
+    setFileWatcher({ glob: ['entities/npc_reward.entity_manifest'], func: () => (cache.npc_rewards.enum = modCache.readNpcRewards()) })
+    setFileWatcher({ glob: ['entities/formation.entity_manifest'], func: () => (cache.formations.enum = modCache.readFormations()) })
+    setFileWatcher({ glob: ['entities/action_data_source.entity_manifest'], func: () => (cache.action_data_sources.enum = modCache.readActionDataSources()) })
+    setFileWatcher({ glob: ['entities/player.entity_manifest'], func: () => (cache.players.enum = modCache.readPlayers()) }, cache.players)
+    setFileWatcher({ glob: ['entities/ability.entity_manifest'], func: () => (cache.abilities.enum = modCache.readAbilities()) })
+    setFileWatcher({ glob: ['entities/weapon.entity_manifest'], func: () => (cache.weapons.enum = modCache.readWeapons()) })
+    setFileWatcher({ glob: ['entities/exotic.entity_manifest'], func: () => (cache.exotic_entities.enum = modCache.readEntityManifest('exotic')) })
+    //
+
     setFileWatcher({ glob: ['colors/named_colors.named_colors'], func: () => (cache.colors.enum = modCache.readColorGroups()) })
     setFileWatcher({ glob: ['sounds/*.sound'] }, cache.sounds)
     setFileWatcher({ glob: ['sounds/*.ogg'] }, cache.ogg)
-    setFileWatcher({ glob: ['entities/ability.entity_manifest'], func: () => (cache.abilities.enum = modCache.readAbilities()) })
     setFileWatcher({
         glob: ['uniforms/galaxy_generator.uniforms'],
         func: () => {
@@ -284,15 +292,8 @@ module.exports = async (modFolder) => {
         glob: ['uniforms/unit_tag.uniforms'],
         func: () => (cache.ship_tags.enum = modCache.readShipTags()),
     })
-    setFileWatcher({
-        glob: ['entities/npc_reward.entity_manifest'],
-        func: () => (cache.npc_rewards.enum = modCache.readNpcRewards()),
-    })
-    setFileWatcher({ glob: ['entities/formation.entity_manifest'], func: () => (cache.formations.enum = modCache.readFormations()) })
     setFileWatcher({ glob: ['uniforms/unit_mutation.uniforms'], func: () => (cache.mutations.enum = modCache.readUnitMutations()) })
-    setFileWatcher({ glob: ['entities/player.entity_manifest'], func: () => (cache.players.enum = modCache.readPlayers()) }, cache.players)
     setFileWatcher({ glob: ['uniforms/strikecraft.uniforms'], func: () => (cache.strikecraft_kinds.enum = modCache.readStrikecraft()) })
-    setFileWatcher({ glob: ['entities/action_data_source.entity_manifest'], func: () => (cache.action_data_sources.enum = modCache.readActionDataSources()) })
     setFileWatcher({ glob: ['uniforms/weapon_tags.uniforms'], func: () => (cache.weapon_tags.enum = modCache.readWeaponTags()) })
 
     return cache

@@ -1,4 +1,3 @@
-const { Log } = require('../../utils/logger')
 const { schema, array, object, string } = require('../data_types')
 
 module.exports = class ExoticUniform {

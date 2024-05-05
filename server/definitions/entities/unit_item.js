@@ -117,6 +117,7 @@ module.exports = class UnitItem extends Definitions {
                 hud_icon: this.cache.textures,
                 name: this.cache.localisation,
                 tooltip_icon: this.cache.textures,
+                tooltip_picture: this.cache.textures,
                 description: this.cache.localisation,
                 build_time: float(),
                 price: super.price,

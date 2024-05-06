@@ -1,7 +1,7 @@
 const DiagnosticStorage = require('../../data/diagnostic-storage')
 const FileHandler = require('../../data/file-handler')
 const { reference } = require('../../utils/utils')
-const { schema, array, enumerate } = require('../data_types')
+const { schema, array, enumerate, boolean } = require('../data_types')
 
 module.exports = class EntityManifest {
     /* eslint-disable no-unused-vars */
@@ -23,6 +23,7 @@ module.exports = class EntityManifest {
         }
         return schema({
             keys: {
+                overwrite_ids: boolean(),
                 ids: array({
                     items: enumerate({ items: this.manifestEntities.map((e) => e?.name) }),
                     isUnique: true,

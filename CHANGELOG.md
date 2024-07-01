@@ -1,7 +1,12 @@
+## 0.4.2
+
+-  Refactored some caching
+-  Removed snippets until further notice
+
 ## 0.4.1
 
--  Added entity manifest autocompletion
--  Added `random_skybox_filling.uniforms`
+-   Added entity manifest autocompletion
+-   Added `random_skybox_filling.uniforms`
 
 ## 0.4.0
 

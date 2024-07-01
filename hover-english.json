@@ -1,6 +1,10 @@
 {
     "hover": [
         {
+            "key": "overwrite_ids",
+            "description": "Whether or not to merge with vanilla definitions"
+        },
+        {
             "key": "version",
             "description": "Archive version"
         },

@@ -115,7 +115,7 @@ module.exports = class Parser {
 
             await this.connection.sendDiagnostics({
                 uri: pathToFileURL(filePath).href,
-                diagnostics: [].concat(generalDiagnostics, EntityDefinition.diagnostics),
+                diagnostics: [].concat(EntityDefinition.diagnostics, generalDiagnostics),
             })
         } catch (err) {
             Log.error(`Error during processing file: '${path.basename(filePath)}' with error: ${err.message}`)

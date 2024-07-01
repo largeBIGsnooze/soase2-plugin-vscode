@@ -103,7 +103,7 @@ module.exports = class Lsp {
 
         return await this.options.connection.sendDiagnostics({
             uri: uri,
-            diagnostics: [].concat(diagnostics, EntityDefinition.diagnostics),
+            diagnostics: [].concat(EntityDefinition.diagnostics, diagnostics),
         })
     }
 }

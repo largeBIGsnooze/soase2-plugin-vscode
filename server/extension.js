@@ -52,7 +52,6 @@ async function activate(ctx) {
             client.onRequest('ignore/extensions', () => workspace.getConfiguration('soase2-plugin').get('extensions.ignore'))
             client.onRequest('formatter/tabs', () => workspace.getConfiguration('soase2-plugin').get('formatter.tabs'))
             client.onRequest('validation/language', () => workspace.getConfiguration('soase2-plugin').get('language'))
-            client.onRequest('validation/snippets_enabled', () => workspace.getConfiguration('soase2-plugin').get('snippets.enabled'))
         })
         .catch((err) => Log.error(err))
 
@@ -66,8 +65,7 @@ async function activate(ctx) {
         command.changeWorkspaceCommand('soase2-plugin.changeWorkspace'),
         command.createModCommand('soase2-plugin.create-mod'),
         command.unzipScenarioCommand('soase2-plugin.unzip-scenario'),
-        command.zipScenarioCommand('soase2-plugin.zip-scenario'),
-        command.toggleSnippetsCommand('soase2-plugin.toggle-snippets')
+        command.zipScenarioCommand('soase2-plugin.zip-scenario')
     )
 
     return api

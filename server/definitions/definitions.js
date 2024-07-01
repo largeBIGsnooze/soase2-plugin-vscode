@@ -981,11 +981,6 @@ class Definitions {
         })
     }
 
-    get build_group_id() {
-        return enumerate({
-            items: ['defense', 'utility', 'offense', 'infrastructure', 'economy'],
-        })
-    }
     exotic_price(exotics) {
         return array({
             items: object({

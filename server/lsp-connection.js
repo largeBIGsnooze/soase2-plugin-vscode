@@ -38,7 +38,7 @@ function initializeServer() {
     documents.onDidChangeContent((params) => server.onDidChangeContent(params))
 
     connection.onHover((params) => server.onHoverProvider.provideHover(params, documents))
-    connection.onCompletion((params) => server.onCompletionProvider.provideCompletion(params, documents, connection))
+    connection.onCompletion((params) => server.onCompletionProvider.provideCompletion(params, documents))
     connection.onDocumentFormatting((params) => server.onDocumentFormatting.provideFormatting(TextEdit, params, documents))
     //connection.onDefinition((params) => server.onDefinition.provideDefinition(params.textDocument, params.position, documents, connection))
 }

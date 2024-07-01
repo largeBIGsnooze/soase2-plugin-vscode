@@ -88,12 +88,6 @@
                     "default": 4,
                     "minimum": 0,
                     "description": "Identation when formatting the file - default: 4"
-                },
-                "soase2-plugin.snippets.enabled": {
-                    "type": "boolean",
-                    "scope": "application",
-                    "default": false,
-                    "description": "Enable definition snippets"
                 }
             }
         },
@@ -188,10 +182,6 @@
             {
                 "command": "soase2-plugin.zip-scenario",
                 "title": "SOASE2: Zips scenario"
-            },
-            {
-                "command": "soase2-plugin.toggle-snippets",
-                "title": "SOASE2: Toggle snippet visibility"
             }
         ]
     },
@@ -215,8 +205,11 @@
         "typescript": "^5.1.3"
     },
     "dependencies": {
+        "ajv": "^8.12.0",
+        "ajv-errors": "^3.0.0",
         "chokidar": "^3.6.0",
         "fast-glob": "^3.3.2",
+        "json-source-map": "^0.6.1",
         "lodash": "^4.17.21",
         "lorem-ipsum": "^2.0.8",
         "vscode-json-languageservice": "^5.3.5",

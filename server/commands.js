@@ -5,7 +5,7 @@ const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
 const { readdirSync } = require('fs')
-const FileHandler = require('./data/file-handler')
+const { EntityParser } = require('./data/file-handler')
 const Config = require('./utils/config')
 
 module.exports = class Command {
@@ -99,7 +99,7 @@ module.exports = class Command {
 
     async getAvaliableScenarioQuickpicks() {
         const quickpicks = []
-        const scenarios = new FileHandler(await this.getInstallationFolder())
+        const scenarios = new EntityParser(await this.getInstallationFolder())
             .readEntities(['scenarios/*.scenario'])
             .map((e) => {
                 return { label: e?.name, detail: e?.entityUri }
@@ -110,14 +110,6 @@ module.exports = class Command {
             quickpicks.push({ label: scenario.label, detail: scenario.detail })
         }
         return quickpicks
-    }
-
-    toggleSnippetsCommand(commandName) {
-        commands.registerCommand(commandName, async () => {
-            const toggled = await Config.get('snippets.enabled')
-            await Config.update('snippets.enabled', !toggled, ConfigurationTarget.Global)
-            window.showInformationMessage(`Snippet visibility changed: ${toggled.toString().toUpperCase()}`)
-        })
     }
 
     zipScenarioCommand(commandName) {
@@ -222,6 +214,7 @@ module.exports = class Command {
             try {
                 mkdirSync(path.join(gamePath, 'scenarios', zip))
                 execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) => (err ? this.client.debug(err) : null))
+                window.showInformationMessage(`Scenario unzipped: ${zipPath}.scenario`)
             } catch (e) {
                 window.showErrorMessage(`Scenario: ${zipPath}, already exists`)
             }
@@ -231,10 +224,12 @@ module.exports = class Command {
                     window.showErrorMessage('Cannot zip the selected scenario. Try unzipping it first')
                     return
                 }
+                unlinkSync(path.resolve(zipPath, `${zipPath}.scenario`))
                 execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) => (err ? this.client.debug(err) : null)).on('exit', () => {
                     readdirSync(zipPath)?.map((e) => unlinkSync(path.resolve(zipPath, e)))
                     rmdirSync(zipPath)
                 })
+                window.showInformationMessage(`Scenario zipped: ${zipPath}`)
             } catch (e) {
                 window.showErrorMessage(`Packing scenario failed: ${e.message}`)
             }

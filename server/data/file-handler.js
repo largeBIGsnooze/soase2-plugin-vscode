@@ -21,7 +21,7 @@ class EntityHandler {
                         basename: baseName,
                         ext: ext,
                         filename: `${baseName}.${ext}`,
-                        content: read ? this.parseContents(fs.readFileSync(filePath, 'utf-8'), `${baseName}.${ext}`) : '',
+                        content: read ? this.parseContents(fs.readFileSync(filePath, 'utf-8'), `${baseName}.${ext}`) : null,
                     }
                 } catch (err) {
                     Log.error('Error during reading:', err)
@@ -81,7 +81,7 @@ class EntityParser extends EntityHandler {
     }
 
     parseTextures() {
-        const textures = super.read(['textures/*.{dds,png}'], { read: false })
+        const textures = super.read(['./textures/*.{DDS,dds,png,PNG}'], { read: false })
         return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
     }
     parseFontsTtf() {
@@ -188,7 +188,7 @@ class EntityParser extends EntityHandler {
         return new BuildGroups(this.gameFolder).unit_build_groups
     }
     parseUnitItemBuildGroupIds() {
-        return new BuildGroups(this.gameFolder).ids
+        return [...new BuildGroups(this.gameFolder).ids, 'starbase']
     }
     // TODO: Find out target types
     parseAttackTargetTypes() {
@@ -227,7 +227,7 @@ class EntityParser extends EntityHandler {
         return this.parseUniform('player', 'races').map((e) => e.name)
     }
     parseModLogos() {
-        const logos = super.read(['./*.png'], { read: false })
+        const logos = super.read(['./*.{png,PNG}'], { read: false })
         return [...logos.map((e) => e.basename), ...logos.map((e) => e.filename), '']
     }
 

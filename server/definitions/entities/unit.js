@@ -1,7 +1,6 @@
 const Definitions = require('../definitions')
 const DiagnosticStorage = require('../../data/diagnostic-storage')
 const { schema, float, object, array, vector3, boolean, enumerate, string, integer, vector2, percentage, angle, vecInt2 } = require('../data_types')
-const FileHandler = require('../../data/file-handler')
 
 module.exports = class Unit extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -11,8 +10,6 @@ module.exports = class Unit extends Definitions {
         this.fileName = fileName
         this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
         this.json = JSON.parse(fileText)
-
-        this.reader = new FileHandler(gameInstallationFolder)
 
         this.cache = cache
     }
@@ -621,7 +618,7 @@ module.exports = class Unit extends Definitions {
                         price: super.price,
                         build_kind: this.cache.build_kinds,
                         supply_cost: integer(),
-                        build_group_id: this.cache.ship_tags,
+                        build_group_id: this.cache.unit_build_group_ids,
                         prerequisites: super.getResearchSubjects(this.cache.research_subjects),
                         build_radius: float(),
                         exotic_price: super.exotic_price(this.cache.exotics),

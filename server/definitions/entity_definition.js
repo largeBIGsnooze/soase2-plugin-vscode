@@ -250,10 +250,12 @@ const ShieldEffect = require('./effects/shield_effect')
 const ExhaustTrailEffect = require('./effects/exhaust_trail_effect')
 const HudSkinUniform = require('./uniforms/hud_skin')
 const RandomSkyboxFillingUniforms = require('./uniforms/random_skybox_filling')
+const WelcomeMessage = require('./welcome_message/welcome_message')
+const GdprAcceptData = require('./gdpr_accept_data/gdpr_accept_data')
 
 module.exports = class EntityDefinition extends Document {
     static diagnostics = []
-
+    static nonschemed_files = []
     static uniforms = {
         // Uniforms //
         ['weapon.uniforms']: WeaponUniform,
@@ -490,7 +492,6 @@ module.exports = class EntityDefinition extends Document {
         ['named_colors.named_colors']: NamedColors,
         // Player Icons ///
         icon: Icons,
-
         player_icon: Icons,
         player_portrait: Icons,
         // Player Colors //
@@ -512,6 +513,10 @@ module.exports = class EntityDefinition extends Document {
         // Death Sequence
         death_sequence: DeathSequence,
         death_sequence_group: DeathSequenceGroup,
+        // Welcome Message
+        welcome_message: WelcomeMessage,
+        // Gdpr Accept Data
+        gdpr_accept_data: GdprAcceptData,
     }
     static entities = {
         ['.mod_meta_data']: ModMetaData,
@@ -574,7 +579,10 @@ module.exports = class EntityDefinition extends Document {
         try {
             if (Entity) {
                 return this.defineSchema(new Entity({ fileText: fileText, fileExt: fileExt, fileName: fileName }, EntityDefinition.diagnostics, gameInstallationFolder, cache).create())
-            } else return this.defineSchema(this.DEFAULT_SCHEMA)
+            } else {
+                EntityDefinition.nonschemed_files.push(`${fileName}.${fileExt}`)
+                return this.defineSchema(this.DEFAULT_SCHEMA)
+            }
         } catch (err) {
             // Log.error('Error during schema configuration', err)
         }

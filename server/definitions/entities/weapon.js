@@ -1,5 +1,4 @@
 const DiagnosticStorage = require('../../data/diagnostic-storage')
-const FileHandler = require('../../data/file-handler')
 const { float, vector3, object, schema, enumerate, array, percentage } = require('../data_types')
 const Definitions = require('../definitions')
 
@@ -13,7 +12,6 @@ module.exports = class Weapon extends Definitions {
         this.diagStorage = new DiagnosticStorage(this.fileText, diagnostics)
 
         this.fileName = fileName
-        this.reader = new FileHandler(gameInstallationFolder)
 
         this.cache = cache
     }

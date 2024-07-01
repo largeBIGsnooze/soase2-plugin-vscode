@@ -1,4 +1,4 @@
-const { schema, object, array, string, float, vector3, vector2, integer, boolean, color, percentage, enumerate } = require('../data_types')
+const { schema, object, array, string, float, vector3, vector2, integer, boolean, color, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class GalaxyGeneratorUniform extends Definitions {

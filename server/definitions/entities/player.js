@@ -1,5 +1,5 @@
 const DiagnosticStorage = require('../../data/diagnostic-storage')
-const FileHandler = require('../../data/file-handler')
+const { EntityParser } = require('../../data/file-handler')
 const { schema, float, string, object, array, integer, enumerate, vector2, boolean, percentage, vecInt2 } = require('../data_types')
 const Definitions = require('../definitions')
 const { planet_modifier_types, unit_modifier_types } = require('../modifier_types')
@@ -11,7 +11,7 @@ module.exports = class Player extends Definitions {
         this.json = JSON.parse(fileText)
         this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
 
-        this.reader = new FileHandler(gameInstallationFolder)
+        this.fileName = fileName
 
         this.cache = cache
     }
@@ -249,13 +249,13 @@ module.exports = class Player extends Definitions {
     }
 
     create() {
-        if (this.json.hasOwnProperty('starting_units_in_hyperspace') && !this.json.hasOwnProperty('starting_units_in_hyperspace_duration')) {
+        if (this.json?.hasOwnProperty('starting_units_in_hyperspace') && !this.json?.hasOwnProperty('starting_units_in_hyperspace_duration')) {
             this.diagStorage.messages.requiresKey(null, 'starting_units_in_hyperspace_duration')
         }
         return schema({
             keys: {
                 version: float(),
-                race: enumerate({ items: this.reader.readRaceNames() }),
+                race: this.cache.race_names,
                 influence: object({
                     keys: {
                         reveal_npc_point_costs: array({ items: integer() }),

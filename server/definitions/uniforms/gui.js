@@ -1,4 +1,4 @@
-const { schema, object, string, float, array } = require('../data_types')
+const { schema, object, float, array } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class GuiUniform extends Definitions {

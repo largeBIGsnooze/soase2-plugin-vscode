@@ -124,7 +124,7 @@ module.exports = class UnitItem extends Definitions {
                 exotic_price: super.exotic_price(this.cache.exotics),
                 build_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
                 max_count_on_unit: integer(),
-                build_group_id: super.build_group_id,
+                build_group_id: this.cache.unit_item_build_group_ids,
                 ability: this.cache.abilities,
                 planet_types: array({
                     items: this.cache.planets,

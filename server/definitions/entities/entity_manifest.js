@@ -1,31 +1,26 @@
 const DiagnosticStorage = require('../../data/diagnostic-storage')
-const FileHandler = require('../../data/file-handler')
 const { reference } = require('../../utils/utils')
-const { schema, array, enumerate, boolean } = require('../data_types')
-
+const { EntityParser } = require('../../data/file-handler')
+const { schema, boolean, array, enumerate } = require('../data_types')
 module.exports = class EntityManifest {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
         this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
-        this.reader = new FileHandler(gameInstallationFolder)
-        this.allEntities = this.reader.readEntities(['entities/*'], { readFile: false })
-        this.manifestEntities = this.reader.readEntities([`entities/*.${fileName}`], { readFile: false })
+        this.reader = new EntityParser(gameInstallationFolder)
+        this.allEntities = this.reader.read(['entities/*'], { read: false })
+        this.manifestEntities = this.reader.read([`entities/*.${fileName}`], { read: false })
 
         this.json = JSON.parse(fileText).ids
         this.fileName = fileName
     }
 
     create() {
-        try {
-            reference(this.manifestEntities, (e) => (!this.json.includes(e.name) ? this.diagStorage.messages.unreferenced(this.fileName, e.name) : null))
-        } catch (err) {
-            //Silent
-        }
+        reference(this.manifestEntities, (e) => (!this.json.includes(e.basename) ? this.diagStorage.messages.unreferenced(this.fileName, e.basename) : null))
         return schema({
             keys: {
                 overwrite_ids: boolean(),
                 ids: array({
-                    items: enumerate({ items: this.manifestEntities.map((e) => e?.name) }),
+                    items: enumerate({ items: this.manifestEntities.map((e) => e.basename) }),
                     isUnique: true,
                 }),
             },

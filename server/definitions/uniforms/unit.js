@@ -1,4 +1,4 @@
-const FileHandler = require('../../data/file-handler')
+const { EntityParser } = require('../../data/file-handler')
 const { schema, array, object, string, float, vector2, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 
@@ -6,7 +6,7 @@ module.exports = class UnitUniform extends Definitions {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
         super(gameInstallationFolder)
-        this.entityReader = new FileHandler(gameInstallationFolder)
+        this.entityReader = new EntityParser(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -26,10 +26,10 @@ module.exports = class UnitUniform extends Definitions {
                         },
                     }),
                 }),
-                buff_agent_unit: this.entityReader.readBuffAgentUnit(),
-                default_gravity_well: this.entityReader.readGravityWellUnit(),
-                default_phase_lane: this.entityReader.readPhaseLaneUnit(),
-                default_rally_point: this.entityReader.readRallyPointUnit(),
+                buff_agent_unit: this.entityReader.parseBuffAgentUnit(),
+                default_gravity_well: this.entityReader.parseGravityWellUnit(),
+                default_phase_lane: this.entityReader.parsePhaseLaneUnit(),
+                default_rally_point: this.entityReader.parseRallyPointUnit(),
                 scuttle_duration: float(),
                 max_special_operation_unit_idle_time: float(),
                 damage_scalar_per_additive_defensive_value: float(),

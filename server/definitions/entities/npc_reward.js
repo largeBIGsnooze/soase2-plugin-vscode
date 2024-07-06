@@ -1,9 +1,10 @@
 const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
-const { prerequisites } = require('../definitions')
 const { schema, float, array, object, enumerate, integer, vector2i, boolean, version, string } = require('../data_types')
 const Buff = require('./buff')
 const { NpcModifiers } = require('../modifier_definitions')
 const Definitions = require('../definitions')
+const { has } = require('../../utils/utils')
+const { ERROR } = require('../../constants')
 
 class Type {
     constructor(json) {

@@ -98,24 +98,7 @@ module.exports = class Command {
     }
 
     async getAvaliableScenarioQuickpicks() {
-        const quickpicks = []
-        const scenarios = new EntityParser(await this.getInstallationFolder())
-            .readEntities(['scenarios/*.scenario'])
-            .map((e) => {
-                return {
-                    label: e?.name,
-                    detail: e?.entityUri,
-                }
-            })
-            .sort()
-
-        for (const scenario of scenarios) {
-            quickpicks.push({
-                label: scenario.label,
-                detail: scenario.detail,
-            })
-        }
-        return quickpicks
+        return new EntityParser(await this.getInstallationFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     zipScenarioCommand(commandName) {

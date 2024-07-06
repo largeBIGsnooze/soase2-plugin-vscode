@@ -656,7 +656,7 @@ module.exports = class UI {
     static alliance_lock_duration_button(localisation, textures) {
         return _.object({
             keys: {
-                text_prefix_if_has_alliance_lock: s_.tring(),
+                text_prefix_if_has_alliance_lock: _.string(),
                 not_included_in_offer_alpha: _.float(),
                 alliance_lock_duration_label: localisation,
                 alliance_lock_duration_seperator: _.string(),

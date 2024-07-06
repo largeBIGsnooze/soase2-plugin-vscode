@@ -1,10 +1,8 @@
 const { schema, object, array, enumerate, boolean, float } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class DeathSequence extends Definitions {
+module.exports = class DeathSequence {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 

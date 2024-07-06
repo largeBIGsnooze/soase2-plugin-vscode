@@ -102,25 +102,43 @@ module.exports = class Command {
         const scenarios = new EntityParser(await this.getInstallationFolder())
             .readEntities(['scenarios/*.scenario'])
             .map((e) => {
-                return { label: e?.name, detail: e?.entityUri }
+                return {
+                    label: e?.name,
+                    detail: e?.entityUri,
+                }
             })
             .sort()
 
         for (const scenario of scenarios) {
-            quickpicks.push({ label: scenario.label, detail: scenario.detail })
+            quickpicks.push({
+                label: scenario.label,
+                detail: scenario.detail,
+            })
         }
         return quickpicks
     }
 
     zipScenarioCommand(commandName) {
         commands.registerCommand(commandName, async () => {
-            this.showQuickpicks(await this.getAvaliableScenarioQuickpicks(), async (option) => await this.manageScenario(option, { mode: 'zip' }))
+            this.showQuickpicks(
+                await this.getAvaliableScenarioQuickpicks(),
+                async (option) =>
+                    await this.manageScenario(option, {
+                        mode: 'zip',
+                    })
+            )
         })
     }
 
     unzipScenarioCommand(commandName) {
         commands.registerCommand(commandName, async () => {
-            this.showQuickpicks(await this.getAvaliableScenarioQuickpicks(), async (option) => await this.manageScenario(option, { mode: 'unzip' }))
+            this.showQuickpicks(
+                await this.getAvaliableScenarioQuickpicks(),
+                async (option) =>
+                    await this.manageScenario(option, {
+                        mode: 'unzip',
+                    })
+            )
         })
     }
 
@@ -245,15 +263,21 @@ module.exports = class Command {
     }
 
     async updateWorkspaceAndCache(dir) {
-        window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (prog) => {
-            prog.report({
-                message: 'Reloading cache...',
-            })
-            await this.client.sendRequest('function/clearDiagnostics')
-            await this.setWorkspace(dir)
-            await this.client.sendRequest('function/clearCache')
-            window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
-        })
+        window.withProgress(
+            {
+                cancellable: false,
+                location: ProgressLocation.Notification,
+            },
+            async (prog) => {
+                prog.report({
+                    message: 'Reloading cache...',
+                })
+                await this.client.sendRequest('function/clearDiagnostics')
+                await this.setWorkspace(dir)
+                await this.client.sendRequest('function/clearCache')
+                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
+            }
+        )
     }
 
     showQuickpicks(picks, callback) {
@@ -267,18 +291,24 @@ module.exports = class Command {
 
     changeWorkspaceCommand(commandName) {
         return commands.registerCommand(commandName, async () => {
-            this.showSelectFolderDialog({ showRootInformation: true }, async (dir) => {
-                if (!this.isValidGamePath(dir)) {
-                    window.showErrorMessage('Could not locate mod metadata')
-                    return
-                }
+            this.showSelectFolderDialog(
+                {
+                    showRootInformation: true,
+                },
+                async (dir) => {
+                    if (!this.isValidGamePath(dir)) {
+                        window.showErrorMessage('Could not locate mod metadata')
+                        return
+                    }
 
-                await this.updateWorkspaceAndCache(dir)
-            })
+                    await this.updateWorkspaceAndCache(dir)
+                }
+            )
         })
     }
 
-    writeModMetaData(filePath, folderName) {
+    writeModData(filePath, folderName) {
+        mkdirSync(path.resolve(filePath, 'entities'))
         writeFileSync(path.resolve(filePath, '.mod_meta_data'), JSON.stringify(ModMetaData.boilerPlate(folderName), null, 4))
     }
 
@@ -310,16 +340,22 @@ module.exports = class Command {
     }
 
     createCustomDirMod(folderName) {
-        this.showSelectFolderDialog({ title: 'Create a mod', openLabel: 'Save' }, async (dir) => {
-            const customPath = path.join(dir, folderName)
-            this.writeMod(customPath)
-        })
+        this.showSelectFolderDialog(
+            {
+                title: 'Create a mod',
+                openLabel: 'Save',
+            },
+            async (dir) => {
+                const customPath = path.join(dir, folderName)
+                this.writeMod(customPath)
+            }
+        )
     }
 
     writeMod(folderPath) {
         mkdirSync(folderPath)
         this.showModCreatedDialog(folderPath)
-        this.writeModMetaData(folderPath, path.basename(folderPath))
+        this.writeModData(folderPath, path.basename(folderPath))
         this.generateBoilerModImages(folderPath)
     }
 

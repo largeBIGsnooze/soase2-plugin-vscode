@@ -1,33 +1,117 @@
-const DiagnosticStorage = require('../../data/diagnostic-storage')
-const { string, integer, boolean, object, schema, enumerate, vecInt2, array, float } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
+const { prerequisites } = require('../definitions')
+const { has } = require('../../utils/utils')
+const { version, integer, boolean, object, schema, enumerate, vector2i, array, float } = require('../data_types')
+const UI = require('../ui_definitions')
 const Definitions = require('../definitions')
+const { PlanetModifiers, PlanetTypeGroups, PlayerModifiers, UnitModifiers, WeaponModifiers, UnitFactoryModifiers } = require('../modifier_definitions')
 
-module.exports = class UnitItem extends Definitions {
+module.exports = class UnitItem {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-        this.fileText = fileText
-        this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
-        this.json = JSON.parse(fileText)
-
+        this.json = new DiagnosticReporter(fileText, diagnostics)
         this.cache = cache
     }
 
-    itemTypes() {
-        if (this.json?.item_type === 'planet_component' && !this.json?.hasOwnProperty('planet_type_groups')) {
-            this.diagStorage.messages.aRequiresB('planet_component', 'planet_component', 'planet_type_groups')
-        }
+    get item_type() {
+        try {
+            switch (this.json.data.item_type) {
+                case 'planet_component': {
+                    this.json.map_unused_keys('', this.json.data, ['is_ruler_ship', 'build_prerequisites', 'weapon_modifiers', 'owner_constraint', 'phase_resonance_capacitor', 'required_excavation_level', 'planet_types', 'unit_modifiers', 'unit_factory_modifiers'])
 
+                    this.json.map_required_keys('', this.json.data, ['planet_type_groups'])
+                    break
+                }
+                case 'planet_bonus': {
+                    this.json.map_unused_keys('', this.json.data, [
+                        'is_ruler_ship',
+                        'planet_type_groups',
+                        'add_back_finite_item_to_player_inventory',
+                        'is_finite',
+                        'is_planet_garrison',
+                        'build_group_id',
+                        'exotic_price',
+                        'build_prerequisites',
+                        'build_time',
+                        'weapon_modifiers',
+                        'additive_scuttle_time',
+                        'required_unit_tags',
+                        'price',
+                        'always_show_in_shop',
+                        'consumable_stack_count',
+                        'max_count_on_unit',
+                        'required_planet_level',
+                        'owner_constraint',
+                        'phase_resonance_capacitor',
+                        'other_item_requirements',
+                        'unit_modifiers',
+                        'unit_factory_modifiers',
+                        'will_scuttle_destroy_planet_and_strip_resources',
+                    ])
+
+                    break
+                }
+                case 'planet_artifact': {
+                    this.json.map_unused_keys('', this.json.data, [
+                        'is_ruler_ship',
+                        'planet_type_groups',
+                        'add_back_finite_item_to_player_inventory',
+                        'is_finite',
+                        'is_planet_garrison',
+                        'build_group_id',
+                        'exotic_price',
+                        'build_prerequisites',
+                        'build_time',
+                        'weapon_modifiers',
+                        'additive_scuttle_time',
+                        'required_unit_tags',
+                        'price',
+                        'always_show_in_shop',
+                        'consumable_stack_count',
+                        'max_count_on_unit',
+                        'required_planet_level',
+                        'owner_constraint',
+                        'phase_resonance_capacitor',
+                        'other_item_requirements',
+                        'unit_modifiers',
+                        'unit_factory_modifiers',
+                        'will_scuttle_destroy_planet_and_strip_resources',
+                    ])
+                    break
+                }
+                case 'ship_component': {
+                    this.json.map_unused_keys('', this.json.data, [
+                        'planet_type_groups',
+                        'add_back_finite_item_to_player_inventory',
+                        'is_planet_garrison',
+                        'additive_scuttle_time',
+                        'required_planet_level',
+                        'planet_modifiers',
+                        'required_excavation_level',
+                        'planet_types',
+                        'will_scuttle_destroy_planet_and_strip_resources',
+                    ])
+
+                    this.json.map_required_keys('', this.json.data, ['build_group_id'])
+                    break
+                }
+                default: {
+                    break
+                }
+            }
+        } catch {}
         return enumerate({
             items: ['planet_component', 'planet_bonus', 'planet_artifact', 'ship_component'],
         })
     }
 
     requiredExcavationLevel() {
-        if (this.json?.hasOwnProperty('required_excavation_level') && !this.json?.hasOwnProperty('planet_types')) {
-            this.diagStorage.messages.unusedKey('required_excavation_level', 'required_excavation_level')
-        }
-        return vecInt2()
+        try {
+            if (has(this.json.data, 'required_excavation_level') && !has(this.json.data, 'planet_types')) {
+                this.json.unused_key('/required_excavation_level', 'required_excavation_level')
+            }
+        } catch {}
+        return vector2i()
     }
 
     tradeCapacity() {
@@ -63,19 +147,21 @@ module.exports = class UnitItem extends Definitions {
     ownerConstraint() {
         return object({
             keys: {
-                constraint_type: super.getConstraintType,
+                constraint_type: Definitions.getConstraintType(),
                 weapon_tag: this.cache.weapon_tags,
             },
+            required: ['constraint_type'],
         })
     }
 
     planetGarrisonHudIcons() {
-        if (this.json?.is_planet_garrison === true && !this.json?.hasOwnProperty('planet_garrison_hud_icons')) {
-            this.diagStorage.messages.requiresKey('is_planet_garrison', 'planet_garrison_hud_icons')
-        } else if (this.json?.is_planet_garrison === false && this.json?.hasOwnProperty('planet_garrison_hud_icons')) {
-            this.diagStorage.messages.unusedKey('is_planet_garrison', 'planet_garrison_hud_icons')
-        }
-
+        try {
+            if (this.json.data.is_planet_garrison === true && !has(this.json.data, 'planet_garrison_hud_icons')) {
+                this.json.key_requires('/is_planet_garrison', 'planet_garrison_hud_icons')
+            } else if (this.json.data.is_planet_garrison === false && has(this.json.data, 'planet_garrison_hud_icons')) {
+                this.json.unused_key('/is_planet_garrison', 'planet_garrison_hud_icons')
+            }
+        } catch {}
         return object({
             keys: {
                 hold: this.cache.textures,
@@ -90,7 +176,7 @@ module.exports = class UnitItem extends Definitions {
             items: object({
                 keys: {
                     ability: this.cache.abilities,
-                    tooltip_lines: super.tooltip_lines(this.cache),
+                    tooltip_lines: UI.tooltip_lines(this.cache),
                 },
             }),
         })
@@ -103,26 +189,24 @@ module.exports = class UnitItem extends Definitions {
                     items: float(),
                 }),
             },
+            required: ['time_to_store_point'],
         })
     }
 
     create() {
-        this.diagStorage.messages.mapUnusedKeys(this.json, this.json?.item_type, 'planet_component', ['is_ruler_ship'])
-        this.diagStorage.messages.mapUnusedKeys(this.json, this.json?.item_type, 'planet_bonus', ['is_ruler_ship', 'max_count_on_unit', 'build_prerequisites', 'price', 'exotic_price', 'build_group_id', 'build_time', 'required_unit_tags'])
-        this.diagStorage.messages.mapUnusedKeys(this.json, this.json?.item_type, 'planet_artifact', ['is_ruler_ship', 'max_count_on_unit', 'build_prerequisites', 'price', 'exotic_price', 'build_group_id', 'build_time', 'required_unit_tags'])
         return schema({
             keys: {
-                version: float(),
-                item_type: this.itemTypes(),
+                version: version(),
+                item_type: this.item_type,
                 hud_icon: this.cache.textures,
                 name: this.cache.localisation,
                 tooltip_icon: this.cache.textures,
                 tooltip_picture: this.cache.textures,
                 description: this.cache.localisation,
                 build_time: float(),
-                price: super.price,
-                exotic_price: super.exotic_price(this.cache.exotics),
-                build_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                price: Definitions.price(),
+                exotic_price: Definitions.exotic_price(this.cache.exotics),
+                build_prerequisites: prerequisites(this.cache.research_subjects),
                 max_count_on_unit: integer(),
                 build_group_id: this.cache.unit_item_build_group_ids,
                 ability: this.cache.abilities,
@@ -133,14 +217,14 @@ module.exports = class UnitItem extends Definitions {
                 required_excavation_level: this.requiredExcavationLevel(),
                 always_show_in_shop: boolean(),
                 is_finite: boolean(),
-                planet_modifiers: super.create().modifiers.planet_modifiers.create(this.cache.planet_modifier_ids),
-                planet_type_groups: super.create().groups.planet_type_groups.create(this.cache.planets, super.getResearchSubjects(this.cache.research_subjects)),
-                player_modifiers: super.create().modifiers.player_modifiers.createResearchSubject(super.getResearchSubjects(this.cache.research_subjects), this.cache.planets),
+                planet_modifiers: PlanetModifiers.create(this.cache.planet_modifier_ids),
+                planet_type_groups: PlanetTypeGroups.create(this.cache.planets, this.cache.research_subjects),
+                player_modifiers: PlayerModifiers.createResearchSubject(this.cache.research_subjects, this.cache.planets),
                 required_unit_tags: array({
                     items: this.cache.ship_tags,
                     isUnique: true,
                 }),
-                unit_modifiers: super.create().modifiers.unit_modifiers.create(
+                unit_modifiers: UnitModifiers.create(
                     {
                         hasArrayValues: true,
                     },
@@ -148,9 +232,11 @@ module.exports = class UnitItem extends Definitions {
                 ),
                 trade_capacity: this.tradeCapacity(),
                 item_level_count: float(),
-                item_level_source: enumerate({ items: ['research_prerequisites_per_level'] }),
+                item_level_source: enumerate({
+                    items: ['research_prerequisites_per_level'],
+                }),
                 item_level_prerequisites: array({
-                    items: super.getResearchSubjects(this.cache.research_subjects),
+                    items: prerequisites(this.cache.research_subjects),
                     isUnique: true,
                 }),
                 required_planet_level: float(),
@@ -159,7 +245,7 @@ module.exports = class UnitItem extends Definitions {
                     items: float(),
                 }),
                 owner_constraint: this.ownerConstraint(),
-                weapon_modifiers: super.create().modifiers.weapon_modifiers.create(
+                weapon_modifiers: WeaponModifiers.create(
                     {
                         hasArrayValues: true,
                     },
@@ -172,7 +258,7 @@ module.exports = class UnitItem extends Definitions {
                     isUnique: true,
                 }),
                 owner_unit_ability_tooltips: this.ownerUnitAbilityTooltips(),
-                unit_factory_modifiers: super.create().modifiers.unit_factory_modifiers.create(
+                unit_factory_modifiers: UnitFactoryModifiers.create(
                     {
                         hasArrayValues: true,
                     },

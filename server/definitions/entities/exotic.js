@@ -1,18 +1,15 @@
-const { schema, float } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, version } = require('../data_types')
 
-module.exports = class Exotic extends Definitions {
+module.exports = class Exotic {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 tooltip_icon: this.cache.textures,
                 small_icon: this.cache.textures,
                 large_icon: this.cache.textures,

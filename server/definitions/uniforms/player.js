@@ -1,11 +1,8 @@
-const { schema, integer, array, float, object, string, percentage, boolean, vector2 } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, integer, array, float, object, string, percentage, boolean, vector2f } = require('../data_types')
 
-module.exports = class PlayerUniform extends Definitions {
+module.exports = class PlayerUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
@@ -58,7 +55,9 @@ module.exports = class PlayerUniform extends Definitions {
                         crystal: this.taxes(),
                     },
                 }),
-                dominant_culture_influence_points_gained_duration: array({ items: float() }),
+                dominant_culture_influence_points_gained_duration: array({
+                    items: float(),
+                }),
                 refund_percentage: percentage(),
                 auction_lost_refund_percentage: percentage(),
                 colonization_victory_planet_count_percentage: percentage(),
@@ -88,7 +87,7 @@ module.exports = class PlayerUniform extends Definitions {
                             isUnique: true,
                         }),
                         auction_cooldown_durations: array({
-                            items: vector2(),
+                            items: vector2f(),
                         }),
                         will_accept_exotics_in_auction_level: integer(),
                         culture_reward_cooldown_duration: float(),

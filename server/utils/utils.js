@@ -18,7 +18,7 @@ module.exports = class Utils {
         }
     }
 
-    static reference(arr, callback) {
-        for (const e of arr) callback(e)
+    static has(text, prop) {
+        return text.hasOwnProperty(prop)
     }
 }

@@ -1,5 +1,5 @@
 const { schema, object, string } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class DebugChangeSkyboxWindow extends Definitions {
     /* eslint-disable no-unused-vars */

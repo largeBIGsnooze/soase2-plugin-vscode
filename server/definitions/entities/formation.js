@@ -1,16 +1,13 @@
-const { schema, array, object, float, integer } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, array, object, float, integer, version } = require('../data_types')
 
-module.exports = class Formation extends Definitions {
+module.exports = class Formation {
     /* eslint-disable no-unused-vars */
-    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-    }
+    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {}
 
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 rank_distances: array({
                     items: float(),
                 }),

@@ -21,6 +21,32 @@ class Log {
     static timeStamp = () => new Date().toLocaleTimeString('en-US')
 }
 
+class PointerDiagnosticLogger {
+    constructor(pointer) {
+        this.pointer = pointer
+    }
+    set(message, severity) {
+        const start = {
+            line: this.pointer.value.line,
+            character: this.pointer.value.column,
+        }
+        const end = {
+            line: this.pointer.value.line,
+            character: this.pointer.valueEnd.column,
+        }
+        return {
+            range: {
+                start: start,
+                end: end,
+            },
+            message: message,
+            severity: severity,
+            code: 0,
+            source: CONSTANTS.source,
+        }
+    }
+}
+
 class DiagnosticLogger {
     /**
      * Represents a diagnostic, such as a compiler error or warning
@@ -37,7 +63,10 @@ class DiagnosticLogger {
             character: Utils.getCharacterNumber(this.docText, this.line ?? 0),
         }
         return {
-            range: { start: position, end: position },
+            range: {
+                start: position,
+                end: position,
+            },
             message: message,
             severity: severity,
             code: 0,
@@ -47,6 +76,7 @@ class DiagnosticLogger {
 }
 
 module.exports = {
+    PointerDiagnosticLogger,
     DiagnosticLogger,
     Log,
 }

@@ -1,5 +1,5 @@
 const { schema, string } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FrontEndIntroMovie extends Definitions {
     /* eslint-disable no-unused-vars */

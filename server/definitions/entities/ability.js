@@ -1,13 +1,16 @@
-const { schema, enumerate, object, array, IfMap, percentage, boolean, angle, vector3, If, float } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
+const { prerequisites } = require('../definitions')
+const { schema, enumerate, object, array, percentage, boolean, angle, vector3f, If, float, version } = require('../data_types')
+const Buff = require('./buff')
 const Definitions = require('../definitions')
+const UI = require('../ui_definitions')
 
-module.exports = class Ability extends Definitions {
+module.exports = class Ability extends Buff {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
+        super({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache)
+        this.json = new DiagnosticReporter(fileText, diagnostics)
         this.cache = cache
-
-        this.json = JSON.parse(fileText)
     }
 
     level_source() {
@@ -19,12 +22,12 @@ module.exports = class Ability extends Definitions {
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 action_data_source: this.cache.action_data_sources,
                 is_ultimate_ability: boolean(),
                 level_source: this.level_source(),
                 level_prerequisites: array({
-                    items: super.getResearchSubjects(this.cache.research_subjects),
+                    items: prerequisites(this.cache.research_subjects),
                     isUnique: true,
                 }),
                 min_required_unit_levels: array({
@@ -40,7 +43,7 @@ module.exports = class Ability extends Definitions {
                         only_if_owner_unit_operational: boolean(),
                         actions: object({
                             keys: {
-                                actions: super.getActions(this.cache),
+                                actions: super.actions(),
                             },
                         }),
                     },
@@ -62,7 +65,7 @@ module.exports = class Ability extends Definitions {
                                 gravity_well_primary_planet_target_filter: this.cache.target_filters,
                             },
                         }),
-                        targeting_ui: super.getTargetingUi,
+                        targeting_ui: Definitions.getTargetingUi(),
                         target_alert: enumerate({
                             items: ['targeted_by_ability'],
                         }),
@@ -77,7 +80,7 @@ module.exports = class Ability extends Definitions {
                         watched_buff: this.cache.buffs,
                         move_alignment: object({
                             keys: {
-                                type: super.getAlignmentType,
+                                type: Definitions.alignment_type(),
                                 angle: angle(),
                                 allow_opposite_angle: boolean(),
                             },
@@ -93,27 +96,21 @@ module.exports = class Ability extends Definitions {
                             keys: {
                                 actions: array({
                                     items: object({
-                                        condition: If({
-                                            key: 'action_type',
-                                            value: 'use_unit_operators_on_units_owned_by_player',
-                                            requires: ['player'],
-                                            properties: {
-                                                player: object({
-                                                    keys: {
-                                                        player_type: enumerate({ items: ['ability_npc_player'] }),
-                                                        ability: object({
-                                                            keys: {
-                                                                ability_type: super.getAbilityType,
-                                                            },
-                                                        }),
-                                                    },
-                                                }),
-                                            },
-                                        }),
                                         keys: {
-                                            player: '',
-                                            constraint: super.getConstraint(this.cache),
-                                            action_type: super.getActionType,
+                                            player: object({
+                                                keys: {
+                                                    player_type: enumerate({
+                                                        items: ['ability_npc_player'],
+                                                    }),
+                                                    ability: object({
+                                                        keys: {
+                                                            ability_type: Definitions.getAbilityType(),
+                                                        },
+                                                    }),
+                                                },
+                                            }),
+                                            constraint: super.constraint(),
+                                            action_type: Definitions.getActionType(),
                                             chain_target_filter_id: this.cache.target_filters,
                                             chain_range_value: this.cache.action_values,
                                             target_filter_id: this.cache.target_filters,
@@ -121,26 +118,26 @@ module.exports = class Ability extends Definitions {
                                             include_radius_origin_unit: boolean(),
                                             gravity_well_origin_unit: object({
                                                 keys: {
-                                                    unit_type: super.getUnitType,
+                                                    unit_type: Definitions.getUnitType(),
                                                 },
                                             }),
                                             radius_origin_unit: object({
                                                 keys: {
-                                                    unit_type: super.getUnitType,
+                                                    unit_type: Definitions.getUnitType(),
                                                 },
                                             }),
                                             first_source_unit: object({
                                                 keys: {
-                                                    unit_type: super.getUnitType,
+                                                    unit_type: Definitions.getUnitType(),
                                                 },
                                             }),
                                             first_destination_unit: object({
                                                 keys: {
-                                                    unit_type: super.getUnitType,
+                                                    unit_type: Definitions.getUnitType(),
                                                 },
                                             }),
-                                            operators_constraint: this.getConstraint(this.cache),
-                                            position: super.getPosition,
+                                            operators_constraint: super.constraint(),
+                                            position: Definitions.getPosition(),
                                             travel_time: object({
                                                 keys: {
                                                     travel_time_source: enumerate({
@@ -150,13 +147,13 @@ module.exports = class Ability extends Definitions {
                                                     travel_speed_value: this.cache.action_values,
                                                 },
                                             }),
-                                            position_operators: super.getPositionOperators(this.cache),
+                                            position_operators: Definitions.getPositionOperators(this.cache),
                                             range_value: this.cache.action_values,
                                             radius_value: this.cache.action_values,
                                             max_target_count_value: this.cache.action_values,
                                             max_jump_distance_value: this.cache.action_values,
-                                            destination_unit: super.getDestinationUnit,
-                                            operators: super.getOperators(this.cache),
+                                            destination_unit: Definitions.getDestinationUnit(),
+                                            operators: super.operators(),
                                         },
                                     }),
                                 }),
@@ -180,11 +177,11 @@ module.exports = class Ability extends Definitions {
                                             target_filter: this.cache.target_filters,
                                             target_constraint: object({
                                                 keys: {
-                                                    constraint_type: super.getConstraintType,
+                                                    constraint_type: Definitions.getConstraintType(),
                                                     value_a: this.cache.action_values,
-                                                    comparison_type: super.getComparisonType,
+                                                    comparison_type: Definitions.getComparisonType(),
                                                     value_b: this.cache.action_values,
-                                                    constraints: super.getConstraints(this.cache),
+                                                    constraints: super.constraints(),
                                                 },
                                             }),
                                         },
@@ -195,30 +192,21 @@ module.exports = class Ability extends Definitions {
                                 }),
                                 caster_constraint: object({
                                     keys: {
-                                        constraints: super.getConstraints(this.cache),
-                                        constraint_type: super.getConstraintType,
-                                        unit: super.getUnit,
-                                        unit_constraint: super.getUnitConstraint(this.cache),
-                                        percentage_missing_threshold: '',
-                                        amount_missing_threshold: '',
+                                        constraints: super.constraints(),
+                                        constraint_type: Definitions.getConstraintType(),
+                                        unit: Definitions.getUnit(),
+                                        unit_constraint: super.unit_constraint(),
+                                        amount_missing_threshold: float(),
+                                        percentage_missing_threshold: percentage(),
                                         radius_origin_unit: object({
                                             keys: {
-                                                unit_type: super.getUnitType,
+                                                unit_type: Definitions.getUnitType(),
                                             },
                                         }),
                                         target_filter_id: this.cache.target_filters,
                                         radius_value: this.cache.action_values,
                                         target_count_value: this.cache.action_values,
                                     },
-                                    condition: IfMap({
-                                        key: 'constraint_type',
-                                        values: ['has_missing_antimatter', 'has_missing_armor', 'has_missing_strikecraft'],
-                                        requires: [],
-                                        properties: {
-                                            amount_missing_threshold: float(),
-                                            percentage_missing_threshold: percentage(),
-                                        },
-                                    }),
                                 }),
                             },
                         }),
@@ -230,57 +218,25 @@ module.exports = class Ability extends Definitions {
                         tooltip_icon: this.cache.textures,
                         name: this.cache.localisation,
                         description: this.cache.localisation,
-                        tooltip_lines: super.tooltip_lines(this.cache),
-                        tooltip_line_groups: super.tooltip_line_groups(this.cache),
+                        tooltip_lines: UI.tooltip_lines(this.cache),
+                        tooltip_line_groups: UI.tooltip_line_groups(this.cache),
                         range: this.cache.action_values,
                         action: enumerate({
                             items: ['toggle_unit_factory_window', 'explore'],
                         }),
                         targeting: object({
                             keys: {
-                                targeting_type: super.getTargetingType,
-                                range: '',
-                                radius: '',
-                                arc_half_angle: '',
+                                targeting_type: Definitions.getTargetingType(),
+                                range: this.cache.action_values,
+                                radius: this.cache.action_values,
+                                arc_half_angle: this.cache.action_values,
                             },
-                            condition: If({
-                                key: 'targeting_type',
-                                value: 'range',
-                                requires: ['range'],
-                                properties: {
-                                    range: this.cache.action_values,
-                                },
-                                additional: If({
-                                    key: 'targeting_type',
-                                    value: 'radius',
-                                    requires: ['radius'],
-                                    properties: {
-                                        radius: this.cache.action_values,
-                                    },
-                                    additional: If({
-                                        key: 'targeting_type',
-                                        value: 'arc',
-                                        requires: ['arc_half_angle'],
-                                        properties: {
-                                            arc_half_angle: this.cache.action_values,
-                                        },
-                                        additional: If({
-                                            key: 'targeting_type',
-                                            value: 'between_gravity_well_range',
-                                            requires: ['range'],
-                                            properties: {
-                                                radius: this.cache.action_values,
-                                            },
-                                        }),
-                                    }),
-                                }),
-                            }),
                             required: ['targeting_type'],
                         }),
                     },
                 }),
                 ability_positions: array({
-                    items: vector3(),
+                    items: vector3f(),
                 }),
             },
         })

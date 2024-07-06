@@ -1,10 +1,9 @@
-const { schema, object, array, string, float, integer, percentage, color, boolean, vector2, enumerate } = require('../data_types')
+const { schema, object, array, string, float, integer, percentage, color, boolean, vector2f, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 
-module.exports = class MainViewUniform extends Definitions {
+module.exports = class MainViewUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -12,7 +11,7 @@ module.exports = class MainViewUniform extends Definitions {
         return object({
             keys: {
                 cursor_over_icon: this.cache.textures,
-                cursor_over_icon_offset: vector2(),
+                cursor_over_icon_offset: vector2f(),
                 considered_full_supply_cost: float(),
                 arc_begin_angle: float(false),
                 arc_end_angle: float(),
@@ -97,7 +96,7 @@ module.exports = class MainViewUniform extends Definitions {
                 pulse_begin_length_perc: percentage(),
                 pulse_end_length_perc: percentage(),
                 pulse_interval: float(),
-                pulse_easing_function: super.getEasingFunctons,
+                pulse_easing_function: Definitions.getEasingFunctons(),
             },
         })
     }
@@ -253,25 +252,25 @@ module.exports = class MainViewUniform extends Definitions {
                         gravity_well_player_status_cross_fade_duration: integer(),
                         gravity_well_player_status_blinks: object({
                             keys: {
-                                enemy_units_detected_at_owned_planet: super.getBlink,
-                                enemy_units_detected_at_unowned_planet: super.getBlink,
-                                planet_bombed: super.getBlink,
-                                friendly_culture_being_established: super.getBlink,
-                                friendly_culture_being_lost: super.getBlink,
-                                enemy_culture_being_established: super.getBlink,
-                                enemy_culture_being_lost: super.getBlink,
-                                upkeep: super.getBlink,
+                                enemy_units_detected_at_owned_planet: Definitions.getBlink(),
+                                enemy_units_detected_at_unowned_planet: Definitions.getBlink(),
+                                planet_bombed: Definitions.getBlink(),
+                                friendly_culture_being_established: Definitions.getBlink(),
+                                friendly_culture_being_lost: Definitions.getBlink(),
+                                enemy_culture_being_established: Definitions.getBlink(),
+                                enemy_culture_being_lost: Definitions.getBlink(),
+                                upkeep: Definitions.getBlink(),
                             },
                         }),
                         unit_alert_blinks: object({
                             keys: {
-                                ping_attention: super.getBlink,
-                                ping_attack: super.getBlink,
-                                ping_defend: super.getBlink,
-                                rallied_to: super.getBlink,
-                                positive_buff: super.getBlink,
-                                negative_buff: super.getBlink,
-                                targeted_by_ability: super.getBlink,
+                                ping_attention: Definitions.getBlink(),
+                                ping_attack: Definitions.getBlink(),
+                                ping_defend: Definitions.getBlink(),
+                                rallied_to: Definitions.getBlink(),
+                                positive_buff: Definitions.getBlink(),
+                                negative_buff: Definitions.getBlink(),
+                                targeted_by_ability: Definitions.getBlink(),
                             },
                         }),
                         user_interface_status_colors: object({
@@ -289,12 +288,12 @@ module.exports = class MainViewUniform extends Definitions {
                                 use_owner_player_color: boolean(),
                             },
                         }),
-                        phase_lane_unit_group_overlap_size: vector2(),
+                        phase_lane_unit_group_overlap_size: vector2f(),
                         groups: array({
                             items: object({
                                 keys: {
                                     group: string(),
-                                    size: vector2(),
+                                    size: vector2f(),
                                     pick_radius: float(),
                                     normal_alert_fill: this.cache.textures,
                                     special_unit_alert_fill: this.cache.textures,
@@ -306,7 +305,7 @@ module.exports = class MainViewUniform extends Definitions {
                                             detection_fade: this.detection_fade(),
                                             never_detected_icon: this.cache.textures,
                                             planet_level_text_font: this.cache.fonts,
-                                            planet_level_text_offset: vector2(),
+                                            planet_level_text_offset: vector2f(),
                                             planet_level_text_has_drop_shadow: boolean(),
                                             name_font: this.cache.fonts,
                                             name_has_drop_shadow: boolean(),
@@ -337,8 +336,8 @@ module.exports = class MainViewUniform extends Definitions {
                                                     bounty: this.cache.textures,
                                                 },
                                             }),
-                                            left_beacon_icon_offset: vector2(),
-                                            right_beacon_icon_offset: vector2(),
+                                            left_beacon_icon_offset: vector2f(),
+                                            right_beacon_icon_offset: vector2f(),
                                             shapes: object({
                                                 keys: {
                                                     not_owned: object({
@@ -463,13 +462,13 @@ module.exports = class MainViewUniform extends Definitions {
                     keys: {
                         phase_lane_unit_group: object({
                             keys: {
-                                icon_top_left_offset_from_center: vector2(),
-                                icon_size: vector2(),
+                                icon_top_left_offset_from_center: vector2f(),
+                                icon_size: vector2f(),
                                 considered_full_supply_cost: float(),
                                 underlay_brush: this.cache.textures,
                                 pips_brush: this.cache.textures,
                                 pip_offsets: array({
-                                    items: vector2(),
+                                    items: vector2f(),
                                 }),
                             },
                         }),

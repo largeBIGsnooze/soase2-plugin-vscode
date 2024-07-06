@@ -1,5 +1,5 @@
 const { schema, color } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FrontEndTitleScreen extends Definitions {
     /* eslint-disable no-unused-vars */

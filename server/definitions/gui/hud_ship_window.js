@@ -1,5 +1,5 @@
-const { schema, string, object, integer, vector2, vecInt2 } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, object, vecInt2 } = require('../data_types')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudShipWindow extends Definitions {
     /* eslint-disable no-unused-vars */

@@ -1,11 +1,9 @@
 const { schema, object, color, integer } = require('../data_types')
 const Definitions = require('../definitions')
 
-module.exports = class UserInterfaceUniform extends Definitions {
+module.exports = class UserInterfaceUniform {
     /* eslint-disable no-unused-vars */
-    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-    }
+    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {}
 
     alert() {
         return object({
@@ -24,7 +22,7 @@ module.exports = class UserInterfaceUniform extends Definitions {
         return schema({
             keys: {
                 unspent_ability_points_fill_color: color(),
-                unspent_ability_points_fill_blink: super.getBlink,
+                unspent_ability_points_fill_blink: Definitions.getBlink(),
                 unit_alert: object({
                     keys: {
                         alert_types: object({

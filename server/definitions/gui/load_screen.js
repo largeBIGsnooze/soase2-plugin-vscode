@@ -1,5 +1,5 @@
 const { schema, string, object, color, array } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class LoadScreen extends Definitions {
     /* eslint-disable no-unused-vars */

@@ -1,10 +1,8 @@
 const { schema, integer, string } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class WelcomeMessage extends Definitions {
+module.exports = class WelcomeMessage {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 

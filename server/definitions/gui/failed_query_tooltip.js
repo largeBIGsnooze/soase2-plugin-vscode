@@ -1,5 +1,5 @@
 const { schema } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FailedQueryTooltip extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -37,7 +37,7 @@ module.exports = class FailedQueryTooltip extends Definitions {
                 ability_is_already_in_use_label: super.label_form2(this.cache),
                 npc_reputation_reward_cooldown_is_not_completed_label: super.label_form2(this.cache),
                 npc_reputation_level_required_label: super.label_form2(this.cache),
-                npc_reputation_level_required_label: this.cache.colors,
+                npc_reputation_level_required_value_color: this.cache.colors,
             },
         })
     }

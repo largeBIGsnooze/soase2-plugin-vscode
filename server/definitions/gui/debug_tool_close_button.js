@@ -1,5 +1,5 @@
-const { schema, object, array } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema } = require('../data_types')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class DebugToolCloseButtonButtonStyle extends Definitions {
     /* eslint-disable no-unused-vars */

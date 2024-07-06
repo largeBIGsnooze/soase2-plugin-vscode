@@ -1,5 +1,5 @@
-const { schema, string, object, integer, float, vecInt2, color } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, object, integer, float, vecInt2 } = require('../data_types')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudNotificationsWindow extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -37,7 +37,7 @@ module.exports = class HudNotificationsWindow extends Definitions {
                 fade_out_duration: float(),
                 max_velocity: float(),
                 acceleration: float(),
-                drop_secondary_icon_easing_function: super.getEasingFunctons,
+                drop_secondary_icon_easing_function: Definitions.getEasingFunctons(),
                 drop_secondary_icon_duration: float(),
                 npc_auction_bid_amount_icon: this.cache.textures,
                 npc_auction_bid_amount_icon_layout: super.layout(),

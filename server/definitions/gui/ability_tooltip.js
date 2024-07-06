@@ -1,5 +1,5 @@
 const { schema } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class AbilityTooltip extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -20,6 +20,7 @@ module.exports = class AbilityTooltip extends Definitions {
                 shields_cost_tooltip_line: super.label_form(this.cache),
                 planet_health_cost_tooltip_line: super.label_form(this.cache),
                 cooldown_tooltip_line: super.label_form(this.cache),
+                unit_to_build_max_count_in_empire_line: super.label_form(this.cache),
                 range_line: super.label_form(this.cache),
                 between_gravity_well_range_line: super.label_form(this.cache),
                 spawned_unit_build_time_tooltip_line: super.label_form(this.cache),
@@ -33,7 +34,11 @@ module.exports = class AbilityTooltip extends Definitions {
                 enable_auto_cast_line: super.label_form(this.cache),
                 disable_auto_cast_line: super.label_form(this.cache),
                 disable_auto_cast_if_any_enemy_bomb_planet_ships_in_gravity_well_description: super.label_form2(this.cache),
-                unit_to_build_max_count_in_gravity_well_line: super.label_form2(this.cache),
+                unit_to_build_max_count_in_gravity_well_line: super.label_form(this.cache),
+                spawned_unit_current_count_in_empire_label: this.cache.localisation,
+                spawned_unit_current_count_in_empire_color_when_zero: this.cache.colors,
+                spawned_unit_current_count_in_empire_color_when_max_count_exceeded: this.cache.colors,
+                spawned_unit_current_count_in_empire_color_when_max_count_not_exceeded: this.cache.colors,
             },
         })
     }

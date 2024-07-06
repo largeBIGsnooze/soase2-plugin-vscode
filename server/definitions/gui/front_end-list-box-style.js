@@ -1,5 +1,5 @@
 const { schema, object, float, color } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FrontEndListBoxStyle extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -11,7 +11,9 @@ module.exports = class FrontEndListBoxStyle extends Definitions {
     create() {
         return schema({
             keys: {
-                background: object({ keys: {} }),
+                background: object({
+                    keys: {},
+                }),
                 not_selected_item_background: super.background(this.cache.textures),
                 selected_item_background: super.background(this.cache.textures),
                 font: this.cache.fonts,

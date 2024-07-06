@@ -1,11 +1,8 @@
 const { schema, object, float, percentage, integer, color } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class UnitBarUniform extends Definitions {
+module.exports = class UnitBarUniform {
     /* eslint-disable no-unused-vars */
-    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-    }
+    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {}
 
     sizes() {
         return object({

@@ -1,5 +1,5 @@
 const { schema, object, color } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudChatWindowTextEntryBoxStyle extends Definitions {
     /* eslint-disable no-unused-vars */

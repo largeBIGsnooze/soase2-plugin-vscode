@@ -1,11 +1,9 @@
-const { schema, array, object, enumerate, float, boolean, percentage, integer, vector2 } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, array, object, enumerate, float, boolean, percentage, integer, vector2f } = require('../data_types')
+const { EmpireModifiers, PlanetModifiers } = require('../modifier_definitions')
 
-module.exports = class PlayerAiUniform extends Definitions {
+module.exports = class PlayerAiUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
@@ -20,7 +18,9 @@ module.exports = class PlayerAiUniform extends Definitions {
             keys: {
                 desired_explore_ship_count: object({
                     keys: {
-                        type: enumerate({ items: ['constant'] }),
+                        type: enumerate({
+                            items: ['constant'],
+                        }),
                         value: integer(),
                     },
                 }),
@@ -52,8 +52,8 @@ module.exports = class PlayerAiUniform extends Definitions {
             desired_unlock_unit_count: contents(),
             bonus_modifiers: object({
                 keys: {
-                    empire_modifiers: super.create().modifiers.empire_modifiers.create(),
-                    planet_modifiers: super.create().modifiers.planet_modifiers.createResearchSubject(this.cache.planets),
+                    empire_modifiers: EmpireModifiers.create(),
+                    planet_modifiers: PlanetModifiers.createResearchSubject(this.cache.planets),
                 },
             }),
         }
@@ -137,7 +137,7 @@ module.exports = class PlayerAiUniform extends Definitions {
                 buy_crystal_from_npc_market_amount: float(),
                 initial_base_npc_auction_asset_bid_amount: float(),
                 initial_base_npc_auction_exotic_bid_amount: float(),
-                npc_auction_bid_amount_scalar_range: vector2(),
+                npc_auction_bid_amount_scalar_range: vector2f(),
                 start_unlock_colonization_research_planet_count_tolerance: integer(),
                 start_random_excavation_colonized_planet_count_tolerance: integer(),
                 ship_factory_build_kinds: array({

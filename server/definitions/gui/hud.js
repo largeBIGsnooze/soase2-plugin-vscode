@@ -1,5 +1,5 @@
 const { schema, object, float, vector2 } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class Hud extends Definitions {
     /* eslint-disable no-unused-vars */

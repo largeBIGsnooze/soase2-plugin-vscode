@@ -1,7 +1,11 @@
+## 0.4.3
+
+-   Refactored a chunk of code
+
 ## 0.4.2
 
--  Refactored some caching
--  Removed snippets until further notice
+-   Refactored some caching
+-   Removed snippets until further notice
 
 ## 0.4.1
 

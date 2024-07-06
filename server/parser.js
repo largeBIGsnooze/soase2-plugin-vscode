@@ -1,9 +1,9 @@
 const path = require('path')
 const { pathToFileURL } = require('url')
 const fs = require('fs')
-const EntityDefinition = require('./definitions/entity_definition')
-const DiagnosticStorage = require('./data/diagnostic-storage')
+const EntityLoader = require('./definitions/entity_loader')
 const { Log } = require('./utils/logger')
+const { DiagnosticReporter } = require('./data/diagnostic-reporter')
 
 module.exports = class Parser {
     /**
@@ -19,7 +19,7 @@ module.exports = class Parser {
         this.languageService = languageService
         this.schemaService = schemaService
         this.gameInstallationFolder = gameInstallationFolder
-        this.entityDefinition = new EntityDefinition(languageService, schemaService)
+        this.entityDefinition = new EntityLoader(languageService, schemaService)
 
         this.filesWithDiagnostics = filesWithDiagnostics
     }
@@ -95,10 +95,10 @@ module.exports = class Parser {
         try {
             const fileText = fs.readFileSync(filePath, 'utf-8')
 
-            EntityDefinition.diagnostics = []
-            const diagStorage = new DiagnosticStorage(fileText, EntityDefinition.diagnostics)
+            EntityLoader.diagnostics = []
+            const reporter = new DiagnosticReporter(fileText, EntityLoader.diagnostics)
 
-            if (fileText.trim().length === 0) diagStorage.messages.invalidJSON()
+            if (fileText.trim().length === 0) reporter.invalidJSON()
             else if (!JSON.parse(fileText)) return
 
             this.entityDefinition.init(
@@ -111,11 +111,11 @@ module.exports = class Parser {
             )
             const generalDiagnostics = await this.entityDefinition.jsonDoValidation(fileText, filePath)
 
-            if (generalDiagnostics[0] || Array.from(EntityDefinition.diagnostics).length > 0) this.filesWithDiagnostics.push(filePath)
+            if (generalDiagnostics[0] || Array.from(EntityLoader.diagnostics).length > 0) this.filesWithDiagnostics.push(filePath)
 
             await this.connection.sendDiagnostics({
                 uri: pathToFileURL(filePath).href,
-                diagnostics: [].concat(EntityDefinition.diagnostics, generalDiagnostics),
+                diagnostics: [].concat(EntityLoader.diagnostics, generalDiagnostics),
             })
         } catch (err) {
             Log.error(`Error during processing file: '${path.basename(filePath)}' with error: ${err.message}`)
@@ -128,7 +128,11 @@ module.exports = class Parser {
      */
     static async clearDiagnostics(files, connection) {
         if (files.length === 0) return
-        for (const file of files) await connection.sendDiagnostics({ uri: pathToFileURL(file).href, diagnostics: [] })
+        for (const file of files)
+            await connection.sendDiagnostics({
+                uri: pathToFileURL(file).href,
+                diagnostics: [],
+            })
         files.length = 0
     }
 }

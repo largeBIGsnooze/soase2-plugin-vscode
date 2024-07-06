@@ -1,15 +1,15 @@
-const DiagnosticStorage = require('../../data/diagnostic-storage')
-const { EntityParser } = require('../../data/file-handler')
-const { schema, float, string, object, array, integer, enumerate, vector2, boolean, percentage, vecInt2 } = require('../data_types')
-const Definitions = require('../definitions')
+const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
+const { prerequisites } = require('../definitions')
+const { has } = require('../../utils/utils')
+const { schema, float, string, object, array, integer, enumerate, vector2f, boolean, percentage, vector2i, version } = require('../data_types')
 const { planet_modifier_types, unit_modifier_types } = require('../modifier_types')
+const Definitions = require('../definitions')
+const { UnitModifiers, WeaponModifiers, EmpireModifiers, NpcModifiers } = require('../modifier_definitions')
 
-module.exports = class Player extends Definitions {
+module.exports = class Player {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-        this.json = JSON.parse(fileText)
-        this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
+        this.json = new DiagnosticReporter(fileText, diagnostics)
 
         this.fileName = fileName
 
@@ -24,23 +24,23 @@ module.exports = class Player extends Definitions {
                         keys: {
                             acquire_time: float(),
                             required_research_points: integer(),
-                            price: super.price,
-                            exotic_price: super.exotic_price(this.cache.exotics),
+                            price: Definitions.price(),
+                            exotic_price: Definitions.exotic_price(this.cache.exotics),
                             player_modifiers: object({
                                 keys: {
-                                    unit_modifiers: super.create().modifiers.unit_modifiers.create(
+                                    unit_modifiers: UnitModifiers.create(
                                         {
                                             hasArrayValues: false,
                                         },
                                         this.cache
                                     ),
-                                    weapon_modifiers: super.create().modifiers.weapon_modifiers.create(
+                                    weapon_modifiers: WeaponModifiers.create(
                                         {
                                             hasArrayValues: false,
                                         },
                                         this.cache
                                     ),
-                                    empire_modifiers: super.create().modifiers.empire_modifiers.create(),
+                                    empire_modifiers: EmpireModifiers.create(),
                                 },
                             }),
                             button_background: this.cache.textures,
@@ -78,12 +78,12 @@ module.exports = class Player extends Definitions {
                     modifier_type: enumerate({
                         items: planet_modifier_types(),
                     }),
-                    value_behavior: super.getValueBehavior,
+                    value_behavior: Definitions.value_behavior(),
                     values: array({
                         items: object({
                             keys: {
                                 value: float(false),
-                                prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                prerequisites: prerequisites(this.cache.research_subjects),
                             },
                         }),
                     }),
@@ -99,12 +99,12 @@ module.exports = class Player extends Definitions {
                     modifier_type: enumerate({
                         items: unit_modifier_types(),
                     }),
-                    value_behavior: super.getValueBehavior,
+                    value_behavior: Definitions.value_behavior(),
                     values: array({
                         items: object({
                             keys: {
                                 value: float(false),
-                                prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                prerequisites: prerequisites(this.cache.research_subjects),
                             },
                         }),
                     }),
@@ -137,7 +137,7 @@ module.exports = class Player extends Definitions {
                             max_military_structure_slots: integer(),
                             max_health_points: float(),
                             health_points_restore_rate: float(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -148,7 +148,7 @@ module.exports = class Player extends Definitions {
                             max_planet_component_slots: integer(),
                             max_civilian_structure_slots: integer(),
                             structure_builder_count: integer(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -157,7 +157,7 @@ module.exports = class Player extends Definitions {
                         keys: {
                             credits_income_rate: float(),
                             max_health_points: float(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -167,7 +167,7 @@ module.exports = class Player extends Definitions {
                             metal_income_rate: float(),
                             crystal_income_rate: float(),
                             max_health_points: float(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -181,7 +181,7 @@ module.exports = class Player extends Definitions {
                         keys: {
                             civilian_research_points: float(),
                             max_health_points: float(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -190,7 +190,7 @@ module.exports = class Player extends Definitions {
                         keys: {
                             military_research_points: float(),
                             max_health_points: float(),
-                            prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            prerequisites: prerequisites(this.cache.research_subjects),
                         },
                     }),
                 }),
@@ -233,13 +233,13 @@ module.exports = class Player extends Definitions {
         return array({
             items: object({
                 keys: {
-                    modifier_type: super.create().modifiers.npc_modifiers.getNpcModifierTypes,
-                    value_behavior: super.getValueBehavior,
+                    modifier_type: NpcModifiers.modifier_type(),
+                    value_behavior: Definitions.value_behavior(),
                     values: array({
                         items: object({
                             keys: {
                                 value: float(),
-                                prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                prerequisites: prerequisites(this.cache.research_subjects),
                             },
                         }),
                     }),
@@ -249,17 +249,25 @@ module.exports = class Player extends Definitions {
     }
 
     create() {
-        if (this.json?.hasOwnProperty('starting_units_in_hyperspace') && !this.json?.hasOwnProperty('starting_units_in_hyperspace_duration')) {
-            this.diagStorage.messages.requiresKey(null, 'starting_units_in_hyperspace_duration')
-        }
+        try {
+            if (has(this.json.data, 'starting_units_in_hyperspace') && !has(this.json.data, 'starting_units_in_hyperspace_duration')) {
+                this.json.key_requires('', 'starting_units_in_hyperspace_duration')
+            }
+            this.json.greater_than_zero(this.json.data.starting_units_in_hyperspace_duration, '/starting_units_in_hyperspace_duration')
+        } catch {}
+
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 race: this.cache.race_names,
                 influence: object({
                     keys: {
-                        reveal_npc_point_costs: array({ items: integer() }),
-                        increase_npc_reputation_level_point_costs: array({ items: integer() }),
+                        reveal_npc_point_costs: array({
+                            items: integer(),
+                        }),
+                        increase_npc_reputation_level_point_costs: array({
+                            items: integer(),
+                        }),
                     },
                     required: ['reveal_npc_point_costs', 'increase_npc_reputation_level_point_costs'],
                 }),
@@ -275,7 +283,7 @@ module.exports = class Player extends Definitions {
                         levels: array({
                             items: object({
                                 keys: {
-                                    income_rates: super.price,
+                                    income_rates: Definitions.price(),
                                     modifier_values: object({
                                         keys: {
                                             max_civilian_structure_slots: object({
@@ -314,13 +322,13 @@ module.exports = class Player extends Definitions {
                             items: this.cache.planet_components,
                             isUnique: true,
                         }),
-                        establish_price: super.price,
+                        establish_price: Definitions.price(),
                     },
                 }),
                 starting_units_in_gravity_well: object({
                     keys: {
-                        required_units: super.getRequiredUnits(this.cache),
-                        random_units: super.units(this.cache.units),
+                        required_units: Definitions.getRequiredUnits(this.cache),
+                        random_units: Definitions.units(this.cache.units),
                     },
                 }),
                 influence: object({
@@ -335,7 +343,7 @@ module.exports = class Player extends Definitions {
                 planet_levels: array({
                     items: object({
                         keys: {
-                            upgrade_price: super.price,
+                            upgrade_price: Definitions.price(),
                             upgrade_duration: float(),
                             experience_given_on_bombed_to_neutral: float(),
                         },
@@ -343,14 +351,14 @@ module.exports = class Player extends Definitions {
                 }),
                 starting_units_in_hyperspace: object({
                     keys: {
-                        required_units: super.getRequiredUnits(this.cache),
-                        random_units: super.units(this.cache.units),
+                        required_units: Definitions.getRequiredUnits(this.cache),
+                        random_units: Definitions.units(this.cache.units),
                     },
                 }),
                 planet_excavation_levels: array({
                     items: object({
                         keys: {
-                            upgrade_price: super.price,
+                            upgrade_price: Definitions.price(),
                             upgrade_duration: float(),
                         },
                     }),
@@ -366,7 +374,7 @@ module.exports = class Player extends Definitions {
                                 items: object({
                                     keys: {
                                         unit: this.cache.units,
-                                        count: vector2(),
+                                        count: vector2f(),
                                     },
                                 }),
                             }),
@@ -403,7 +411,7 @@ module.exports = class Player extends Definitions {
                             id: string(),
                             name: this.cache.localisation,
                             column_count: integer(),
-                            structure_slot_type: super.getDomain,
+                            structure_slot_type: Definitions.getDomain(),
                         },
                     }),
                 }),
@@ -463,7 +471,9 @@ module.exports = class Player extends Definitions {
                                     portrait: this.cache.player_portraits,
                                     icon: this.cache.player_icons,
                                     color_group: this.cache.color_groups,
-                                    reputation_panel: enumerate({ items: ['viturak_cabal_panel', 'pranast_united_panel', 'jiskun_force_panel', 'aluxian_resurgence_panel', 'pirate_panel'] }),
+                                    reputation_panel: enumerate({
+                                        items: ['viturak_cabal_panel', 'pranast_united_panel', 'jiskun_force_panel', 'aluxian_resurgence_panel', 'pirate_panel'],
+                                    }),
                                 },
                             }),
                         }),
@@ -472,10 +482,12 @@ module.exports = class Player extends Definitions {
                                 will_fleet_colonize: boolean(),
                                 max_jumps_from_home_planet_for_fleets: integer(),
                                 max_fleet_supply: float(),
-                                pick_another_buildable_attack_ship_type_interval_in_minutes: vecInt2(),
+                                pick_another_buildable_attack_ship_type_interval_in_minutes: vector2i(),
                                 desired_explore_ship_count: object({
                                     keys: {
-                                        type: enumerate({ items: ['constant'] }),
+                                        type: enumerate({
+                                            items: ['constant'],
+                                        }),
                                         value: integer(),
                                     },
                                     required: ['type', 'value'],
@@ -497,8 +509,8 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     weight: float(),
-                                    initial_cooldown: vector2(),
-                                    cooldown_duration: vector2(),
+                                    initial_cooldown: vector2f(),
+                                    cooldown_duration: vector2f(),
                                     event_type: enumerate({
                                         items: ['raid'],
                                     }),
@@ -510,8 +522,8 @@ module.exports = class Player extends Definitions {
                                                     keys: {
                                                         units: object({
                                                             keys: {
-                                                                required_units: super.getRequiredUnits(this.cache),
-                                                                random_units: super.units(this.cache.units),
+                                                                required_units: Definitions.getRequiredUnits(this.cache),
+                                                                random_units: Definitions.units(this.cache.units),
                                                             },
                                                         }),
                                                         supply: float(),
@@ -539,8 +551,8 @@ module.exports = class Player extends Definitions {
                                         keys: {
                                             spawned_units: object({
                                                 keys: {
-                                                    required_units: super.getRequiredUnits(this.cache),
-                                                    random_units: super.units(this.cache.units),
+                                                    required_units: Definitions.getRequiredUnits(this.cache),
+                                                    random_units: Definitions.units(this.cache.units),
                                                 },
                                             }),
                                             supply_threshold: float(),
@@ -553,13 +565,15 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     weight: float(),
-                                    bid_asset_type: super.getResources,
+                                    bid_asset_type: Definitions.getResources(),
                                     bid_exotic_type: this.cache.exotics,
                                     bid_duration: float(),
                                     winner_reputation_points: float(),
                                     reward: this.cache.npc_rewards,
-                                    rewards: array({ items: this.cache.npc_rewards }),
-                                    constraint: super.getConstraintType,
+                                    rewards: array({
+                                        items: this.cache.npc_rewards,
+                                    }),
+                                    constraint: Definitions.getConstraintType(),
                                 },
                             }),
                         }),
@@ -638,19 +652,19 @@ module.exports = class Player extends Definitions {
                                                 keys: {
                                                     sell_crystal_credits_received: object({
                                                         keys: {
-                                                            value_behavior: super.getValueBehavior,
+                                                            value_behavior: Definitions.value_behavior(),
                                                             value: float(),
                                                         },
                                                     }),
                                                     sell_metal_credits_received: object({
                                                         keys: {
-                                                            value_behavior: super.getValueBehavior,
+                                                            value_behavior: Definitions.value_behavior(),
                                                             value: float(),
                                                         },
                                                     }),
                                                     sell_exotic_credits_received: object({
                                                         keys: {
-                                                            value_behavior: super.getValueBehavior,
+                                                            value_behavior: Definitions.value_behavior(),
                                                             value: float(),
                                                         },
                                                     }),
@@ -726,7 +740,7 @@ module.exports = class Player extends Definitions {
                         keys: {
                             planet_type: this.cache.planets,
                             can_ever_be_colonized: boolean(),
-                            colonization_research_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                            colonization_research_prerequisites: prerequisites(this.cache.research_subjects),
                             tracks: this.tracks(),
                             maintenance_cost_rates: array({}),
                             trade_capacity_levels: array({
@@ -746,7 +760,7 @@ module.exports = class Player extends Definitions {
                         },
                     }),
                 }),
-                default_starting_assets: super.price,
+                default_starting_assets: Definitions.price(),
                 default_starting_exotics: array({
                     items: object({
                         keys: {
@@ -778,7 +792,7 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     propagation_rate_scalar: float(false),
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                         }),
@@ -790,7 +804,7 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     npc: string(),
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                         }),
@@ -801,7 +815,7 @@ module.exports = class Player extends Definitions {
                                         items: ['commerce'],
                                     }),
                                     minimum_level: integer(),
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                     rate: percentage(),
                                 },
                             }),
@@ -809,10 +823,10 @@ module.exports = class Player extends Definitions {
                         insurgency: object({
                             keys: {
                                 special_operation_unit_kind: this.cache.special_operation_kinds,
-                                prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                prerequisites: prerequisites(this.cache.research_subjects),
                                 spawn_units: object({
                                     keys: {
-                                        random_units: super.units(this.cache.units),
+                                        random_units: Definitions.units(this.cache.units),
                                     },
                                 }),
                                 supply: float(),
@@ -822,7 +836,7 @@ module.exports = class Player extends Definitions {
                         }),
                     },
                 }),
-                find_npc_explore_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                find_npc_explore_prerequisites: prerequisites(this.cache.research_subjects),
                 buildable_exotics: array({
                     items: array({
                         items: [
@@ -830,8 +844,8 @@ module.exports = class Player extends Definitions {
                             object({
                                 keys: {
                                     build_time: float(),
-                                    price: super.price,
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    price: Definitions.price(),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                         ],
@@ -847,7 +861,7 @@ module.exports = class Player extends Definitions {
                                         keys: {
                                             movement: object({
                                                 keys: {
-                                                    unit_modifiers: super.create().modifiers.unit_modifiers.create(
+                                                    unit_modifiers: UnitModifiers.create(
                                                         {
                                                             hasArrayValues: false,
                                                         },
@@ -857,7 +871,7 @@ module.exports = class Player extends Definitions {
                                             }),
                                             combat: object({
                                                 keys: {
-                                                    weapon_modifiers: super.create().modifiers.weapon_modifiers.create(
+                                                    weapon_modifiers: WeaponModifiers.create(
                                                         {
                                                             hasArrayValues: false,
                                                         },
@@ -867,7 +881,7 @@ module.exports = class Player extends Definitions {
                                             }),
                                             utility: object({
                                                 keys: {
-                                                    unit_modifiers: super.create().modifiers.unit_modifiers.create(
+                                                    unit_modifiers: UnitModifiers.create(
                                                         {
                                                             hasArrayValues: false,
                                                         },
@@ -885,7 +899,7 @@ module.exports = class Player extends Definitions {
                 }),
                 garrison: object({
                     keys: {
-                        spawn_type: super.getSpawnType,
+                        spawn_type: Definitions.getSpawnType(),
                         hyperspace_interval_time: float(),
                         special_operation_unit_kind: this.cache.special_operation_kinds,
                         garrison_type: enumerate({
@@ -895,7 +909,7 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     build_kind: this.cache.build_kinds,
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                             isUnique: true,
@@ -903,24 +917,24 @@ module.exports = class Player extends Definitions {
                         factory_build_time_scalar: float(),
                         units: object({
                             keys: {
-                                random_units: super.units(this.cache.units),
+                                random_units: Definitions.units(this.cache.units),
                             },
                         }),
                         base_max_supply: float(),
-                        prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                        prerequisites: prerequisites(this.cache.research_subjects),
                     },
                 }),
                 trade: object({
                     keys: {
-                        trade_income_rates: super.price,
-                        trade_ship_death_assets: super.price,
+                        trade_income_rates: Definitions.price(),
+                        trade_ship_death_assets: Definitions.price(),
                         trade_ship_escorts: array({
                             items: object({
                                 keys: {
                                     unit: this.cache.units,
                                     count_per_trade_ship: integer(),
                                     special_operation_unit_kind: this.cache.special_operation_kinds,
-                                    research_prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    research_prerequisites: prerequisites(this.cache.research_subjects),
                                     construction_time: float(),
                                 },
                             }),
@@ -933,7 +947,7 @@ module.exports = class Player extends Definitions {
                             items: object({
                                 keys: {
                                     max_supply: float(),
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                         }),
@@ -946,7 +960,7 @@ module.exports = class Player extends Definitions {
                                 keys: {
                                     starting_experience: float(),
                                     max_supply: float(),
-                                    prerequisites: super.getResearchSubjects(this.cache.research_subjects),
+                                    prerequisites: prerequisites(this.cache.research_subjects),
                                 },
                             }),
                         }),
@@ -994,54 +1008,54 @@ module.exports = class Player extends Definitions {
                     keys: {
                         user_interface_sounds: object({
                             keys: {
-                                set_rally_point: super.sound(this.cache),
-                                set_unit_factory_deliverable_destination: super.sound(this.cache),
-                                build_structure: super.sound(this.cache),
-                                set_planet_structure_plate_spin: super.sound(this.cache),
-                                ping_attention: super.sound(this.cache),
-                                ping_attack: super.sound(this.cache),
-                                ping_defend: super.sound(this.cache),
-                                join_fleet: super.sound(this.cache),
-                                research_completed: super.sound(this.cache),
-                                planet_being_bombed: super.sound(this.cache),
-                                planet_colonized: super.sound(this.cache),
-                                planet_lost: super.sound(this.cache),
-                                ally_planet_lost: super.sound(this.cache),
-                                planet_artifact_excavated: super.sound(this.cache),
-                                planet_bonus_excavated: super.sound(this.cache),
-                                planet_track_upgrade_completed: super.sound(this.cache),
-                                enemy_units_incoming: super.sound(this.cache),
-                                enemy_units_arrived: super.sound(this.cache),
-                                enemy_planet_made_dead_from_bombing: super.sound(this.cache),
-                                pirate_units_arrived: super.sound(this.cache),
-                                insufficient_credits: super.sound(this.cache),
-                                insufficient_metal: super.sound(this.cache),
-                                insufficient_crystal: super.sound(this.cache),
-                                insufficient_civilian_structure_slots: super.sound(this.cache),
-                                insufficient_military_structure_slots: super.sound(this.cache),
-                                insufficient_antimatter: super.sound(this.cache),
-                                research_prerequisites_not_met: super.sound(this.cache),
-                                insufficient_civilian_research_points: super.sound(this.cache),
-                                insufficient_military_research_points: super.sound(this.cache),
-                                position_has_overlapped_unit: super.sound(this.cache),
-                                click_failed: super.sound(this.cache),
-                                generic_order_issued: super.sound(this.cache),
-                                generic_attack_order_issued: super.sound(this.cache),
-                                generic_joined_fleet: super.sound(this.cache),
-                                sell_npc_market_asset: super.sound(this.cache),
-                                buy_npc_market_asset: super.sound(this.cache),
-                                capital_ship_shields_down: super.sound(this.cache),
-                                capital_ship_hull_severely_damaged: super.sound(this.cache),
-                                capital_ship_lost: super.sound(this.cache),
-                                ally_capital_ship_lost: super.sound(this.cache),
-                                titan_shields_down: super.sound(this.cache),
-                                titan_hull_severely_damaged: super.sound(this.cache),
-                                titan_lost: super.sound(this.cache),
-                                ally_titan_lost: super.sound(this.cache),
-                                ally_titan_built: super.sound(this.cache),
-                                enemy_titan_built: super.sound(this.cache),
-                                fleet_under_attack: super.sound(this.cache),
-                                destroy_planet_rewards_given: super.sound(this.cache),
+                                set_rally_point: Definitions.sound(this.cache),
+                                set_unit_factory_deliverable_destination: Definitions.sound(this.cache),
+                                build_structure: Definitions.sound(this.cache),
+                                set_planet_structure_plate_spin: Definitions.sound(this.cache),
+                                ping_attention: Definitions.sound(this.cache),
+                                ping_attack: Definitions.sound(this.cache),
+                                ping_defend: Definitions.sound(this.cache),
+                                join_fleet: Definitions.sound(this.cache),
+                                research_completed: Definitions.sound(this.cache),
+                                planet_being_bombed: Definitions.sound(this.cache),
+                                planet_colonized: Definitions.sound(this.cache),
+                                planet_lost: Definitions.sound(this.cache),
+                                ally_planet_lost: Definitions.sound(this.cache),
+                                planet_artifact_excavated: Definitions.sound(this.cache),
+                                planet_bonus_excavated: Definitions.sound(this.cache),
+                                planet_track_upgrade_completed: Definitions.sound(this.cache),
+                                enemy_units_incoming: Definitions.sound(this.cache),
+                                enemy_units_arrived: Definitions.sound(this.cache),
+                                enemy_planet_made_dead_from_bombing: Definitions.sound(this.cache),
+                                pirate_units_arrived: Definitions.sound(this.cache),
+                                insufficient_credits: Definitions.sound(this.cache),
+                                insufficient_metal: Definitions.sound(this.cache),
+                                insufficient_crystal: Definitions.sound(this.cache),
+                                insufficient_civilian_structure_slots: Definitions.sound(this.cache),
+                                insufficient_military_structure_slots: Definitions.sound(this.cache),
+                                insufficient_antimatter: Definitions.sound(this.cache),
+                                research_prerequisites_not_met: Definitions.sound(this.cache),
+                                insufficient_civilian_research_points: Definitions.sound(this.cache),
+                                insufficient_military_research_points: Definitions.sound(this.cache),
+                                position_has_overlapped_unit: Definitions.sound(this.cache),
+                                click_failed: Definitions.sound(this.cache),
+                                generic_order_issued: Definitions.sound(this.cache),
+                                generic_attack_order_issued: Definitions.sound(this.cache),
+                                generic_joined_fleet: Definitions.sound(this.cache),
+                                sell_npc_market_asset: Definitions.sound(this.cache),
+                                buy_npc_market_asset: Definitions.sound(this.cache),
+                                capital_ship_shields_down: Definitions.sound(this.cache),
+                                capital_ship_hull_severely_damaged: Definitions.sound(this.cache),
+                                capital_ship_lost: Definitions.sound(this.cache),
+                                ally_capital_ship_lost: Definitions.sound(this.cache),
+                                titan_shields_down: Definitions.sound(this.cache),
+                                titan_hull_severely_damaged: Definitions.sound(this.cache),
+                                titan_lost: Definitions.sound(this.cache),
+                                ally_titan_lost: Definitions.sound(this.cache),
+                                ally_titan_built: Definitions.sound(this.cache),
+                                enemy_titan_built: Definitions.sound(this.cache),
+                                fleet_under_attack: Definitions.sound(this.cache),
+                                destroy_planet_rewards_given: Definitions.sound(this.cache),
                             },
                         }),
                     },

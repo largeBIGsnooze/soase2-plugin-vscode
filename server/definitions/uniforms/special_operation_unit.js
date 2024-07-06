@@ -1,10 +1,8 @@
 const { schema, string, object, array, boolean, float, color, enumerate } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class SpecialOperationUnit extends Definitions {
+module.exports = class SpecialOperationUnit {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -36,7 +34,9 @@ module.exports = class SpecialOperationUnit extends Definitions {
                                         required: ['icon', 'mesh_center_offset'],
                                     }),
                                     main_view_icon_fill_color: color(),
-                                    duration_start_condition: enumerate({ items: ['when_planet_is_not_enemy', 'when_gravity_well_has_no_attackable_enemy_units', 'immediately'] }),
+                                    duration_start_condition: enumerate({
+                                        items: ['when_planet_is_not_enemy', 'when_gravity_well_has_no_attackable_enemy_units', 'immediately'],
+                                    }),
                                     duration: float(),
                                 },
                                 required: ['is_ever_controllable'],

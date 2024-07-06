@@ -1,11 +1,8 @@
 const { schema, array, object, string, boolean } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class UnitMutationUniform extends Definitions {
+module.exports = class UnitMutationUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 

@@ -1,10 +1,9 @@
-const { schema, object, enumerate, boolean, vecInt2, float } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, object, enumerate, boolean, vector2i, float } = require('../data_types')
+const UI = require('../ui_definitions')
 
-module.exports = class Brush extends Definitions {
+module.exports = class Brush {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -28,14 +27,14 @@ module.exports = class Brush extends Definitions {
                 focused_state: this.brush_state(),
                 pressed_state: this.brush_state(),
                 hovered_state: this.brush_state(),
-                margins: super.margins(),
+                margins: UI.margins(),
                 is_transient: boolean(),
                 tiles: object({
                     keys: {
                         total_count: float(),
                         column_count: float(),
-                        tile_size: vecInt2(),
-                        tile_stride: vecInt2(),
+                        tile_size: vector2i(),
+                        tile_stride: vector2i(),
                     },
                 }),
             },

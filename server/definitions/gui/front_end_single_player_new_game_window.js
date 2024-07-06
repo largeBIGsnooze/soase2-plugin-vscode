@@ -1,5 +1,5 @@
 const { schema, object } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FrontEndSinglePlayerNewGameWindow extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -12,7 +12,9 @@ module.exports = class FrontEndSinglePlayerNewGameWindow extends Definitions {
         return schema({
             keys: {
                 layout: super.layout(),
-                background_window: object({ keys: {} }),
+                background_window: object({
+                    keys: {},
+                }),
                 create_lobby_button: super.button(this.cache),
                 scenario_picker_window_frame: object({
                     keys: {

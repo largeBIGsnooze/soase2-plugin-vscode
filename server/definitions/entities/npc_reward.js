@@ -1,291 +1,78 @@
-const DiagnosticStorage = require('../../data/diagnostic-storage')
-const { schema, float, array, object, enumerate, If, integer, vecInt2, boolean } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
+const { prerequisites } = require('../definitions')
+const { schema, float, array, object, enumerate, integer, vector2i, boolean, version, string } = require('../data_types')
+const Buff = require('./buff')
+const { NpcModifiers } = require('../modifier_definitions')
 const Definitions = require('../definitions')
 
-module.exports = class NpcReward extends Definitions {
+class Type {
+    constructor(json) {
+        this.json = json
+    }
+
+    definition() {
+        const types = {
+            ship_component: 'item',
+            planet_component: 'item',
+            random_exotics: 'random_exotics',
+            send_raid_action: 'raid',
+            spawn_units: 'spawn_units',
+            assets: 'assets',
+            exotics: 'exotics',
+            player_modifiers: 'player_modifiers',
+            starbase_component: 'item',
+            random_assets_and_exotics: 'random_assets_and_exotics',
+            asset_market_exclusive_use: 'exclusive_market',
+            ability: 'ability',
+            alliance: 'alliance',
+        }
+
+        try {
+            const type = types[this.json.data.type]
+            if (type) {
+                if (!has(this.json.data, type)) this.createPointerDiagnostic('', `key not found: '${type}'`, ERROR)
+                this.json.map_unused_keys(
+                    '/type',
+                    this.json.data,
+                    ['item', 'exotics', 'random_exotics', 'assets', 'exclusive_market', 'random_assets_and_exotics', 'raid', 'spawn_units', 'ability', 'alliance', 'player_modifiers'].filter((e) => e !== type)
+                )
+            }
+        } catch {}
+        return enumerate({
+            items: ['alliance', 'ability', 'random_assets_and_exotics', 'starbase_component', 'planet_component', 'player_modifiers', 'ship_component', 'assets', 'asset_market_exclusive_use', 'exotics', 'random_exotics', 'send_raid_action', 'spawn_units'],
+        })
+    }
+}
+
+module.exports = class NpcReward extends Buff {
     /* eslint-disable no-unused-vars */
-
-    types = ['alliance', 'ability', 'random_assets_and_exotics', 'starbase_component', 'planet_component', 'player_modifiers', 'ship_component', 'assets', 'asset_market_exclusive_use', 'exotics', 'random_exotics', 'send_raid_action', 'spawn_units']
-
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-        this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
-        this.json = JSON.parse(fileText)
-
+        super({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache)
+        this.json = new DiagnosticReporter(fileText, diagnostics)
+        this.type = new Type(this.json)
         this.cache = cache
     }
 
-    type(type) {
-        switch (type) {
-            case 'random_exotics': {
-                return {
-                    random_exotics: object({
-                        keys: {
-                            count: vecInt2(),
-                            exotics: array({
-                                items: this.cache.exotics,
-                                isUnique: true,
-                            }),
-                        },
-                        required: ['count', 'exotics'],
-                    }),
-                }
+    items() {
+        try {
+            switch (this.json.data.type) {
+                case 'ship_component':
+                case 'starbase_component':
+                    return this.cache.ship_components
+                case 'planet_component':
+                    return this.cache.planet_components
+                default:
+                    return string()
             }
-            case 'random_assets_and_exotics': {
-                return {
-                    random_assets_and_exotics: array({
-                        items: object({
-                            keys: {
-                                weight: float(),
-                                credits: vecInt2(),
-                                metal: vecInt2(),
-                                crystal: vecInt2(),
-                                exotics: object({
-                                    keys: {
-                                        count: vecInt2(),
-                                        exotics: array({
-                                            items: this.cache.exotics,
-                                            isUnique: true,
-                                        }),
-                                    },
-                                    required: ['count', 'exotics'],
-                                }),
-                            },
-                        }),
-                    }),
-                }
-            }
-            case 'send_raid_action': {
-                return {
-                    raid: object({
-                        keys: {
-                            units: object({
-                                keys: {
-                                    required_units: super.getRequiredUnits(this.cache),
-                                    random_units: super.units(this.cache.units),
-                                    supply: integer(),
-                                    bounty_credits: float(),
-                                },
-                            }),
-                            supply: float(),
-                            buff: this.cache.buffs,
-                            action_data_source: this.cache.action_data_sources,
-                        },
-                        required: ['units'],
-                    }),
-                }
-            }
-            case 'exotics': {
-                return {
-                    exotics: super.exotic_price(this.cache.exotics),
-                }
-            }
-            case 'assets': {
-                return {
-                    assets: object({
-                        keys: {
-                            credits: float(),
-                            metal: float(),
-                            crystal: float(),
-                        },
-                    }),
-                }
-            }
-            case 'spawn_units': {
-                return {
-                    spawn_units: object({
-                        keys: {
-                            spawn_units: object({
-                                keys: {
-                                    random_units: super.units(this.cache.units),
-                                    required_units: super.getRequiredUnits(this.cache),
-                                },
-                            }),
-                            is_usable_by_player_ai: boolean(),
-                            special_operation_unit_kind: this.cache.special_operation_kinds,
-                            arrival_delay_duration: integer(),
-                            gravity_well_fixture_target_filter: object({
-                                keys: {
-                                    unit_types: array({
-                                        items: this.cache.ship_tags,
-                                        isUnique: true,
-                                    }),
-                                    ownerships: super.getOwnerships,
-                                    constraints: super.getConstraints(this.cache),
-                                },
-                            }),
-                            target_alert: enumerate({ items: ['targeted_by_ability'] }),
-                            supply: float(),
-                        },
-                    }),
-                }
-            }
-            case 'player_modifiers': {
-                return {
-                    player_modifiers: object({
-                        keys: {
-                            duration_in_minutes: float(),
-                            player_modifiers: object({
-                                keys: {
-                                    npc_modifiers: super.create().modifiers.npc_modifiers.create(super.getResearchSubjects(this.cache.research_subjects)),
-                                },
-                            }),
-                        },
-                    }),
-                }
-            }
-            case 'alliance': {
-                return {
-                    alliance: object({
-                        keys: {
-                            alliance_type: enumerate({ items: ['cease_fire'] }),
-                            duration_in_minutes: float(),
-                        },
-                    }),
-                }
-            }
-            case 'asset_market_exclusive_use': {
-                return {
-                    exclusive_market: object({
-                        keys: {
-                            asset_type: super.getResources,
-                            duration: float(),
-                            modifiers: object({
-                                keys: {
-                                    npc_modifiers: super.create().modifiers.npc_modifiers.create(super.getResearchSubjects(this.cache.research_subjects)),
-                                },
-                            }),
-                        },
-                        required: ['asset_type', 'duration', 'modifiers'],
-                    }),
-                }
-            }
-            default: {
-            }
-        }
+        } catch {}
     }
 
     create() {
-        // for (let i = 0; i < this.types.length; i++) {
-        //     const type = this.types[i]
-        //     if (this.json?.type === type) {
-        //         for (const property of [...this.types])  {
-        //             if (property == type) continue
-        //             if (this.json.hasOwnProperty(property)) {
-        //                 this.diagStorage.messages.unusedKey(property, property)
-        //             }
-        //         }
-        //     }
-        // }
-
         return schema({
-            additional: If({
-                key: 'type',
-                value: 'ship_component',
-                requires: ['item'],
-                properties: {
-                    item: this.cache.ship_components,
-                },
-                additional: If({
-                    key: 'type',
-                    value: 'planet_component',
-                    requires: ['item'],
-                    properties: {
-                        item: this.cache.planet_components,
-                    },
-                    additional: If({
-                        key: 'type',
-                        value: 'asset_market_exclusive_use',
-                        requires: ['exclusive_market'],
-                        properties: {
-                            ...this.type('asset_market_exclusive_use'),
-                        },
-                        additional: If({
-                            key: 'type',
-                            value: 'spawn_units',
-                            requires: ['spawn_units'],
-                            properties: {
-                                ...this.type('spawn_units'),
-                            },
-                            additional: If({
-                                key: 'type',
-                                value: 'assets',
-                                requires: ['assets'],
-                                properties: {
-                                    ...this.type('assets'),
-                                },
-                                additional: If({
-                                    key: 'type',
-                                    value: 'exotics',
-                                    requires: ['exotics'],
-                                    properties: {
-                                        ...this.type('exotics'),
-                                    },
-                                    additional: If({
-                                        key: 'type',
-                                        value: 'send_raid_action',
-                                        requires: ['raid'],
-                                        properties: {
-                                            ...this.type('send_raid_action'),
-                                        },
-                                        additional: If({
-                                            key: 'type',
-                                            value: 'random_exotics',
-                                            requires: ['random_exotics'],
-                                            properties: {
-                                                ...this.type('random_exotics'),
-                                            },
-                                            additional: If({
-                                                key: 'type',
-                                                value: 'player_modifiers',
-                                                requires: ['player_modifiers'],
-                                                properties: {
-                                                    ...this.type('player_modifiers'),
-                                                },
-                                                additional: If({
-                                                    key: 'type',
-                                                    value: 'starbase_component',
-                                                    requires: ['item'],
-                                                    properties: {
-                                                        item: this.cache.ship_components,
-                                                    },
-                                                    additional: If({
-                                                        key: 'type',
-                                                        value: 'random_assets_and_exotics',
-                                                        requires: ['random_assets_and_exotics'],
-                                                        properties: {
-                                                            ...this.type('random_assets_and_exotics'),
-                                                        },
-                                                        additional: If({
-                                                            key: 'type',
-                                                            value: 'ability',
-                                                            requires: ['ability'],
-                                                            properties: {
-                                                                ability: this.cache.abilities,
-                                                            },
-                                                            additional: If({
-                                                                key: 'type',
-                                                                value: 'alliance',
-                                                                requires: ['alliance'],
-                                                                properties: {
-                                                                    ...this.type('alliance'),
-                                                                },
-                                                            }),
-                                                        }),
-                                                    }),
-                                                }),
-                                            }),
-                                        }),
-                                    }),
-                                }),
-                            }),
-                        }),
-                    }),
-                }),
-            }),
+            required: ['type'],
             keys: {
-                version: float(),
-                targeting_ui: super.getTargetingUi,
+                version: version(),
+                targeting_ui: Definitions.getTargetingUi(),
                 gui: object({
                     keys: {
                         hud_icon: this.cache.textures,
@@ -293,21 +80,122 @@ module.exports = class NpcReward extends Definitions {
                         name: this.cache.localisation,
                         description: this.cache.localisation,
                     },
+                    required: ['hud_icon', 'name', 'description'],
                 }),
-                type: enumerate({
-                    items: this.types,
+                type: this.type.definition(),
+                item: this.items(),
+                ability: this.cache.abilities,
+                exclusive_market: object({
+                    keys: {
+                        asset_type: Definitions.getResources(),
+                        duration: float(),
+                        modifiers: object({
+                            keys: {
+                                npc_modifiers: NpcModifiers.create(this.cache.research_subjects),
+                            },
+                        }),
+                    },
+                    required: ['asset_type', 'duration', 'modifiers'],
                 }),
-                raid: '',
-                assets: '',
-                item: '',
-                exotics: '',
-                random_exotics: '',
-                exclusive_market: '',
-                random_assets_and_exotics: '',
-                spawn_units: '',
-                ability: '',
-                alliance: '',
-                player_modifiers: '',
+                alliance: object({
+                    keys: {
+                        alliance_type: enumerate({
+                            items: ['cease_fire'],
+                        }),
+                        duration_in_minutes: float(),
+                    },
+                }),
+                player_modifiers: object({
+                    keys: {
+                        duration_in_minutes: float(),
+                        player_modifiers: object({
+                            keys: {
+                                npc_modifiers: NpcModifiers.create(this.cache.research_subjects),
+                            },
+                        }),
+                    },
+                }),
+                assets: object({
+                    keys: {
+                        credits: float(),
+                        metal: float(),
+                        crystal: float(),
+                    },
+                }),
+                exotics: Definitions.exotic_price(this.cache.exotics),
+                spawn_units: object({
+                    keys: {
+                        spawn_units: object({
+                            keys: {
+                                random_units: Definitions.units(this.cache.units),
+                                required_units: Definitions.getRequiredUnits(this.cache),
+                            },
+                        }),
+                        is_usable_by_player_ai: boolean(),
+                        special_operation_unit_kind: this.cache.special_operation_kinds,
+                        arrival_delay_duration: integer(),
+                        gravity_well_fixture_target_filter: object({
+                            keys: {
+                                unit_types: array({
+                                    items: this.cache.ship_tags,
+                                    isUnique: true,
+                                }),
+                                ownerships: Definitions.getOwnerships(),
+                                constraints: this.constraints(),
+                            },
+                        }),
+                        target_alert: enumerate({
+                            items: ['targeted_by_ability'],
+                        }),
+                        supply: float(),
+                    },
+                }),
+                raid: object({
+                    keys: {
+                        units: object({
+                            keys: {
+                                required_units: Definitions.getRequiredUnits(this.cache),
+                                random_units: Definitions.units(this.cache.units),
+                                supply: integer(),
+                                bounty_credits: float(),
+                            },
+                        }),
+                        supply: float(),
+                        buff: this.cache.buffs,
+                        action_data_source: this.cache.action_data_sources,
+                    },
+                    required: ['units'],
+                }),
+                random_exotics: object({
+                    keys: {
+                        count: vector2i(),
+                        exotics: array({
+                            items: this.cache.exotics,
+                            isUnique: true,
+                        }),
+                    },
+                    required: ['count', 'exotics'],
+                }),
+                random_assets_and_exotics: array({
+                    items: object({
+                        keys: {
+                            weight: float(),
+                            credits: vector2i(),
+                            metal: vector2i(),
+                            crystal: vector2i(),
+                            exotics: object({
+                                keys: {
+                                    count: vector2i(),
+                                    exotics: array({
+                                        items: this.cache.exotics,
+                                        isUnique: true,
+                                    }),
+                                },
+                                required: ['count', 'exotics'],
+                            }),
+                        },
+                    }),
+                }),
             },
         })
     }

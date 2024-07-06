@@ -1,5 +1,5 @@
 const { schema, string, object, float, vecInt2, color } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudTradeWindow extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -85,8 +85,12 @@ module.exports = class HudTradeWindow extends Definitions {
                                                         }),
                                                     },
                                                 }),
-                                                increase_button: super.button(this.cache, { isPrefixText: true }),
-                                                decrease_button: super.button(this.cache, { isPrefixText: true }),
+                                                increase_button: super.button(this.cache, {
+                                                    isPrefixText: true,
+                                                }),
+                                                decrease_button: super.button(this.cache, {
+                                                    isPrefixText: true,
+                                                }),
                                             },
                                         }),
                                     },

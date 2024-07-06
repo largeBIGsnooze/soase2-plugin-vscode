@@ -1,11 +1,9 @@
 const { schema, array, object, string, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 
-module.exports = class TargetFilterUniform extends Definitions {
+module.exports = class TargetFilterUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
@@ -22,18 +20,18 @@ module.exports = class TargetFilterUniform extends Definitions {
                                         items: this.cache.ship_tags,
                                         isUnique: true,
                                     }),
-                                    ownerships: super.getOwnerships,
+                                    ownerships: Definitions.getOwnerships(),
                                     constraints: array({
                                         items: object({
                                             keys: {
-                                                constraint_type: super.getConstraintType,
+                                                constraint_type: Definitions.getConstraintType(),
                                                 constraints: array({
                                                     items: object({
                                                         keys: {
-                                                            constraint_type: super.getConstraintType,
+                                                            constraint_type: Definitions.getConstraintType(),
                                                             constraint: object({
                                                                 keys: {
-                                                                    constraint_type: super.getConstraintType,
+                                                                    constraint_type: Definitions.getConstraintType(),
                                                                 },
                                                             }),
                                                         },
@@ -43,7 +41,9 @@ module.exports = class TargetFilterUniform extends Definitions {
                                         }),
                                     }),
                                     exemptions: array({
-                                        items: enumerate({ items: ['is_fully_unbuilt', 'is_dead'] }),
+                                        items: enumerate({
+                                            items: ['is_fully_unbuilt', 'is_dead'],
+                                        }),
                                         isUnique: true,
                                     }),
                                 },

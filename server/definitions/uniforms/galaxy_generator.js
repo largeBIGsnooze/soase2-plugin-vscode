@@ -1,10 +1,8 @@
-const { schema, object, array, string, float, vector3, vector2, integer, boolean, color, enumerate } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate } = require('../data_types')
 
-module.exports = class GalaxyGeneratorUniform extends Definitions {
+module.exports = class GalaxyGeneratorUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -66,14 +64,14 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                             sockets: array({
                                 items: object({
                                     keys: {
-                                        distance_as_percent_of_parent_inner_move_radius: vector2(),
-                                        angle: vector2(),
+                                        distance_as_percent_of_parent_inner_move_radius: vector2f(),
+                                        angle: vector2f(),
                                         socket_children: array({
                                             items: object({
                                                 required: ['distance_as_percent_of_parent_inner_move_radius', 'angle'],
                                                 keys: {
-                                                    distance_as_percent_of_parent_inner_move_radius: vector2(),
-                                                    angle: vector2(),
+                                                    distance_as_percent_of_parent_inner_move_radius: vector2f(),
+                                                    angle: vector2f(),
                                                 },
                                             }),
                                         }),
@@ -164,7 +162,7 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                                         orbit_parent: boolean(),
                                         sync_orbit_to_parent: boolean(),
                                         use_parent_ownership: boolean(),
-                                        planet_offset: vector2(),
+                                        planet_offset: vector2f(),
                                         counts: array({
                                             items: object({
                                                 keys: {
@@ -186,9 +184,9 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
     create() {
         return schema({
             keys: {
-                minimum_gravity_well_distances_by_hierarchy_depth: vector3(),
+                minimum_gravity_well_distances_by_hierarchy_depth: vector3f(),
                 gravity_well_y_offsets_by_hierarchy_depth: array({
-                    items: vector2(),
+                    items: vector2f(),
                 }),
                 gravity_well_orbit_durations_by_hierarchy_depth: array({
                     items: object({
@@ -208,7 +206,7 @@ module.exports = class GalaxyGeneratorUniform extends Definitions {
                         },
                     }),
                 }),
-                secondary_fixture_y_offset: vector2(),
+                secondary_fixture_y_offset: vector2f(),
                 min_jumps_to_any_home_planet_for_loot_level: array({
                     items: integer(),
                 }),

@@ -1,22 +1,19 @@
-const { schema, array, object, float, vector3, boolean } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, array, object, float, vector3f, boolean, version } = require('../data_types')
 
-module.exports = class FlightPattern extends Definitions {
+module.exports = class FlightPattern {
     /* eslint-disable no-unused-vars */
-    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-    }
+    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {}
 
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 segments: array({
                     items: object({
                         keys: {
-                            forward: vector3(),
-                            up: vector3(),
-                            linear_direction: vector3(),
+                            forward: vector3f(),
+                            up: vector3f(),
+                            linear_direction: vector3f(),
                             stop_at_goal: boolean(),
                             move_limits_scalars: object({
                                 keys: {

@@ -1,5 +1,5 @@
 const { schema, object, color, float } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class ColonyListBoxStyle extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -11,7 +11,9 @@ module.exports = class ColonyListBoxStyle extends Definitions {
     create() {
         return schema({
             keys: {
-                background: object({ keys: {} }),
+                background: object({
+                    keys: {},
+                }),
                 not_selected_item_background: object({
                     keys: {
                         border_color_focused: color(),

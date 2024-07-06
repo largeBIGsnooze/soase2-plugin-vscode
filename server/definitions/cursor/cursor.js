@@ -1,4 +1,4 @@
-const { string, vector2, schema } = require('../data_types')
+const { string, vector2f, schema } = require('../data_types')
 
 module.exports = class Cursor {
     /* eslint-disable no-unused-vars */
@@ -10,7 +10,7 @@ module.exports = class Cursor {
         return schema({
             keys: {
                 texture_name: this.cache.textures,
-                hot_spot: vector2(),
+                hot_spot: vector2f(),
             },
             required: ['texture_name', 'hot_spot'],
         })

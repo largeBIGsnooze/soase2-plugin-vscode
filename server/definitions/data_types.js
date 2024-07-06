@@ -1,14 +1,25 @@
+const version = () => {
+    return {
+        type: 'number',
+        minimum: 0,
+    }
+}
+
 const float = (minimum = true) => {
     return minimum
         ? {
               type: 'number',
               minimum: 0,
           }
-        : { type: 'number' }
+        : {
+              type: 'number',
+          }
 }
 const integer = (negative = false) => {
     return negative
-        ? { type: 'integer' }
+        ? {
+              type: 'integer',
+          }
         : {
               type: 'integer',
               minimum: 0,
@@ -112,7 +123,7 @@ const array = ({ items: items, isUnique: isUnique = false }) => ({
     uniqueItems: isUnique,
 })
 
-const vector3 = () => ({
+const vector3f = () => ({
     type: 'array',
     items: {
         type: 'number',
@@ -121,7 +132,7 @@ const vector3 = () => ({
     maxItems: 3,
 })
 
-const vecInt2 = () => ({
+const vector2i = () => ({
     type: 'array',
     items: {
         type: 'integer',
@@ -130,7 +141,7 @@ const vecInt2 = () => ({
     maxItems: 2,
 })
 
-const vector2 = () => ({
+const vector2f = () => ({
     type: 'array',
     items: {
         type: 'number',
@@ -155,15 +166,16 @@ module.exports = {
     If,
     IfMap,
     array,
-    vecInt2,
+    vector2i,
     enumerate,
     schema,
     object,
     boolean,
     string,
-    vector3,
-    vector2,
+    vector3f,
+    vector2f,
     float,
     integer,
     angle,
+    version,
 }

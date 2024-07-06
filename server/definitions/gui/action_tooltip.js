@@ -1,5 +1,5 @@
 const { schema, object, integer } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class ActionTooltip extends Definitions {
     /* eslint-disable no-unused-vars */
@@ -22,7 +22,7 @@ module.exports = class ActionTooltip extends Definitions {
                 action_value_ratio_gap: integer(),
                 action_value_ratio_colors: object({
                     keys: {
-                        per_unity: this.cache.colors,
+                        per_spell_power: this.cache.colors,
                     },
                 }),
             },

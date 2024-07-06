@@ -1,11 +1,9 @@
 const { EntityParser } = require('../../data/file-handler')
-const { schema, array, object, string, float, vector2, boolean } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, array, object, string, float, vector2f, boolean } = require('../data_types')
 
-module.exports = class UnitUniform extends Definitions {
+module.exports = class UnitUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.entityReader = new EntityParser(gameInstallationFolder)
         this.cache = cache
     }
@@ -35,8 +33,8 @@ module.exports = class UnitUniform extends Definitions {
                 damage_scalar_per_additive_defensive_value: float(),
                 recently_damaged_time_threshold: float(),
                 recently_bombed_time_threshold: float(),
-                spawn_in_fixture_move_area_radius_scalars: vector2(),
-                spawn_in_fixture_build_radius_scalars: vector2(),
+                spawn_in_fixture_move_area_radius_scalars: vector2f(),
+                spawn_in_fixture_build_radius_scalars: vector2f(),
                 add_new_phase_lane_max_direct_distance: float(),
                 add_new_phase_lane_min_jump_distance: float(),
                 max_hyperspace_charge_time_unit_count: float(),

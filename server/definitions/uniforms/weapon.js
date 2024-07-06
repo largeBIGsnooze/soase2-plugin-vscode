@@ -1,10 +1,8 @@
 const { schema, array, object, string, float } = require('../data_types')
-const Definitions = require('../definitions')
 
-module.exports = class WeaponUniform extends Definitions {
+module.exports = class WeaponUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 

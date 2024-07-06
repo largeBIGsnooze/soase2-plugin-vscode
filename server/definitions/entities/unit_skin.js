@@ -1,18 +1,16 @@
-const { schema, float, string, array, object, color, boolean, enumerate, vecInt2, If } = require('../data_types')
+const { schema, float, string, array, object, color, boolean, enumerate, vector2i, If, version } = require('../data_types')
 const Definitions = require('../definitions')
 
-module.exports = class UnitSkin extends Definitions {
+module.exports = class UnitSkin {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 skin_stages: array({
                     items: object({
                         keys: {
@@ -20,6 +18,7 @@ module.exports = class UnitSkin extends Definitions {
                             unit_radius_when_mesh_visible: float(),
                             min_camera_distance: float(),
                             gui: object({
+                                required: ['hud_icon', 'name', 'description'],
                                 keys: {
                                     hud_icon: this.cache.textures,
                                     hud_monochrome_icon: this.cache.textures,
@@ -28,13 +27,13 @@ module.exports = class UnitSkin extends Definitions {
                                     tooltip_icon: this.cache.textures,
                                     name: this.cache.localisation,
                                     description: this.cache.localisation,
-                                    hud_selection_window_icon_offet: vecInt2(),
+                                    hud_selection_window_icon_offet: vector2i(),
                                 },
                             }),
                             unit_mesh: object({
                                 keys: {
                                     mesh: this.cache.meshes,
-                                    shader: super.getShaders,
+                                    shader: Definitions.getShaders(),
                                     is_shadow_blocker: boolean(),
                                 },
                             }),
@@ -47,7 +46,7 @@ module.exports = class UnitSkin extends Definitions {
                                                 object({
                                                     keys: {
                                                         mesh: this.cache.meshes,
-                                                        shader: super.getShaders,
+                                                        shader: Definitions.getShaders(),
                                                         is_shadow_blocker: boolean(),
                                                     },
                                                 }),
@@ -58,33 +57,33 @@ module.exports = class UnitSkin extends Definitions {
                                     }),
                                 },
                             }),
-                            star_mesh: super.planet({
+                            star_mesh: Definitions.planet({
                                 textures: this.cache.textures,
                                 meshes: this.cache.meshes,
                                 properties: {
                                     atmosphere: object({
                                         keys: {
-                                            shader: super.getShaders,
+                                            shader: Definitions.getShaders(),
                                             material: this.cache.mesh_materials,
                                             noise_texture: this.cache.textures,
                                         },
                                     }),
                                 },
                             }),
-                            planet_mesh: super.planet({
+                            planet_mesh: Definitions.planet({
                                 textures: this.cache.textures,
                                 meshes: this.cache.meshes,
                                 properties: {
                                     city: object({
                                         keys: {
-                                            shader: super.getShaders,
+                                            shader: Definitions.getShaders(),
                                             city_material: this.cache.mesh_materials,
                                             city_level_texture: this.cache.textures,
                                         },
                                     }),
                                     atmosphere: object({
                                         keys: {
-                                            shader: super.getShaders,
+                                            shader: Definitions.getShaders(),
                                             cloud_material: this.cache.mesh_materials,
                                             cloud_noise_texture: this.cache.textures,
                                             cloud_rotation_speed: float(),
@@ -228,7 +227,9 @@ module.exports = class UnitSkin extends Definitions {
                             death_sequence_group: this.cache.death_sequence_groups,
                             light: object({
                                 keys: {
-                                    type: enumerate({ items: ['point_infinite'] }),
+                                    type: enumerate({
+                                        items: ['point_infinite'],
+                                    }),
                                     color: color(),
                                     intensity: float(),
                                 },

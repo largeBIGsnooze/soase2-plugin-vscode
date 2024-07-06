@@ -1,5 +1,5 @@
 const { schema, object, vecInt2, percentage } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudProductionWindow extends Definitions {
     /* eslint-disable no-unused-vars */

@@ -6,7 +6,9 @@ module.exports = class FrontEndUniform {
 
     create() {
         return schema({
-            keys: object({ keys: {} }),
+            keys: object({
+                keys: {},
+            }),
         })
     }
 }

@@ -1,5 +1,5 @@
 const { schema, string, object, integer, float, array } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudPlayerAllianceOfferWindow extends Definitions {
     /* eslint-disable no-unused-vars */

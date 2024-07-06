@@ -6,13 +6,10 @@ module.exports = class onDocumentFormattingProvider {
     }
 
     async provideFormatting(TextEdit, params, documents) {
-        const tabQuantity = await this.connection.sendRequest('formatter/tabs').then((data) => {
-            return data
-        })
+        const tabQuantity = await this.connection.sendRequest('formatter/tabs').then((data) => data)
         try {
             const document = documents.get(params.textDocument.uri)
             const text = document.getText()
-
             return [
                 TextEdit.replace(
                     {

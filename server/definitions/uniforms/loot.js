@@ -1,10 +1,9 @@
-const { schema, array, object, float, percentage, vector2, integer, string } = require('../data_types')
+const { schema, array, object, float, percentage, vector2f, integer, string, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 
-module.exports = class LootUniform extends Definitions {
+module.exports = class LootUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -19,7 +18,7 @@ module.exports = class LootUniform extends Definitions {
                             decay_duration: float(),
                             collection_range: float(),
                             spawn_position_radius_percentage_from_center: percentage(),
-                            spawn_guardians_within_collection_range_scalar: vector2(),
+                            spawn_guardians_within_collection_range_scalar: vector2f(),
                         },
                         required: ['name', 'collection_duration', 'decay_duration', 'collection_range', 'spawn_position_radius_percentage_from_center', 'spawn_guardians_within_collection_range_scalar'],
                     }),
@@ -72,13 +71,13 @@ module.exports = class LootUniform extends Definitions {
                                             }),
                                         }),
                                         guardian_npc_name: string(),
-                                        guardian_supply: vector2(),
+                                        guardian_supply: vector2f(),
                                         guardian_units: object({
                                             keys: {
-                                                random_units: super.units(this.cache.units),
+                                                random_units: Definitions.units(this.cache.units),
                                             },
                                         }),
-                                        rotation_angle_variance: vector2(),
+                                        rotation_angle_variance: vector2f(),
                                     },
                                 }),
                             }),

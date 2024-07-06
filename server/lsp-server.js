@@ -1,12 +1,12 @@
 const onCompletionProvider = require('./providers/completion')
 const onHoverProvider = require('./providers/hover')
 //const onDefinitionProvider = require('./providers/definition')
-const EntityDefinition = require('./definitions/entity_definition')
+const EntityLoader = require('./definitions/entity_loader')
 const onDocumentFormattingProvider = require('./providers/formatting')
-const DiagnosticStorage = require('./data/diagnostic-storage')
 const { Log } = require('./utils/logger')
 const Parser = require('./parser')
-const { CONSTANTS } = require('./constants')
+const { CONSTANTS, ERROR } = require('./constants')
+const { DiagnosticReporter } = require('./data/diagnostic-reporter')
 
 module.exports = class Lsp {
     /**
@@ -18,7 +18,7 @@ module.exports = class Lsp {
     constructor({ options: options }) {
         this.options = options
 
-        this.entityDefinition = new EntityDefinition(this.options.languageService, this.options.schemaService)
+        this.entityDefinition = new EntityLoader(this.options.languageService, this.options.schemaService)
         this.onCompletionProvider = new onCompletionProvider(this.options.languageService, this.options.schemaService)
         this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService, this.options.connection)
         //this.onDefinition = new onDefinitionProvider();
@@ -36,7 +36,9 @@ module.exports = class Lsp {
      */
     initialize() {
         Log.info('Initializing server...')
-        return { capabilities: this.options.capabilities }
+        return {
+            capabilities: this.options.capabilities,
+        }
     }
 
     async initialized() {
@@ -52,7 +54,7 @@ module.exports = class Lsp {
         results.uniforms = {}
         results.effects = {}
 
-        Object.keys(EntityDefinition.files).map((e, index) => {
+        Object.keys(EntityLoader.files).map((e, index) => {
             if (e.endsWith('.gui')) results.gui[index] = e
             else if (e.endsWith('.uniforms')) results.uniforms[index] = e
             else if (e.endsWith('.button_style')) results.button_styles[index] = e
@@ -72,7 +74,12 @@ module.exports = class Lsp {
 
         this.options.connection.onRequest(
             'function/validateFiles',
-            async () => await new Parser(this.options.connection, this.options.languageService, this.options.schemaService, await this.getGameInstallationFolder(), { filesWithDiagnostics: filesWithDiagnostics }).validate().catch((e) => Log.error(e))
+            async () =>
+                await new Parser(this.options.connection, this.options.languageService, this.options.schemaService, await this.getGameInstallationFolder(), {
+                    filesWithDiagnostics: filesWithDiagnostics,
+                })
+                    .validate()
+                    .catch((e) => Log.error(e))
         )
         this.options.connection.onRequest('function/clearDiagnostics', async () => await Parser.clearDiagnostics(filesWithDiagnostics, this.options.connection))
 
@@ -87,9 +94,9 @@ module.exports = class Lsp {
     async onDidChangeContent(params) {
         const text = params.document.getText()
         const uri = params.document.uri
-        EntityDefinition.diagnostics = []
+        EntityLoader.diagnostics = []
 
-        if (text.trim().length === 0) new DiagnosticStorage(text, EntityDefinition.diagnostics).messages.invalidJSON()
+        if (text.trim().length === 0) new DiagnosticReporter(text, EntityLoader.diagnostics).invalidJSON()
 
         this.entityDefinition.init(
             {
@@ -103,7 +110,7 @@ module.exports = class Lsp {
 
         return await this.options.connection.sendDiagnostics({
             uri: uri,
-            diagnostics: [].concat(EntityDefinition.diagnostics, diagnostics),
+            diagnostics: [].concat(EntityLoader.diagnostics, diagnostics),
         })
     }
 }

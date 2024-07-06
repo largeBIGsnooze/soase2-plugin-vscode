@@ -1,26 +1,33 @@
-const DiagnosticStorage = require('../../data/diagnostic-storage')
-const { reference } = require('../../utils/utils')
 const { EntityParser } = require('../../data/file-handler')
 const { schema, boolean, array, enumerate } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
+const { WARN } = require('../../constants')
 module.exports = class EntityManifest {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        this.diagStorage = new DiagnosticStorage(fileText, diagnostics)
+        this.json = new DiagnosticReporter(fileText, diagnostics)
         this.reader = new EntityParser(gameInstallationFolder)
-        this.allEntities = this.reader.read(['entities/*'], { read: false })
-        this.manifestEntities = this.reader.read([`entities/*.${fileName}`], { read: false })
+        this.manifestEntities = this.reader.read([`entities/*.${fileName}`], {
+            read: false,
+        })
 
-        this.json = JSON.parse(fileText).ids
         this.fileName = fileName
     }
 
     create() {
-        reference(this.manifestEntities, (e) => (!this.json.includes(e.basename) ? this.diagStorage.messages.unreferenced(this.fileName, e.basename) : null))
+        for (const entity of this.manifestEntities) {
+            if (!this.json.data.ids.includes(entity.basename)) {
+                this.json.createPointerDiagnostic('/ids', `- ${this.fileName}_definition not found. id='${entity.basename}'`, WARN)
+            }
+        }
+
         return schema({
             keys: {
                 overwrite_ids: boolean(),
                 ids: array({
-                    items: enumerate({ items: this.manifestEntities.map((e) => e.basename) }),
+                    items: enumerate({
+                        items: this.manifestEntities.map((e) => e.basename),
+                    }),
                     isUnique: true,
                 }),
             },

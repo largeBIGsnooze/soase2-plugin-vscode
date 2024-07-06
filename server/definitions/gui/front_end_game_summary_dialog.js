@@ -1,5 +1,5 @@
 const { schema, string, object, color, boolean, float } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class FrontEndGameSummaryDialog extends Definitions {
     /* eslint-disable no-unused-vars */

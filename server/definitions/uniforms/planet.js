@@ -1,11 +1,8 @@
-const { schema, object, string, array, enumerate, vector2, float, percentage, boolean, integer } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, object, string, array, enumerate, vector2f, float, percentage, boolean, integer } = require('../data_types')
 
-module.exports = class PlanetUniform extends Definitions {
+module.exports = class PlanetUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
@@ -24,7 +21,7 @@ module.exports = class PlanetUniform extends Definitions {
                     items: this.cache.crystal_asteroids,
                     isUnique: true,
                 }),
-                asteroid_y_offset_range: vector2(),
+                asteroid_y_offset_range: vector2f(),
                 scuttle_duration: float(),
                 give_bounty_min_supply: float(),
                 give_bounty_max_supply: float(),

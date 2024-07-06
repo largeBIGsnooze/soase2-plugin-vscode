@@ -1,17 +1,15 @@
-const { schema, float, color, object, enumerate, array, vector2, percentage } = require('../data_types')
-const Definitions = require('../definitions')
+const { schema, float, color, object, enumerate, array, vector2f, percentage, version } = require('../data_types')
 
-module.exports = class BeamEffect extends Definitions {
+module.exports = class BeamEffect {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
         this.cache = cache
     }
 
     create() {
         return schema({
             keys: {
-                version: float(),
+                version: version(),
                 glow_texture: this.cache.textures,
                 core_texture: this.cache.textures,
                 glow_color: color(),
@@ -24,7 +22,9 @@ module.exports = class BeamEffect extends Definitions {
                 light: object({
                     required: ['type', 'color', 'intensity', 'surface_radius'],
                     keys: {
-                        type: enumerate({ items: ['line'] }),
+                        type: enumerate({
+                            items: ['line'],
+                        }),
                         color: color(),
                         intensity: float(),
                         surface_radius: float(),
@@ -35,7 +35,7 @@ module.exports = class BeamEffect extends Definitions {
                         required: ['particle_effect', 'interval_distance'],
                         keys: {
                             particle_effect: this.cache.particle_effects,
-                            interval_distance: vector2(),
+                            interval_distance: vector2f(),
                         },
                     }),
                 }),

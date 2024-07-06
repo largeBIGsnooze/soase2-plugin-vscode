@@ -1,5 +1,5 @@
 const { schema, string, object, integer } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class UnitTooltip extends Definitions {
     /* eslint-disable no-unused-vars */

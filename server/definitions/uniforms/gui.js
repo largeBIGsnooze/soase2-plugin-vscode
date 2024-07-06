@@ -1,11 +1,9 @@
 const { schema, object, float, array } = require('../data_types')
-const Definitions = require('../definitions')
+const UI = require('../ui_definitions')
 
-module.exports = class GuiUniform extends Definitions {
+module.exports = class GuiUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super(gameInstallationFolder)
-
         this.cache = cache
     }
 
@@ -233,15 +231,15 @@ module.exports = class GuiUniform extends Definitions {
                         home_planet_overlay: this.cache.textures,
                         has_artifact_overlay: this.cache.textures,
                         unit_level_font: this.cache.fonts,
-                        unit_level_layout: super.layout(),
+                        unit_level_layout: UI.layout(),
                         unit_level_color: this.cache.colors,
                         planet_level_font: this.cache.fonts,
-                        planet_level_layout: super.layout(),
+                        planet_level_layout: UI.layout(),
                         planet_level_color: this.cache.colors,
                         has_unspent_ability_points_icon: this.cache.textures,
-                        has_unspent_ability_points_layout: super.layout(),
+                        has_unspent_ability_points_layout: UI.layout(),
                         has_planet_maintenance_costs_icon: this.cache.textures,
-                        has_planet_maintenance_costs_layout: super.layout(),
+                        has_planet_maintenance_costs_layout: UI.layout(),
                         special_operation_unit_icons: object({
                             keys: {
                                 garrison: this.cache.textures,
@@ -249,7 +247,7 @@ module.exports = class GuiUniform extends Definitions {
                                 dark_fleet: this.cache.textures,
                             },
                         }),
-                        special_operation_unit_icon_layout: super.layout(),
+                        special_operation_unit_icon_layout: UI.layout(),
                         metal_asteroid_hud_icon: this.cache.textures,
                         crystal_asteroid_hud_icon: this.cache.textures,
                     },

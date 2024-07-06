@@ -3,6 +3,8 @@ const path = require('path')
 const fg = require('fast-glob')
 const { Log } = require('../utils/logger')
 const { unit_modifier_types, unit_factory_modifier_types, weapon_modifier_types, planet_modifier_types } = require('../definitions/modifier_types')
+const { DiagnosticReporter } = require('./diagnostic-reporter')
+const { ERROR } = require('../constants')
 
 class EntityHandler {
     constructor(gameFolder) {
@@ -10,7 +12,10 @@ class EntityHandler {
     }
     read(glob, { read: read = true } = {}) {
         return fg
-            .globSync(glob, { dot: true, cwd: this.gameFolder })
+            .globSync(glob, {
+                dot: true,
+                cwd: this.gameFolder,
+            })
             .map((entity) => {
                 try {
                     const filePath = path.resolve(this.gameFolder, entity)
@@ -49,13 +54,6 @@ class EntityParser extends EntityHandler {
         super(gameFolder)
     }
 
-    parse(entity) {
-        switch (entity) {
-            case 'entity_manifest':
-                return this.parseEntityManifest(entity)
-        }
-    }
-
     parseEntity(entity) {
         const raw = super.read(entity)
         if (!raw.length || !raw[0]?.content) return [`${entity}, invalid JSON.`]
@@ -68,24 +66,31 @@ class EntityParser extends EntityHandler {
         if (!content.ids) return [`${manifest}.entity_manifest, missing 'ids' property`]
         return content.ids.map((e) => e)
     }
+    parseEntityManifestTest(manifest, glob = [`entities/${manifest}.entity_manifest`]) {
+        const content = this.parseEntity(glob)
+        if (!content) return [`missing ${manifest}.entity_manifest`]
+        if (!content.ids) return [`${manifest}.entity_manifest, mising 'ids' property`]
+        return content.ids.map((e) => e)
+    }
 
-    parseUniform(file, name, callback) {
-        try {
-            const content = super.toJSON(fs.readFileSync(path.resolve(this.gameFolder, 'uniforms', `${file}.uniforms`)))
-            if (typeof callback === 'function') {
-                return callback(content[name])
-            } else return content[name].map((e) => e)
-        } catch (e) {
-            return ['']
-        }
+    parseUniform(name) {
+        const uniform = super.read([`uniforms/${name}.uniforms`])[0]
+        if (uniform) return uniform.content
+        return []
     }
 
     parseTextures() {
-        const textures = super.read(['./textures/*.{DDS,dds,png,PNG}'], { read: false })
-        return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
+        const textures = super.read(['./textures/*.{DDS,dds,png,PNG}'], {
+            read: false,
+        })
+        return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename)]
     }
     parseFontsTtf() {
-        return super.read(['fonts/*.ttf'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['fonts/*.ttf'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseAbilityGuiActions() {
         const actions = []
@@ -95,12 +100,18 @@ class EntityParser extends EntityHandler {
             .map((e) => actions.push(e))
         return actions
     }
-    parseMainviewGroups() {
-        return this.parseUniform('main_view', 'unit_icons', (e) => e.groups.map((e) => e.group))
+    parseMainviewGroups(groups = this.parseUniform('main_view').unit_icons) {
+        if (groups && groups.groups) return groups.groups.map((e) => e.group)
+
+        return ['']
     }
 
     parseMeshMaterials() {
-        return super.read(['mesh_materials/*.mesh_material'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['mesh_materials/*.mesh_material'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseChildMeshes() {
         const child_meshes_set = new Set()
@@ -120,7 +131,14 @@ class EntityParser extends EntityHandler {
         return child_meshes_set
     }
     parseParticleEffects() {
-        return [...super.read(['effects/*.particle_effect'], { read: false }).map((e) => e.basename), ...this.parseEffectAliasBindings()]
+        return [
+            ...super
+                .read(['effects/*.particle_effect'], {
+                    read: false,
+                })
+                .map((e) => e.basename),
+            ...this.parseEffectAliasBindings(),
+        ]
     }
     parseEffectAliasBindings() {
         const effect_alias_binding_set = new Set()
@@ -133,12 +151,17 @@ class EntityParser extends EntityHandler {
         return unit_skin_effect_set
     }
     parseMeshes() {
-        return super.read(['meshes/*.mesh'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['meshes/*.mesh'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseLocalisation() {
-        return [...Object.keys(this.parseEntity(['localized_text/en.localized_text'])), '']
+        const loc = super.read(['localized_text/en.localized_text'])[0]?.content
+        if (loc) return [...Object.keys(loc), '']
+        return ['']
     }
-
     parseBuffModifierIds() {
         return super
             .read(['entities/*.action_data_source'])
@@ -158,7 +181,7 @@ class EntityParser extends EntityHandler {
         )
     }
     parseStrikecraft() {
-        return new Strikecraft(this.gameFolder).strikecraft
+        return new Strikecraft(this.gameFolder).strikecraft()
     }
     parseStrikecraftUnits() {
         return new Strikecraft(this.gameFolder).units
@@ -176,7 +199,11 @@ class EntityParser extends EntityHandler {
         return new DeathSequence(this.gameFolder).groups
     }
     parseColorGroups() {
-        return super.read(['player_colors/*.player_color_group'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['player_colors/*.player_color_group'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseGravityWellUnit() {
         return super
@@ -185,24 +212,24 @@ class EntityParser extends EntityHandler {
             .map((e) => e.basename)
     }
     parseUnitBuildGroupIds() {
-        return new BuildGroups(this.gameFolder).unit_build_groups
+        return [...new BuildGroups(this.gameFolder).unit_build_groups, 'starbase']
     }
     parseUnitItemBuildGroupIds() {
-        return [...new BuildGroups(this.gameFolder).ids, 'starbase']
+        return new BuildGroups(this.gameFolder).ids
     }
     // TODO: Find out target types
     parseAttackTargetTypes() {
-        return new Set(
-            this.parseUniform('attack_target_type_group', 'attack_target_type_groups')
-                .map((e) => e.unit_attack_target_type_group)
-                .flatMap((y) => y?.types.map((g) => g))
-        )
+        return ['']
     }
-    parseWeaponTags() {
-        return this.parseUniform('weapon', 'weapon_tags').map((e) => e.name)
+    parseWeaponTags(tags = this.parseUniform('weapon').weapon_tags) {
+        if (tags) return tags.map((e) => e.name)
+
+        return ['']
     }
-    parseNpcTags() {
-        return this.parseUniform('player', 'npc', (e) => e?.npc_tags?.map((y) => y.name))
+    parseNpcTags(tags = this.parseUniform('player')) {
+        if (tags && tags.npc) return tags.npc.npc_tags.map((e) => e.name)
+
+        return ['']
     }
     parseTargetFilters() {
         return new TargetFilters(this.gameFolder)
@@ -223,11 +250,15 @@ class EntityParser extends EntityHandler {
             .map((e) => e.content.per_buff_memory_declaration.float_variable_ids)
             .flat()
     }
-    parseRaceNames() {
-        return this.parseUniform('player', 'races').map((e) => e.name)
+    parseRaceNames(names = this.parseUniform('player').races) {
+        if (names) return names.map((e) => e.name)
+
+        return ['']
     }
     parseModLogos() {
-        const logos = super.read(['./*.{png,PNG}'], { read: false })
+        const logos = super.read(['./*.{png,PNG}'], {
+            read: false,
+        })
         return [...logos.map((e) => e.basename), ...logos.map((e) => e.filename), '']
     }
 
@@ -272,26 +303,36 @@ class EntityParser extends EntityHandler {
         ]
     }
 
-    parseDebrisUniform() {
-        return this.parseUniform('debris', 'groups').map((e) => e[0])
+    parseResearchTierCount(tiers = this.parseUniform('research')) {
+        if (tiers && tiers.max_tier_count)
+            return [
+                ...Array.from({
+                    length: tiers.max_tier_count + 1,
+                }).keys(),
+            ]
     }
 
-    parseActionValues() {
+    parseDebrisUniform(debris = this.parseUniform('debris').groups) {
+        if (debris) return debris.map((e) => e[0])
+        return ['']
+    }
+
+    parseActionValues(common_action_values = this.parseUniform('action').common_action_values, action_values = super.read([`entities/*.action_data_source`])) {
         const action_values_set = new Set()
 
-        const action_values = super.read(['entities/*.action_data_source'])
-        const uniforms_action_values = this.parseUniform('action', 'common_action_values')
-
-        if (Array.isArray(action_values))
+        if (Array.isArray(action_values)) {
             action_values.map((e) => {
                 if (e.content && Array.isArray(e.content.action_values)) {
-                    e.content.action_values.filter((y) => y.action_value_id !== undefined).map((e) => action_values_set.add(e.action_value_id))
+                    e.content.action_values.map((e) => action_values_set.add(e.action_value_id))
                 }
             })
+        }
 
-        if (Array.isArray(uniforms_action_values)) uniforms_action_values.map((e) => action_values_set.add(e?.action_value_id))
+        if (Array.isArray(common_action_values) && common_action_values.length > 1) {
+            common_action_values.map((e) => action_values_set.add(e.action_value_id))
+        }
 
-        return Array.from(action_values_set)
+        return action_values_set
     }
 
     parseFleetUnits() {
@@ -301,7 +342,10 @@ class EntityParser extends EntityHandler {
             .map((e) => e.basename)
     }
     parseResearchField(type) {
-        const fields = { civilian: [], military: [] }
+        const fields = {
+            civilian: [],
+            military: [],
+        }
         const players = super.read(['entities/*.player'])
 
         for (const player of players) {
@@ -329,8 +373,9 @@ class EntityParser extends EntityHandler {
         return super.read(['entities/*.unit_item']).map((e) => e.basename)
     }
 
-    parsePlanets() {
-        return this.parseUniform('planet', 'planet_types').map((e) => e.name)
+    parsePlanets(planets = this.parseUniform('planet').planet_types) {
+        if (planets) return planets.map((e) => e.name)
+        return ['']
     }
 
     parseBeamEffects() {
@@ -354,11 +399,22 @@ class EntityParser extends EntityHandler {
     }
 
     parseSounds({ ext: ext }) {
-        return super.read([`sounds/*.${ext}`], { read: false }).map((e) => e.basename)
+        return super
+            .read([`sounds/*.${ext}`], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
 
     parseBrushes() {
-        return [...super.read(['brushes/*.brush'], { read: false }).map((e) => e.basename), '']
+        return [
+            ...super
+                .read(['brushes/*.brush'], {
+                    read: false,
+                })
+                .map((e) => e.basename),
+            '',
+        ]
     }
 
     parseMetalAsteroids() {
@@ -381,12 +437,16 @@ class EntityParser extends EntityHandler {
         return super.read(['effects/*.shield_effect']).map((e) => e.basename)
     }
 
-    parseShipTags() {
-        return new Set([...this.parseUniform('unit_tag', 'unit_tags').map((e) => e.name), ...['planet', 'torpedo', 'star', 'buff_agent', 'asteroid', 'loot', 'debris', 'gravity_well', 'phase_lane', 'cannon_shell']])
+    parseShipTags(tags = this.parseUniform('unit_tag').unit_tags) {
+        const vanilla_tags = ['planet', 'torpedo', 'star', 'buff_agent', 'asteroid', 'loot', 'debris', 'gravity_well', 'phase_lane', 'cannon_shell']
+        if (tags) return new Set([...tags.map((e) => e.name), ...vanilla_tags])
+
+        return vanilla_tags
     }
 
-    parseUnitMutations() {
-        return this.parseUniform('unit_mutation', 'mutations').map((e) => e.name)
+    parseUnitMutations(mutations = this.parseUniform('unit_mutation').mutations) {
+        if (mutations) return mutations.map((e) => e.name)
+        return ['']
     }
 
     parseUnitVariableIds() {
@@ -396,35 +456,51 @@ class EntityParser extends EntityHandler {
             .flatMap((e) => e.content.per_buff_memory_declaration.unit_variable_ids)
     }
 
-    parseUnitBuildKinds() {
-        return this.parseUniform('unit_build', 'build_kinds').map((e) => e.name)
+    parseUnitBuildKinds(kinds = this.parseUniform('unit_build').build_kinds) {
+        if (kinds) return kinds.map((e) => e.name)
+        return ['']
     }
 
-    parseExotics() {
-        return this.parseUniform('exotic', 'type_datas').map((e) => e.name)
+    parseExotics(exotics = this.parseUniform('exotic').type_datas) {
+        if (exotics) return exotics.map((e) => e.name)
+        return ['']
     }
 
     parseScenarios() {
         return super.read(['scenarios/*.scenario']).map((e) => e.basename)
     }
-    parseSpecialOperationUnitKinds() {
-        return this.parseUniform('special_operation_unit', 'special_operation_unit_kinds').map((e) => e.name)
+    parseSpecialOperationUnitKinds(unit_kinds = this.parseUniform('special_operation_unit').special_operation_unit_kinds) {
+        if (unit_kinds) return unit_kinds.map((e) => e.name)
+        return ['']
     }
 
-    parseAttackTargetTypeGroups() {
-        return this.parseUniform('attack_target_type_group', 'attack_target_type_groups').map((e) => e.unit_attack_target_type_group_id)
+    parseAttackTargetTypeGroups(groups = this.parseUniform('attack_target_type_group').attack_target_type_groups) {
+        if (groups) return groups.map((e) => e.unit_attack_target_type_group_id)
+        return ['']
     }
 
     parsePlayerIcons() {
-        return super.read(['player_icons/*.player_icon'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['player_icons/*.player_icon'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
 
     parsePlayerPortraits() {
-        return super.read(['player_portraits/*.player_portrait'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['player_portraits/*.player_portrait'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
 
     parseExhaustTrailEffects() {
-        return super.read(['effects/*.exhaust_trail_effect'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['effects/*.exhaust_trail_effect'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
 
     parsePipGroups() {
@@ -435,7 +511,7 @@ class EntityParser extends EntityHandler {
         const unit_names_list = new Set()
 
         const unit_names = super.read(['entities/*.player'])
-        const uniform_unit_names = this.parseUniform('unit', 'unit_names')
+        const uniform_unit_names = this.parseUniform('unit').unit_names
 
         if (unit_names) {
             unit_names.map((e) => {
@@ -454,26 +530,46 @@ class EntityParser extends EntityHandler {
         }
         return unit_names_list.add('loot').add('ship_loot')
     }
-    parseGravityWellFillings(type) {
-        const fillings = { fillings: [], random_fillings: [], random_fixtures: [], fixtures: [] }
+    parseGravityWellFillings(type, galaxy_generator = this.parseUniform('galaxy_generator').fillings) {
+        const fillings = {
+            fillings: [],
+            random_fillings: [],
+            random_fixtures: [],
+            fixtures: [],
+        }
 
-        this.parseUniform('galaxy_generator', 'fillings', (e) => e?.fixture_fillings?.map((e) => fillings['fixtures'].push(e?.name)))
-        this.parseUniform('galaxy_generator', 'fillings', (e) => e?.random_fixture_fillings?.map((e) => fillings['random_fixtures'].push(e?.name)))
-        this.parseUniform('galaxy_generator', 'fillings', (e) => e?.gravity_well_fillings?.map((e) => fillings['fillings'].push(e?.name)))
-        this.parseUniform('galaxy_generator', 'fillings', (e) => e?.random_gravity_well_fillings?.map((e) => fillings['random_fillings'].push(e?.name)))
+        if (galaxy_generator) {
+            galaxy_generator.fixture_fillings.map((e) => fillings['fixtures'].push(e.name))
+            galaxy_generator.random_fixture_fillings.map((e) => fillings['random_fixtures'].push(e.name))
+            galaxy_generator.gravity_well_fillings.map((e) => fillings['fillings'].push(e.name))
+            galaxy_generator.random_gravity_well_fillings.map((e) => fillings['random_fillings'].push(e.name))
+        }
+
         if (type === 'all') return new Set([...fillings['fillings'], ...fillings['random_fillings'], ...fillings['fixtures'], ...fillings['random_fixtures']])
         return new Set(fillings[type])
     }
 
     parseGravityWellProps() {
-        return super.read(['gravity_well_props/*.gravity_well_props'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['gravity_well_props/*.gravity_well_props'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
 
     parseTextureAnimations() {
-        return super.read(['texture_animations/*.texture_animation'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['texture_animations/*.texture_animation'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseSkyboxes() {
-        return super.read(['skyboxes/*'], { read: false }).map((e) => e.basename)
+        return super
+            .read(['skyboxes/*'], {
+                read: false,
+            })
+            .map((e) => e.basename)
     }
     parseColors() {
         return super
@@ -487,15 +583,16 @@ class TargetFilters extends EntityParser {
     constructor(gameFolder) {
         super(gameFolder)
     }
-    get target_filters() {
+    target_filters() {
         return super
             .read(['entities/*.action_data_source'])
             .filter((e) => e.content.target_filters)
             .map((e) => e.content)
             .flatMap((e) => e.target_filters.map((e) => e.target_filter_id))
     }
-    get uniform() {
-        return super.parseUniform('target_filter', 'common_target_filters').map((e) => e.target_filter_id)
+    uniform(uniform = super.parseUniform('target_filter').common_target_filters) {
+        if (uniform) return uniform.map((e) => e.target_filter_id)
+        return ['']
     }
 }
 
@@ -544,8 +641,9 @@ class Strikecraft extends EntityParser {
         super(gameFolder)
     }
 
-    get strikecraft() {
-        return super.parseUniform('strikecraft', 'strikecraft_kinds').map((e) => e.name)
+    strikecraft(strikcraft = super.parseUniform('strikecraft').strikecraft_kinds) {
+        if (strikcraft) return strikcraft.map((e) => e.name)
+        return ['']
     }
     get units() {
         return super
@@ -555,4 +653,6 @@ class Strikecraft extends EntityParser {
     }
 }
 
-module.exports = { EntityParser }
+module.exports = {
+    EntityParser,
+}

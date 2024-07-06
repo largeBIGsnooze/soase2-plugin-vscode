@@ -1,5 +1,5 @@
 const { schema, integer, color, array, float } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class DebugStatisticsWindow extends Definitions {
     /* eslint-disable no-unused-vars */

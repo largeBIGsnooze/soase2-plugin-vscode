@@ -1,5 +1,5 @@
 const { schema, string, object, integer, float, percentage, array, boolean, color } = require('../data_types')
-const Definitions = require('../definitions')
+const Definitions = require('../modifier_definitions')
 
 module.exports = class HudResearchWindow extends Definitions {
     /* eslint-disable no-unused-vars */

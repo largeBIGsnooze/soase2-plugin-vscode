@@ -1,4 +1,4 @@
-const { schema, array, object, float, percentage, vector2f, integer, string, enumerate } = require('../data_types')
+const { schema, array, object, float, percentage, vector2f, integer, string } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class LootUniform {
@@ -7,11 +7,86 @@ module.exports = class LootUniform {
         this.cache = cache
     }
 
+    exotics_definition() {
+        return array({
+            items: object({
+                required: ['bundles', 'weight'],
+                keys: {
+                    weight: integer(),
+                    bundles: array({
+                        items: object({
+                            required: ['counts', 'types'],
+                            keys: {
+                                types: array({
+                                    items: this.cache.exotics,
+                                    isUnique: true,
+                                }),
+                                counts: array({
+                                    items: integer(),
+                                }),
+                            },
+                        }),
+                    }),
+                },
+            }),
+        })
+    }
+
+    random_loots_definition() {
+        return array({
+            items: object({
+                keys: {
+                    levels: array({
+                        items: object({
+                            keys: {
+                                loot_units: array({
+                                    items: this.cache.loot,
+                                    isUnique: true,
+                                }),
+                                experience_given: float(),
+                                chance_for_two_assets: percentage(),
+                                chance_for_three_assets: percentage(),
+                                assets: object({
+                                    keys: {
+                                        credits: array({
+                                            items: integer(),
+                                        }),
+                                        metal: array({
+                                            items: integer(),
+                                        }),
+                                        crystal: array({
+                                            items: integer(),
+                                        }),
+                                    },
+                                }),
+                                chance_for_exotics: percentage(),
+                                exotics: this.exotics_definition(),
+                                guardian_npc_name: string(),
+                                guardian_supply: vector2f(),
+                                guardian_units: Definitions.spawn_units_definition(this.cache),
+                                rotation_angle_variance: vector2f(),
+                            },
+                        }),
+                    }),
+                    weight: integer(),
+                },
+            }),
+        })
+    }
+
     create() {
         return schema({
             keys: {
                 levels: array({
                     items: object({
+                        required: [
+                            'collection_duration',
+                            'collection_range',
+                            'decay_duration',
+                            'name',
+                            'spawn_guardians_within_collection_range_scalar',
+                            'spawn_position_radius_percentage_from_center',
+                        ],
                         keys: {
                             name: this.cache.localisation,
                             collection_duration: float(),
@@ -20,71 +95,9 @@ module.exports = class LootUniform {
                             spawn_position_radius_percentage_from_center: percentage(),
                             spawn_guardians_within_collection_range_scalar: vector2f(),
                         },
-                        required: ['name', 'collection_duration', 'decay_duration', 'collection_range', 'spawn_position_radius_percentage_from_center', 'spawn_guardians_within_collection_range_scalar'],
                     }),
                 }),
-                random_loots: array({
-                    items: object({
-                        keys: {
-                            levels: array({
-                                items: object({
-                                    keys: {
-                                        loot_units: array({
-                                            items: this.cache.loot,
-                                            isUnique: true,
-                                        }),
-                                        experience_given: float(),
-                                        chance_for_two_assets: percentage(),
-                                        chance_for_three_assets: percentage(),
-                                        assets: object({
-                                            keys: {
-                                                credits: array({
-                                                    items: float(),
-                                                }),
-                                                metal: array({
-                                                    items: float(),
-                                                }),
-                                                crystal: array({
-                                                    items: float(),
-                                                }),
-                                            },
-                                        }),
-                                        chance_for_exotics: percentage(),
-                                        exotics: array({
-                                            items: object({
-                                                keys: {
-                                                    weight: integer(),
-                                                    bundles: array({
-                                                        items: object({
-                                                            keys: {
-                                                                types: array({
-                                                                    items: this.cache.exotics,
-                                                                    isUnique: true,
-                                                                }),
-                                                                counts: array({
-                                                                    items: float(),
-                                                                }),
-                                                            },
-                                                        }),
-                                                    }),
-                                                },
-                                            }),
-                                        }),
-                                        guardian_npc_name: string(),
-                                        guardian_supply: vector2f(),
-                                        guardian_units: object({
-                                            keys: {
-                                                random_units: Definitions.units(this.cache.units),
-                                            },
-                                        }),
-                                        rotation_angle_variance: vector2f(),
-                                    },
-                                }),
-                            }),
-                            weight: integer(),
-                        },
-                    }),
-                }),
+                random_loots: this.random_loots_definition(),
             },
             required: ['levels'],
         })

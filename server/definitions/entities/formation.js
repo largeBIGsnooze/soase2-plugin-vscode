@@ -7,17 +7,17 @@ module.exports = class Formation {
     create() {
         return schema({
             keys: {
-                version: version(),
                 rank_distances: array({
                     items: float(),
                 }),
                 rank_groups: array({
                     items: object({
                         keys: {
-                            width_scalar: float(),
-                            column_spacing: float(),
-                            row_spacing: float(),
+                            width_scalar: float(true, '', 0),
+                            column_spacing: float(true, '', 0),
+                            row_spacing: float(true, '', 0),
                         },
+                        required: ['width_scalar', 'column_spacing', 'row_spacing'],
                     }),
                 }),
                 pattern: object({
@@ -26,7 +26,7 @@ module.exports = class Formation {
                             items: object({
                                 keys: {
                                     group_index: integer(),
-                                    column_weight: float(),
+                                    column_weight: float(true, '', 0),
                                 },
                                 required: ['group_index', 'column_weight'],
                             }),

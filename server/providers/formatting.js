@@ -1,5 +1,3 @@
-const { Log } = require('../utils/logger')
-
 module.exports = class onDocumentFormattingProvider {
     constructor(connection) {
         this.connection = connection
@@ -25,8 +23,7 @@ module.exports = class onDocumentFormattingProvider {
                     JSON.stringify(JSON.parse(text), null, tabQuantity)
                 ),
             ]
-        } catch (err) {
-            Log.error('Error during formatting the text document: ', err)
+        } catch {
             return []
         }
     }

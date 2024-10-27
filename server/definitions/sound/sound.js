@@ -15,7 +15,17 @@ module.exports = class Sound {
                 min_attenuation_distance: float(),
                 data: this.cache.ogg,
                 sound_group: enumerate({
-                    items: ['exhaust', 'ability', 'hit_hull', 'weapon_muzzle_light', 'weapon_muzzle_medium', 'weapon_muzzle_heavy', 'hyperspace_exit', 'hyperspace_enter', 'hyperspace_charge'],
+                    items: [
+                        'exhaust',
+                        'ability',
+                        'hit_hull',
+                        'weapon_muzzle_light',
+                        'weapon_muzzle_medium',
+                        'weapon_muzzle_heavy',
+                        'hyperspace_exit',
+                        'hyperspace_enter',
+                        'hyperspace_charge',
+                    ],
                 }),
             },
         })

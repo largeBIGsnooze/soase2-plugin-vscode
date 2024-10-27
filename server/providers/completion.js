@@ -1,5 +1,4 @@
 const Document = require('./document')
-
 module.exports = class onCompletionProvider extends Document {
     constructor(languageService, schemaService) {
         super(languageService, schemaService)

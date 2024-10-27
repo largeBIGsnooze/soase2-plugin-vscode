@@ -1,43 +1,24 @@
-const { Log } = require('../utils/logger')
 const Document = require('./document')
-const { readFileSync } = require('fs')
-const path = require('path')
 
 module.exports = class onHoverProvider extends Document {
-    constructor(languageService, schemaService, connection) {
+    constructor(languageService, schemaService) {
         super(languageService, schemaService)
-        this.connection = connection
     }
 
     async provideHover(params, documents) {
-        const document = documents.get(params.textDocument.uri)
-        const text = document.getText()
-        const { line, character } = params.position
-
-        const fetchLanguage = await this.connection.sendRequest('validation/language').then((data) => data)
-
-        const hoverInformation = readFileSync(path.resolve(__dirname, `../../hover-${fetchLanguage}.json`), 'utf-8')
-
-        const contentLines = text.split('\n')
-        const currentCharacter = contentLines[line].slice(character, character + 1)
-
         try {
-            if (currentCharacter === ' ' || currentCharacter === ',' || currentCharacter === ':') return {}
+            const uri = params.textDocument.uri
+            const text = documents.get(uri)
 
-            if (!document) return null
+            const { parseDoc, parseJSON } = super.provideDocument(uri, text.getText())
+            const hover = await this.languageService.doHover(parseDoc, params.position, parseJSON)
 
-            for (const field of JSON.parse(hoverInformation).hover) {
-                if (contentLines[line].search(`\\b${field.key}\\b`) !== -1) {
-                    return {
-                        contents: {
-                            kind: 'markdown',
-                            value: field.description,
-                        },
-                    }
-                }
+            return {
+                range: hover.range,
+                contents: hover.contents,
             }
-        } catch (err) {
-            Log.error('Error during hover event: ', err)
+        } catch {
+            return {}
         }
     }
 }

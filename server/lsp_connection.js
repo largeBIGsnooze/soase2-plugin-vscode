@@ -4,7 +4,7 @@ const { TextDocument } = require('vscode-languageserver-textdocument')
 const connection = createConnection(ProposedFeatures.all)
 const languageService = schemaService.getLanguageService({})
 const documents = new TextDocuments(TextDocument)
-const Lsp = require('./lsp-server')
+const Lsp = require('./lsp_server')
 
 function initializeServer() {
     const generateTriggerCharacters = () => {
@@ -36,11 +36,13 @@ function initializeServer() {
     connection.onInitialize(() => server.initialize())
     connection.onInitialized(() => server.initialized())
     documents.onDidChangeContent((params) => server.onDidChangeContent(params))
+    documents.onDidSave((params) => server.onDidSave(params))
+    documents.onDidOpen((params) => server.onDidOpen(params))
+    documents.onDidClose((params) => server.onDidClose(params))
 
     connection.onHover((params) => server.onHoverProvider.provideHover(params, documents))
     connection.onCompletion((params) => server.onCompletionProvider.provideCompletion(params, documents))
     connection.onDocumentFormatting((params) => server.onDocumentFormatting.provideFormatting(TextEdit, params, documents))
-    //connection.onDefinition((params) => server.onDefinition.provideDefinition(params.textDocument, params.position, documents, connection))
 }
 
 initializeServer()

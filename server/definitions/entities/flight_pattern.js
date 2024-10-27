@@ -1,4 +1,4 @@
-const { schema, array, object, float, vector3f, boolean, version } = require('../data_types')
+const { schema, array, object, float, vector3f, boolean } = require('../data_types')
 
 module.exports = class FlightPattern {
     /* eslint-disable no-unused-vars */
@@ -7,7 +7,6 @@ module.exports = class FlightPattern {
     create() {
         return schema({
             keys: {
-                version: version(),
                 segments: array({
                     items: object({
                         keys: {
@@ -24,10 +23,16 @@ module.exports = class FlightPattern {
                                     max_angular_acceleration_scalar: float(),
                                     max_angular_deceleration_scalar: float(),
                                 },
-                                required: ['max_linear_speed_scalar', 'max_linear_acceleration_scalar', 'max_linear_deceleration_scalar', 'max_angular_speed_scalar', 'max_angular_acceleration_scalar', 'max_angular_deceleration_scalar'],
+                                required: [
+                                    'max_angular_acceleration_scalar',
+                                    'max_angular_deceleration_scalar',
+                                    'max_angular_speed_scalar',
+                                    'max_linear_acceleration_scalar',
+                                    'max_linear_deceleration_scalar',
+                                    'max_linear_speed_scalar',
+                                ],
                             }),
                         },
-                        required: ['forward', 'up', 'linear_direction', 'stop_at_goal', 'move_limits_scalars'],
                     }),
                 }),
             },

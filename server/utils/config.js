@@ -1,4 +1,4 @@
-const { workspace, ConfigurationTarget } = require('vscode')
+const { workspace } = require('vscode')
 
 module.exports = class Config {
     constructor() {}
@@ -11,7 +11,7 @@ module.exports = class Config {
         return await this.config().get(data)
     }
 
-    static async update(data, update) {
-        return await this.config().update(data, update, ConfigurationTarget.Global)
+    static async update(data, update, configuration) {
+        return await this.config().update(data, update, configuration)
     }
 }

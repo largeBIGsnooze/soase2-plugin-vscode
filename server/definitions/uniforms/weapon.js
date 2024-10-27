@@ -1,4 +1,4 @@
-const { schema, array, object, string, float } = require('../data_types')
+const { schema, array, object, string, float, version } = require('../data_types')
 
 module.exports = class WeaponUniform {
     /* eslint-disable no-unused-vars */
@@ -10,6 +10,7 @@ module.exports = class WeaponUniform {
         return schema({
             required: ['weapon_tags', 'recently_fired_time_threshold'],
             keys: {
+                recently_fired_time_threshold: float(),
                 weapon_tags: array({
                     items: object({
                         required: ['name', 'localized_name'],
@@ -19,7 +20,6 @@ module.exports = class WeaponUniform {
                         },
                     }),
                 }),
-                recently_fired_time_threshold: float(),
             },
         })
     }

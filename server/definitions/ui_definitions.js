@@ -1,10 +1,10 @@
 const _ = require('./data_types')
-const Definitions = require('./definitions')
 
 module.exports = class UI {
     constructor() {}
-    static margins() {
+    static margins(desc = '') {
         return _.object({
+            desc: desc,
             keys: {
                 top: _.integer(true),
                 bottom: _.integer(true),
@@ -69,17 +69,6 @@ module.exports = class UI {
         })
     }
 
-    static tooltip_line_groups(data) {
-        return _.array({
-            items: _.object({
-                keys: {
-                    header_text: data['localisation'],
-                    lines: this.tooltip_lines(data),
-                },
-            }),
-        })
-    }
-
     static icon_size() {
         return _.enumerate({
             items: ['large'],
@@ -132,47 +121,6 @@ module.exports = class UI {
                 post_value_color: colors,
                 bottom_gap: _.float(),
             },
-        })
-    }
-
-    static tooltip_lines(data) {
-        return _.array({
-            items: _.object({
-                keys: {
-                    visibility: _.enumerate({
-                        items: ['upgrade_only'],
-                    }),
-                    trade_import_points_id: data['buff_unit_modifiers'],
-                    visible_if_value_zero: _.boolean(),
-                    is_resolved_value: _.boolean(),
-                    rendering_type: Definitions.rendering_type(),
-                    label_text: data['localisation'],
-                    value_float_format: Definitions.value_float_format(),
-                    unit_factory_modifier_id: data['buff_unit_factory_modifiers'],
-                    empire_modifier_id: data['buff_empire_ids'],
-                    value_suffix_text: data['localisation'],
-                    unit_modifier_id: data['buff_unit_modifiers'],
-                    value_id: data['action_values'],
-                    weapon_modifier_id: data['weapon_modifier_ids'],
-                    value_color: Definitions.value_color(),
-                    unit_item: data['unit_items'],
-                    unit: data['units'],
-                    value_suffix: Definitions.value_suffix(),
-                    planet_modifier_id: data['planet_modifier_ids'],
-                    is_resolved_value: _.boolean(),
-                    value_modifiers: _.array({
-                        items: _.object({
-                            keys: {
-                                operator_type: _.enumerate({
-                                    items: ['multiply', 'add'],
-                                }),
-                                operand_value: data['action_values'],
-                            },
-                        }),
-                    }),
-                },
-                required: ['rendering_type'],
-            }),
         })
     }
 
@@ -520,7 +468,12 @@ module.exports = class UI {
 
     static header_label_style() {
         return _.enumerate({
-            items: ['modding_filter_type_header', 'game_input_group_header', 'front_end_lobby_dialog_team_panel_header', 'unit_factory_build_group_header'],
+            items: [
+                'modding_filter_type_header',
+                'game_input_group_header',
+                'front_end_lobby_dialog_team_panel_header',
+                'unit_factory_build_group_header',
+            ],
         })
     }
 

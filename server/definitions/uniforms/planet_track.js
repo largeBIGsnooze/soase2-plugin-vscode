@@ -1,4 +1,4 @@
-const { schema, object } = require('../data_types')
+const { schema, object, version } = require('../data_types')
 
 module.exports = class PlanetTrackUniform {
     /* eslint-disable no-unused-vars */
@@ -6,17 +6,17 @@ module.exports = class PlanetTrackUniform {
         this.cache = cache
     }
 
-    track() {
+    track_definition() {
         return object({
             keys: {
-                tooltip_icon: this.cache.textures,
-                hud_icon: this.cache.textures,
+                tooltip_icon: this.cache.textures(),
+                hud_icon: this.cache.textures(),
                 name: this.cache.localisation,
                 desc: this.cache.localisation,
                 max_level_label: this.cache.localisation,
                 current_level_label: this.cache.localisation,
             },
-            required: ['tooltip_icon', 'hud_icon', 'name', 'desc', 'max_level_label', 'current_level_label'],
+            required: ['hud_icon', 'tooltip_icon'],
         })
     }
 
@@ -25,11 +25,13 @@ module.exports = class PlanetTrackUniform {
             keys: {
                 planet_tracks: object({
                     keys: {
-                        defense: this.track(),
-                        logistics: this.track(),
-                        commerce: this.track(),
-                        mining: this.track(),
-                        excavation: this.track(),
+                        defense: this.track_definition(),
+                        logistics: this.track_definition(),
+                        commerce: this.track_definition(),
+                        mining: this.track_definition(),
+                        research: this.track_definition(),
+                        surveying: this.track_definition(),
+                        excavation: this.track_definition(),
                     },
                 }),
             },

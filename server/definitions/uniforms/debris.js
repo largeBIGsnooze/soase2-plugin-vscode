@@ -1,4 +1,4 @@
-const { schema, array, object, string } = require('../data_types')
+const { schema, array, object, string, version } = require('../data_types')
 
 module.exports = class DebrisUniform {
     /* eslint-disable no-unused-vars */

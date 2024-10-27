@@ -1,23 +1,25 @@
-const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
-const { float, vector3f, object, schema, enumerate, array, percentage, version } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const { float, vector3f, object, schema, enumerate, array, percentage } = require('../data_types')
 const Definitions = require('../definitions')
 const { WeaponModifiers } = require('../modifier_definitions')
 
-class Firing {
-    constructor(cache, json) {
-        this.json = json
-        this.firingData = json.data.firing
+module.exports = class Weapon {
+    /* eslint-disable no-unused-vars */
+    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
+        this.json = new DiagnosticReporter(fileText, diagnostics)
         this.cache = cache
     }
 
-    isFiring(type) {
-        return this.firingData.firing_type === type
+    getTurretType(type) {
+        return this.json?.data?.turret?.type === type
     }
-    torpedo_definition() {
+    isFiringType(type) {
+        return this.json?.data?.firing?.firing_type === type
+    }
+    torpedoDefinition() {
         try {
-            if (this.isFiring('spawn_torpedo')) {
-                this.json.map_required_keys('/firing', this.firingData, ['torpedo_firing_definition'])
-                this.json.map_unused_keys('/firing', this.firingData, ['beam_duration', 'travel_speed'])
+            if (this.isFiringType('spawn_torpedo')) {
+                this.json.validate_keys('/firing', this.json.data.firing, ['torpedo_firing_definition'], ['beam_duration', 'travel_speed'])
                 return {
                     torpedo_firing_definition: object({
                         keys: {
@@ -32,71 +34,52 @@ class Firing {
                             bypass_shields_chance: percentage(),
                             enable_steering_distance_as_radius_scalar: float(),
                         },
-                        required: ['spawned_unit', 'buff', 'buff_data_source', 'damage_variable_id', 'penetration_variable_id', 'bypass_shields_chance_variable_id', 'duration_variable_id', 'duration'],
+                        required: ['duration', 'spawned_unit'],
                     }),
                 }
             }
         } catch {}
     }
 
-    projectile_definition() {
+    projectileDefinition() {
         try {
-            if (this.isFiring('projectile')) {
-                this.json.map_required_keys('/firing', this.firingData, ['travel_speed'])
-                this.json.map_unused_keys('/firing', this.firingData, ['beam_duration', 'torpedo_firing_definition'])
+            if (this.isFiringType('projectile')) {
+                this.json.validate_keys('/firing', this.json.data.firing, ['travel_speed'], ['beam_duration', 'torpedo_firing_definition'])
                 return {
-                    charge_duration: float(),
-                    travel_speed: float(),
+                    charge_duration: float(true),
+                    travel_speed: float(true),
                 }
             }
         } catch {}
     }
 
-    beam_definition() {
+    beamDefinition() {
         try {
-            if (this.isFiring('beam')) {
-                this.json.map_required_keys('/firing', this.firingData, ['beam_duration'])
-                this.json.map_unused_keys('/firing', this.firingData, ['travel_speed', 'torpedo_firing_definition'])
+            if (this.isFiringType('beam')) {
+                this.json.validate_keys('/firing', this.json.data.firing, ['beam_duration'], ['travel_speed', 'torpedo_firing_definition'])
                 return {
-                    beam_duration: float(),
+                    beam_duration: float(true),
                 }
             }
         } catch {}
     }
 
-    definition() {
+    turret_definition() {
         try {
-            this.json.greater_than_zero(this.firingData.beam_duration, '/firing/beam_duration')
-            this.json.greater_than_zero(this.firingData.travel_speed, '/firing/travel_speed')
-        } catch {}
-        return object({
-            keys: {
-                firing_type: enumerate({
-                    items: ['projectile', 'spawn_torpedo', 'beam'],
-                }),
-                ...this.torpedo_definition(),
-                ...this.projectile_definition(),
-                ...this.beam_definition(),
-            },
-        })
-    }
-}
-
-class Turret {
-    constructor(cache, json) {
-        this.json = json
-        this.cache = cache
-    }
-
-    turret_type(type) {
-        return this.json.data.turret.type === type
-    }
-
-    gimbal_definition() {
-        try {
-            if (this.turret_type('gimbal')) {
-                this.json.map_unused_keys('/turret', this.json.data.turret, ['biaxial_base_mesh', 'biaxial_barrel_mesh', 'barrel_position'])
-                this.json.map_required_keys('/turret', this.json.data.turret, ['gimbal_mesh'])
+            if (this.getTurretType('biaxial')) {
+                this.json.validate_keys('/turret', this.json.data.turret, ['biaxial_base_mesh', 'biaxial_barrel_mesh'], ['gimbal_mesh'])
+                return {
+                    biaxial_base_mesh: this.cache.child_meshes,
+                    biaxial_barrel_mesh: this.cache.child_meshes,
+                    barrel_position: vector3f(),
+                }
+            } else if (this.getTurretType('gimbal')) {
+                this.json.validate_keys(
+                    '/turret',
+                    this.json.data.turret,
+                    ['gimbal_mesh'],
+                    ['biaxial_base_mesh', 'biaxial_barrel_mesh', 'barrel_position']
+                )
                 return {
                     gimbal_mesh: this.cache.child_meshes,
                 }
@@ -104,91 +87,81 @@ class Turret {
         } catch {}
     }
 
-    biaxial_definition() {
+    create() {
         try {
-            if (this.turret_type('biaxial')) {
-                this.json.map_unused_keys('/turret', this.json.data.turret, ['gimbal_mesh'])
-                this.json.map_required_keys('/turret', this.json.data.turret, ['biaxial_base_mesh', 'biaxial_barrel_mesh'])
-                return {
-                    biaxial_base_mesh: this.cache.child_meshes,
-                    biaxial_barrel_mesh: this.cache.child_meshes,
-                    barrel_position: vector3f(),
-                }
+            switch (this.json.data.weapon_type) {
+                case 'normal':
+                    this.json.validate_keys('/weapon_type', this.json.data, ['damage', 'penetration'], ['bombing_damage'])
+                    break
+                case 'planet_bombing':
+                    this.json.validate_keys('/weapon_type', this.json.data, ['bombing_damage'], ['damage', 'penetration'])
+                    break
             }
         } catch {}
-    }
-
-    definition() {
-        return object({
-            keys: {
-                type: enumerate({
-                    items: ['biaxial', 'gimbal'],
-                }),
-                muzzle_positions: array({
-                    items: vector3f(),
-                }),
-                ...this.biaxial_definition(),
-                ...this.gimbal_definition(),
-            },
-            required: ['type'],
-        })
-    }
-}
-
-module.exports = class Weapon {
-    /* eslint-disable no-unused-vars */
-    constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        this.json = new DiagnosticReporter(fileText, diagnostics)
-        this.firing = new Firing(cache, this.json)
-        this.turret = new Turret(cache, this.json)
-        this.cache = cache
-    }
-
-    create() {
         return schema({
+            required: ['acquire_target_logic', 'cooldown_duration', 'effects', 'name', 'pitch_speed', 'range', 'weapon_type', 'yaw_speed'],
             keys: {
-                version: version(),
                 name: this.cache.localisation,
-                pitch_speed: float(),
-                yaw_speed: float(),
-                pitch_firing_tolerance: float(),
-                yaw_firing_tolerance: float(),
+                pitch_speed: float(true),
+                yaw_speed: float(true),
+                weapon_type: Definitions.weapon_type(),
+                pitch_firing_tolerance: float(true),
+                yaw_firing_tolerance: float(true),
                 range: float(),
                 cooldown_duration: float(),
                 uniforms_target_filter_id: this.cache.target_filters_uniforms,
-                weapon_type: enumerate({
-                    items: ['normal', 'planet_bombing'],
-                }),
+                weapon_type: Definitions.weapon_type(),
                 damage_affect_type: Definitions.damage_affect_type(),
+                target_acquired_duration_required_to_fire: float(),
                 damage: float(),
                 penetration: float(),
+                custom_target_filter: Definitions.target_filter_definition(
+                    this.json.data?.custom_target_filter,
+                    '/custom_target_filter',
+                    this.cache,
+                    this.json
+                ),
                 hull_armor_penetration: float(),
                 tags: array({
                     items: this.cache.weapon_tags,
                     isUnique: true,
                 }),
-                modifiers: WeaponModifiers.create(
-                    {
-                        hasArrayValues: false,
-                    },
-                    this.cache
-                ),
+                modifiers: WeaponModifiers.create(this.cache),
                 acquire_target_logic: enumerate({
                     items: ['order_target_only', 'order_target_or_best_target_in_range', 'best_target_in_range'],
                 }),
-                firing: this.firing.definition(),
-                effects: Definitions.getEffects(this.cache.particle_effects),
+                firing: object({
+                    desc: 'if not provided the weapon will never fire (handy for simulating turrets that are cosmetic only like an eye)',
+                    required: ['firing_type'],
+                    keys: {
+                        firing_type: enumerate({
+                            items: ['projectile', 'beam', 'missile', 'spawn_torpedo'],
+                        }),
+                        ...this.torpedoDefinition(),
+                        ...this.projectileDefinition(),
+                        ...this.beamDefinition(),
+                    },
+                }),
+                effects: Definitions.weapon_effects_definition(this.cache),
                 burst_pattern: array({
                     items: float(),
                 }),
-                turret: this.turret.definition(),
+                turret: object({
+                    keys: {
+                        type: enumerate({ items: ['none', 'gimbal', 'biaxial'] }),
+                        muzzle_positions: array({
+                            items: vector3f(),
+                        }),
+                        ...this.turret_definition(),
+                    },
+                    required: ['type'],
+                }),
                 attack_target_type_groups: array({
                     items: this.cache.attack_target_type_groups,
                     isUnique: true,
                 }),
-                bombing_damage: float(),
+                bombing_damage: float(true),
             },
-            required: ['name', 'pitch_speed', 'yaw_speed', 'range', 'cooldown_duration', 'weapon_type', 'firing', 'acquire_target_logic', 'effects'],
         })
     }
 }

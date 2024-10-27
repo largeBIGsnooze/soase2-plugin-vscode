@@ -11,9 +11,10 @@ module.exports = class Icons {
             keys: {
                 sizes: object({
                     keys: {
-                        tiny: this.cache.textures,
-                        medium: this.cache.textures,
-                        large: this.cache.textures,
+                        tiny: this.cache.textures(),
+                        medium: this.cache.textures(),
+                        large: this.cache.textures(),
+                        lobby: this.cache.textures(),
                     },
                     required: ['tiny', 'medium', 'large'],
                 }),

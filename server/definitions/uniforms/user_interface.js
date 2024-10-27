@@ -14,7 +14,27 @@ module.exports = class UserInterfaceUniform {
                 blink_duration: integer(),
                 fade_duration: integer(),
             },
-            required: ['min_color', 'max_color', 'total_duration', 'blink_duration', 'fade_duration'],
+            required: ['blink_duration', 'fade_duration', 'max_color', 'min_color', 'total_duration'],
+        })
+    }
+
+    unit_alert_definition() {
+        return object({
+            keys: {
+                alert_types: object({
+                    keys: {
+                        ping_attention: this.alert(),
+                        ping_attack: this.alert(),
+                        ping_defend: this.alert(),
+                        rallied_to: this.alert(),
+                        positive_buff: this.alert(),
+                        negative_buff: this.alert(),
+                        targeted_by_ability: this.alert(),
+                    },
+                    required: ['ping_attention', 'ping_attack', 'ping_defend', 'rallied_to', 'positive_buff', 'negative_buff', 'targeted_by_ability'],
+                }),
+            },
+            required: ['alert_types'],
         })
     }
 
@@ -22,27 +42,16 @@ module.exports = class UserInterfaceUniform {
         return schema({
             keys: {
                 unspent_ability_points_fill_color: color(),
-                unspent_ability_points_fill_blink: Definitions.getBlink(),
-                unit_alert: object({
-                    keys: {
-                        alert_types: object({
-                            keys: {
-                                ping_attention: this.alert(),
-                                ping_attack: this.alert(),
-                                ping_defend: this.alert(),
-                                rallied_to: this.alert(),
-                                positive_buff: this.alert(),
-                                negative_buff: this.alert(),
-                                targeted_by_ability: this.alert(),
-                            },
-                            required: ['ping_attention', 'ping_attack', 'ping_defend', 'rallied_to', 'positive_buff', 'negative_buff', 'targeted_by_ability'],
-                        }),
-                    },
-                    required: ['alert_types'],
-                }),
+                unspent_ability_points_fill_blink: Definitions.blink(),
+                unit_alert: this.unit_alert_definition(),
                 custom_click_failed_sound_spam_threshold: integer(),
             },
-            required: ['unspent_ability_points_fill_color', 'unspent_ability_points_fill_blink', 'unit_alert', 'custom_click_failed_sound_spam_threshold'],
+            required: [
+                'unspent_ability_points_fill_color',
+                'unspent_ability_points_fill_blink',
+                'unit_alert',
+                'custom_click_failed_sound_spam_threshold',
+            ],
         })
     }
 }

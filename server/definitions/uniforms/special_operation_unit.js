@@ -25,10 +25,10 @@ module.exports = class SpecialOperationUnit {
                                     max_move_distance_from_owner_planet: float(),
                                     name: this.cache.localisation,
                                     description: this.cache.localisation,
-                                    hud_icon: this.cache.textures,
+                                    hud_icon: this.cache.textures(),
                                     main_view_icon: object({
                                         keys: {
-                                            icon: this.cache.textures,
+                                            icon: this.cache.textures(),
                                             mesh_center_offset: float(),
                                         },
                                         required: ['icon', 'mesh_center_offset'],
@@ -37,6 +37,7 @@ module.exports = class SpecialOperationUnit {
                                     duration_start_condition: enumerate({
                                         items: ['when_planet_is_not_enemy', 'when_gravity_well_has_no_attackable_enemy_units', 'immediately'],
                                     }),
+                                    will_give_experience: boolean(),
                                     duration: float(),
                                 },
                                 required: ['is_ever_controllable'],

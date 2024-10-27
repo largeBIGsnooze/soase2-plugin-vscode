@@ -1,4 +1,4 @@
-const { schema, object, color, array } = require('../data_types')
+const { schema, object, color, array, version } = require('../data_types')
 
 module.exports = class PlayerColorUniform {
     /* eslint-disable no-unused-vars */
@@ -6,27 +6,18 @@ module.exports = class PlayerColorUniform {
         this.cache = cache
     }
 
-    colors() {
-        return object({
-            keys: {
-                primary: color(),
-                main_view_planet_background: color(),
-                secondary: color(),
-            },
-        })
-    }
-
     create() {
         return schema({
             keys: {
-                null_player_colors: this.colors(),
+                null_player_colors: this.cache.color_groups,
                 minimal_team_color_primary_color: color(),
                 player_alliance_relationship_colors: object({
+                    required: ['ally', 'enemy', 'none', 'self'],
                     keys: {
-                        self: this.colors(),
-                        ally: this.colors(),
-                        enemy: this.colors(),
-                        none: this.colors(),
+                        self: this.cache.color_groups,
+                        ally: this.cache.color_groups,
+                        enemy: this.cache.color_groups,
+                        none: this.cache.color_groups,
                     },
                 }),
                 playable_player_color_groups: array({
@@ -34,7 +25,12 @@ module.exports = class PlayerColorUniform {
                     isUnique: true,
                 }),
             },
-            required: ['null_player_colors', 'minimal_team_color_primary_color', 'player_alliance_relationship_colors', 'playable_player_color_groups'],
+            required: [
+                'null_player_colors',
+                'minimal_team_color_primary_color',
+                'player_alliance_relationship_colors',
+                'playable_player_color_groups',
+            ],
         })
     }
 }

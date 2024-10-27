@@ -57,7 +57,7 @@ module.exports = class GravityWellProps {
                                         items: float(),
                                     }),
                                     textures: array({
-                                        items: this.cache.textures,
+                                        items: this.cache.textures(),
                                         isUnique: true,
                                     }),
                                     basic_constants: object({

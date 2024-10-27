@@ -1,62 +1,110 @@
-const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
-const { schema, float, array, object, enumerate, integer, vector2i, boolean, version, string } = require('../data_types')
-const Buff = require('./buff')
-const { NpcModifiers } = require('../modifier_definitions')
+const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const { schema, float, array, object, enumerate, integer, vector2i, boolean, string } = require('../data_types')
+const { PlayerModifiers } = require('../modifier_definitions')
 const Definitions = require('../definitions')
-const { has } = require('../../utils/utils')
-const { ERROR } = require('../../constants')
 
-class Type {
-    constructor(json) {
-        this.json = json
-    }
-
-    definition() {
-        const types = {
-            ship_component: 'item',
-            planet_component: 'item',
-            random_exotics: 'random_exotics',
-            send_raid_action: 'raid',
-            spawn_units: 'spawn_units',
-            assets: 'assets',
-            exotics: 'exotics',
-            player_modifiers: 'player_modifiers',
-            starbase_component: 'item',
-            random_assets_and_exotics: 'random_assets_and_exotics',
-            asset_market_exclusive_use: 'exclusive_market',
-            ability: 'ability',
-            alliance: 'alliance',
-        }
-
-        try {
-            const type = types[this.json.data.type]
-            if (type) {
-                if (!has(this.json.data, type)) this.createPointerDiagnostic('', `key not found: '${type}'`, ERROR)
-                this.json.map_unused_keys(
-                    '/type',
-                    this.json.data,
-                    ['item', 'exotics', 'random_exotics', 'assets', 'exclusive_market', 'random_assets_and_exotics', 'raid', 'spawn_units', 'ability', 'alliance', 'player_modifiers'].filter((e) => e !== type)
-                )
-            }
-        } catch {}
-        return enumerate({
-            items: ['alliance', 'ability', 'random_assets_and_exotics', 'starbase_component', 'planet_component', 'player_modifiers', 'ship_component', 'assets', 'asset_market_exclusive_use', 'exotics', 'random_exotics', 'send_raid_action', 'spawn_units'],
-        })
-    }
-}
-
-module.exports = class NpcReward extends Buff {
+module.exports = class NpcReward {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        super({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache)
         this.json = new DiagnosticReporter(fileText, diagnostics)
-        this.type = new Type(this.json)
         this.cache = cache
     }
 
-    items() {
+    type_definition(ctx, ptr) {
+        const _ = [
+            'random_exotics',
+            'raid',
+            'spawn_units',
+            'assets',
+            'exotics',
+            'player_modifiers',
+            'item',
+            'random_assets_and_exotics',
+            'exclusive_market',
+            'ability',
+            'alliance',
+        ]
+
         try {
-            switch (this.json.data.type) {
+            switch (ctx.type) {
+                case 'planet_component':
+                case 'starbase_component':
+                case 'ship_component':
+                    this.json.validate_keys(ptr, ctx, ['item'], _)
+                    break
+                case 'random_exotics':
+                    this.json.validate_keys(ptr, ctx, ['random_exotics'], _)
+                    break
+                case 'send_raid_action':
+                    this.json.validate_keys(ptr, ctx, ['raid'], _)
+                    break
+                case 'random_ship_component':
+                    this.json.validate_keys(ptr, ctx, ['random_items'], _)
+                    break
+                case 'spawn_units':
+                    this.json.validate_keys(ptr, ctx, ['spawn_units'], _)
+                    break
+                case 'assets':
+                    this.json.validate_keys(ptr, ctx, ['assets'], _)
+                    break
+                case 'exotics':
+                    this.json.validate_keys(ptr, ctx, ['exotics'], _)
+                    break
+                case 'player_modifiers':
+                    this.json.validate_keys(ptr, ctx, ['player_modifiers'], _)
+                    break
+                case 'random_assets_and_exotics':
+                    this.json.validate_keys(ptr, ctx, ['random_assets_and_exotics'], _)
+                    break
+                case 'asset_market_exclusive_use':
+                    this.json.validate_keys(ptr, ctx, ['exclusive_market'], _)
+                    break
+                case 'ability':
+                    this.json.validate_keys(ptr, ctx, ['ability'], _)
+                    break
+                case 'alliance':
+                    this.json.validate_keys(ptr, ctx, ['alliance'], _)
+                    break
+            }
+        } catch {}
+
+        return enumerate({
+            items: [
+                'alliance',
+                'ability',
+                'random_assets_and_exotics',
+                'starbase_component',
+                'planet_component',
+                'player_modifiers',
+                'ship_component',
+                'random_ship_component',
+                'assets',
+                'asset_market_exclusive_use',
+                'exotics',
+                'random_exotics',
+                'send_raid_action',
+                'spawn_units',
+            ],
+        })
+    }
+
+    spawn_units_definition() {
+        return object({
+            keys: {
+                formation_type: Definitions.formation_type(),
+                buff: this.cache.buffs,
+                arrival_delay_duration: float(),
+                required_units: Definitions.required_units(this.cache),
+                random_units: Definitions.random_units(this.cache),
+                supply: integer(),
+                bounty_credits: float(),
+            },
+        })
+    }
+
+    item_definition(ctx) {
+        try {
+            switch (ctx.type) {
                 case 'ship_component':
                 case 'starbase_component':
                     return this.cache.ship_components
@@ -72,48 +120,47 @@ module.exports = class NpcReward extends Buff {
         return schema({
             required: ['type'],
             keys: {
-                version: version(),
-                targeting_ui: Definitions.getTargetingUi(),
+                between_gravity_well_range: float(),
+                gravity_well_fixture_target_filter_id: this.cache.target_filters,
+                targeting_ui: Definitions.targeting_ui(),
                 gui: object({
                     keys: {
-                        hud_icon: this.cache.textures,
-                        tooltip_icon: this.cache.textures,
+                        gravity_well_fixture_target_filter_description: this.cache.localisation,
+                        hud_icon: this.cache.textures(),
+                        tooltip_icon: this.cache.textures(),
                         name: this.cache.localisation,
                         description: this.cache.localisation,
                     },
                     required: ['hud_icon', 'name', 'description'],
                 }),
-                type: this.type.definition(),
-                item: this.items(),
+                type: this.type_definition(this.json?.data, ''),
+                item: this.item_definition(this.json?.data),
                 ability: this.cache.abilities,
+                random_items: array({
+                    items: this.cache.npc_rewards,
+                    isUnique: true,
+                }),
                 exclusive_market: object({
                     keys: {
-                        asset_type: Definitions.getResources(),
+                        asset_type: Definitions.resources(),
                         duration: float(),
-                        modifiers: object({
-                            keys: {
-                                npc_modifiers: NpcModifiers.create(this.cache.research_subjects),
-                            },
-                        }),
+                        modifiers: PlayerModifiers.create(this.cache),
                     },
                     required: ['asset_type', 'duration', 'modifiers'],
                 }),
                 alliance: object({
                     keys: {
                         alliance_type: enumerate({
-                            items: ['cease_fire'],
+                            items: ['cease_fire', 'share_vision', 'synergy'],
                         }),
-                        duration_in_minutes: float(),
+                        duration_in_minutes: float(true, 'todo_json_object'),
                     },
                 }),
                 player_modifiers: object({
+                    required: ['player_modifiers'],
                     keys: {
-                        duration_in_minutes: float(),
-                        player_modifiers: object({
-                            keys: {
-                                npc_modifiers: NpcModifiers.create(this.cache.research_subjects),
-                            },
-                        }),
+                        duration_in_minutes: float(true, 'todo_json_object'),
+                        player_modifiers: PlayerModifiers.create(this.cache),
                     },
                 }),
                 assets: object({
@@ -123,44 +170,31 @@ module.exports = class NpcReward extends Buff {
                         crystal: float(),
                     },
                 }),
-                exotics: Definitions.exotic_price(this.cache.exotics),
+                exotics: Definitions.exotic_price(this.cache),
                 spawn_units: object({
+                    required: ['spawn_units'],
                     keys: {
+                        player_ai_usage: enumerate({ items: ['defend_planet', 'missing_ship_component_shop', 'raid_enemy_planet'] }),
                         spawn_units: object({
                             keys: {
-                                random_units: Definitions.units(this.cache.units),
-                                required_units: Definitions.getRequiredUnits(this.cache),
+                                random_units: Definitions.random_units(this.cache),
+                                required_units: Definitions.required_units(this.cache),
                             },
                         }),
+                        action_data_source: this.cache.action_data_sources,
+                        buff_on_units: this.cache.buffs,
                         is_usable_by_player_ai: boolean(),
+                        spawn_units_ownership_type: enumerate({ desc: 'default=targeting_player', items: ['targeting_player', 'npc_player'] }),
                         special_operation_unit_kind: this.cache.special_operation_kinds,
                         arrival_delay_duration: integer(),
-                        gravity_well_fixture_target_filter: object({
-                            keys: {
-                                unit_types: array({
-                                    items: this.cache.ship_tags,
-                                    isUnique: true,
-                                }),
-                                ownerships: Definitions.getOwnerships(),
-                                constraints: this.constraints(),
-                            },
-                        }),
-                        target_alert: enumerate({
-                            items: ['targeted_by_ability'],
-                        }),
-                        supply: float(),
+                        target_alert: Definitions.target_alert(),
+                        supply: integer(),
                     },
                 }),
                 raid: object({
                     keys: {
-                        units: object({
-                            keys: {
-                                required_units: Definitions.getRequiredUnits(this.cache),
-                                random_units: Definitions.units(this.cache.units),
-                                supply: integer(),
-                                bounty_credits: float(),
-                            },
-                        }),
+                        units: Definitions.spawn_units_definition(this.cache),
+                        highest_used_supply_scalar: float(),
                         supply: float(),
                         buff: this.cache.buffs,
                         action_data_source: this.cache.action_data_sources,
@@ -179,6 +213,7 @@ module.exports = class NpcReward extends Buff {
                 }),
                 random_assets_and_exotics: array({
                     items: object({
+                        required: ['weight'],
                         keys: {
                             weight: float(),
                             credits: vector2i(),

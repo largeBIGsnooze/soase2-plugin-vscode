@@ -1,10 +1,16 @@
-const { DiagnosticReporter } = require('../../data/diagnostic-reporter')
-const { float, string, schema, version, integer, array, object, enumerate } = require('../data_types')
+const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const { float, string, schema, integer, array, object, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
-const { planet_modifier_types, unit_modifier_types, weapon_modifier_types, unit_factory_modifier_types, empire_modifier_types } = require('../modifier_types')
-const Buff = require('./buff')
+const {
+    planet_modifier_types,
+    unit_modifier_types,
+    weapon_modifier_types,
+    unit_factory_modifier_types,
+    empire_modifier_types,
+} = require('../modifier_types')
+const Ability = require('./ability')
 
-module.exports = class ActionDataSource extends Buff {
+module.exports = class ActionDataSource extends Ability {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
         super({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache)
@@ -12,217 +18,248 @@ module.exports = class ActionDataSource extends Buff {
         this.cache = cache
     }
 
-    target_filter_id() {
+    action_value() {
         return object({
             keys: {
-                target_filter_id: string(),
-                target_filter: object({
-                    keys: {
-                        unit_types: array({
-                            items: this.cache.ship_tags,
-                            isUnique: true,
-                        }),
-                        ownerships: Definitions.getOwnerships(),
-                        constraints: super.constraints(),
-                        exemptions: array({
-                            items: Definitions.getExemptions(),
-                            isUnique: true,
-                        }),
-                    },
-                }),
-            },
-        })
-    }
-    action_value_id() {
-        return object({
-            keys: {
-                action_value_id: string(),
-                action_value: object({
-                    keys: {
-                        transform_type: Definitions.getTransformType(),
-                        memory_float_variable_id: this.cache.float_variables,
-                        values: array({
-                            items: float(false),
-                        }),
-                        transform_unit: object({
-                            keys: {
-                                unit_type: Definitions.getUnitType(),
-                            },
-                        }),
-                    },
-                }),
+                ratio: Definitions.action_value_ratio(),
+                transform_type: Definitions.transform_type(),
+                values: array({ items: float(false) }),
+                transform_unit: Definitions.action_unit({ cache: this.cache }),
+                memory_float_variable_id: this.cache.float_variables,
             },
         })
     }
 
-    buff_empire_modifiers_id() {
-        return object({
-            keys: {
-                buff_empire_modifier_id: string(),
-                buff_empire_modifier: object({
-                    keys: {
-                        modifier_type: enumerate({
-                            items: empire_modifier_types(),
-                        }),
-                        value_behavior: Definitions.value_behavior(),
-                        value_id: this.cache.action_values,
-                    },
-                }),
-            },
+    validateActionValue(ctx, ptr, json) {
+        try {
+            const _ = ['transform_unit', 'memory_float_variable_id']
+            switch (ctx.transform_type) {
+                case 'transform_unit':
+                case 'per_max_antimatter':
+                case 'per_current_antimatter':
+                case 'per_planet_future_level':
+                case 'per_planet_current_health_points':
+                case 'per_planet_max_health_points':
+                case 'per_planet_current_shield_points':
+                case 'per_planet_max_shield_points':
+                case 'per_planet_max_civilian_slots':
+                case 'per_planet_max_military_slots':
+                case 'per_planet_commerce_track_credit_income':
+                case 'per_planet_mining_track_metal_income':
+                case 'per_planet_mining_track_crystal_income':
+                case 'per_current_hull_points':
+                case 'per_missing_hull_points':
+                case 'per_max_hull_points':
+                case 'per_percent_missing_hull_points':
+                case 'per_current_crippled_hull_points':
+                case 'per_missing_crippled_hull_points':
+                case 'per_max_crippled_hull_points':
+                case 'per_percent_missing_crippled_hull_points':
+                case 'per_current_armor_points':
+                case 'per_missing_armor_points':
+                case 'per_max_armor_points':
+                case 'per_percent_missing_armor_points':
+                case 'per_current_shield_points':
+                case 'per_missing_shield_points':
+                case 'per_max_shield_points':
+                case 'surface_radius':
+                case 'per_credit_price':
+                case 'per_metal_price':
+                case 'per_crystal_price':
+                case 'per_allied_player_in_gravity_well':
+                case 'per_enemy_unit_in_gravity_well':
+                case 'per_unit_level':
+                case 'per_build_or_virtual_supply':
+                case 'per_unit_id':
+                    json.validate_keys(ptr, ctx, [], _, ['transform_unit'])
+                    break
+                case 'operand_buff_memory_value':
+                case 'current_buff_memory_value':
+                    json.validate_keys(ptr, ctx, [], _, ['memory_float_variable_id'])
+                    break
+            }
+        } catch {}
+    }
+
+    action_values_definition(ctx, ptr) {
+        try {
+            if (Array.isArray(ctx)) {
+                ctx.forEach((action, idx) => this.validateActionValue(action?.action_value, ptr + `/${idx}/action_value`, this.json))
+            }
+        } catch {}
+        return array({
+            items: object({
+                required: ['action_value', 'action_value_id'],
+                keys: {
+                    action_value_id: string(),
+                    action_value: this.action_value(),
+                },
+            }),
         })
     }
 
-    buff_unit_modifiers_id() {
-        return object({
-            keys: {
-                buff_unit_modifier_id: string(),
-                buff_unit_modifier: object({
-                    keys: {
-                        modifier_type: enumerate({
-                            items: unit_modifier_types(),
-                        }),
-                        value_behavior: Definitions.value_behavior(),
-                        value_id: this.cache.action_values,
-                    },
-                }),
-            },
+    buff_actions_definition(ctx, ptr) {
+        const json_builder = {}
+        try {
+            if (Array.isArray(ctx)) {
+                ctx.forEach((acc, idx) => {
+                    const action_ptr = ptr + `/${idx}/action`
+                    const action = acc.action
+                    super.validateAction(ctx, ptr, action, action_ptr, json_builder, false)
+                })
+            }
+        } catch {}
+
+        return array({
+            items: object({
+                required: ['action', 'action_id'],
+                keys: {
+                    action_id: string(),
+                    action: Definitions.action(ctx, ptr, this.cache, this.json, json_builder),
+                },
+            }),
         })
     }
-    buff_unit_factory_modifiers_id() {
-        return object({
-            keys: {
-                buff_unit_factory_modifier_id: string(),
-                buff_unit_factory_modifier: object({
-                    keys: {
-                        modifier_type: enumerate({
-                            items: unit_factory_modifier_types(),
-                        }),
-                        value_behavior: Definitions.value_behavior(),
-                        value_id: this.cache.action_values,
-                    },
-                }),
-            },
+
+    buff_empire_modifiers_definition() {
+        return array({
+            items: object({
+                required: ['buff_empire_modifier', 'buff_empire_modifier_id'],
+                keys: {
+                    buff_empire_modifier_id: string(),
+                    buff_empire_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({
+                                items: empire_modifier_types(),
+                            }),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: this.cache.action_values(),
+                        },
+                    }),
+                },
+            }),
         })
     }
-    buff_planet_modifiers_id() {
-        return object({
-            keys: {
-                buff_planet_modifier_id: string(),
-                buff_planet_modifier: object({
-                    keys: {
-                        modifier_type: enumerate({
-                            items: planet_modifier_types(),
-                        }),
-                        value_behavior: Definitions.value_behavior(),
-                        value_id: this.cache.action_values,
-                    },
-                }),
-            },
+
+    buff_planet_modifiers_definition() {
+        return array({
+            items: object({
+                required: ['buff_planet_modifier', 'buff_planet_modifier_id'],
+                keys: {
+                    buff_planet_modifier_id: string(),
+                    buff_planet_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({
+                                items: planet_modifier_types(),
+                            }),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: this.cache.action_values(),
+                        },
+                    }),
+                },
+            }),
         })
     }
-    buff_weapon_modifiers_id() {
-        return object({
-            keys: {
-                buff_weapon_modifier_id: string(),
-                buff_weapon_modifier: object({
-                    keys: {
-                        //transform_type: super.getTransformType,
-                        //memory_float_variable_id: string(),
-                        weapon_type: Definitions.getWeaponType(),
-                        modifier_type: enumerate({
-                            items: weapon_modifier_types(),
-                        }),
-                        value_behavior: Definitions.value_behavior(),
-                        tags: array({
-                            items: this.cache.weapon_tags,
-                            isUnique: true,
-                        }),
-                        value_id: string(),
-                    },
-                }),
-            },
+    buff_unit_factory_modifiers_definition() {
+        return array({
+            items: object({
+                required: ['buff_unit_factory_modifier', 'buff_unit_factory_modifier_id'],
+                keys: {
+                    buff_unit_factory_modifier_id: string(),
+                    buff_unit_factory_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({
+                                items: unit_factory_modifier_types(),
+                            }),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: this.cache.action_values(),
+                        },
+                    }),
+                },
+            }),
         })
     }
+    buff_unit_modifiers_definition(ctx, ptr) {
+        return array({
+            items: object({
+                required: ['buff_unit_modifier', 'buff_unit_modifier_id'],
+                keys: {
+                    buff_unit_modifier_id: string(),
+                    buff_unit_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({
+                                items: unit_modifier_types(),
+                            }),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: this.cache.action_values(),
+                        },
+                    }),
+                },
+            }),
+        })
+    }
+
+    buff_weapon_modifiers_definition(cache) {
+        return array({
+            items: object({
+                required: ['buff_weapon_modifier', 'buff_weapon_modifier_id'],
+                keys: {
+                    buff_weapon_modifier_id: string(),
+                    buff_weapon_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({
+                                items: weapon_modifier_types(),
+                            }),
+                            tags: array({
+                                desc: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+                                items: this.cache.weapon_tags,
+                                isUnique: true,
+                            }),
+                            weapon_type: Definitions.weapon_type(),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: this.cache.action_values(),
+                        },
+                    }),
+                },
+            }),
+        })
+    }
+
+    target_filters_definition(ctx, ptr) {
+        return array({
+            items: object({
+                required: ['target_filter', 'target_filter_id'],
+                keys: {
+                    target_filter_id: string(),
+                    target_filter: Definitions.target_filter_definition(ctx, ptr, this.cache, this.json),
+                },
+            }),
+        })
+    }
+
     create() {
         return schema({
             keys: {
-                version: version(),
-                level_count: integer(),
+                level_count: integer(true),
+                action_values: this.action_values_definition(this.json?.data?.action_values, '/action_values'),
+                buff_actions: this.buff_actions_definition(this.json?.data?.buff_actions, '/buff_actions'),
+                buff_empire_modifiers: this.buff_empire_modifiers_definition(),
+                buff_planet_modifiers: this.buff_planet_modifiers_definition(),
+                buff_unit_factory_modifiers: this.buff_unit_factory_modifiers_definition(),
+                buff_unit_modifiers: this.buff_unit_modifiers_definition(this.json?.data?.buff_unit_modifiers, '/buff_unit_modifiers'),
+                buff_weapon_modifiers: this.buff_weapon_modifiers_definition(),
+                effect_alias_bindings: Definitions.effect_alias_bindings_definition(this.cache),
+                target_filters: this.target_filters_definition(this.json?.data?.target_filters, '/target_filters'),
                 per_buff_memory_declaration: object({
                     keys: {
-                        unit_variable_ids: array({
-                            items: string(),
-                            isUnique: true,
-                        }),
-                        float_variable_ids: array({
-                            items: string(),
-                            isUnique: true,
-                        }),
+                        float_variable_ids: array({ items: string(), isUnique: true }),
+                        unit_variable_ids: array({ items: string(), isUnique: true }),
                     },
-                }),
-                action_values: array({
-                    items: this.action_value_id(),
-                    isUnique: true,
-                }),
-                target_filters: array({
-                    items: this.target_filter_id(),
-                    isUnique: true,
-                }),
-                buff_empire_modifiers: array({
-                    items: this.buff_empire_modifiers_id(),
-                    isUnique: true,
-                }),
-                buff_unit_modifiers: array({
-                    items: this.buff_unit_modifiers_id(),
-                    isUnique: true,
-                }),
-                buff_unit_factory_modifiers: array({
-                    items: this.buff_unit_factory_modifiers_id(),
-                    isUnique: true,
-                }),
-                buff_planet_modifiers: array({
-                    items: this.buff_planet_modifiers_id(),
-                    isUnique: true,
-                }),
-                buff_actions: array({
-                    items: object({
-                        keys: {
-                            action_id: string(),
-                            action: object({
-                                keys: {
-                                    action_type: Definitions.getActionType(),
-                                    max_jump_distance_value: string(),
-                                    gravity_well_origin_unit: Definitions.getGravityWellOriginUnit(),
-                                    constraint: super.constraint(),
-                                    action_type: Definitions.getActionType(),
-                                    destination_unit: Definitions.getUnit(),
-                                    operators: super.operators(),
-                                    float_variable: this.cache.float_variables,
-                                    math_operators: super.math_operators(),
-                                },
-                            }),
-                        },
-                    }),
-                }),
-                buff_weapon_modifiers: array({
-                    items: this.buff_weapon_modifiers_id(),
-                    isUnique: true,
-                }),
-                effect_alias_bindings: array({
-                    items: array({
-                        items: [
-                            string(),
-                            object({
-                                keys: {
-                                    particle_effect: this.cache.particle_effects,
-                                    sounds: array({
-                                        items: this.cache.sounds,
-                                        isUnique: true,
-                                    }),
-                                },
-                            }),
-                        ],
-                    }),
                 }),
             },
         })

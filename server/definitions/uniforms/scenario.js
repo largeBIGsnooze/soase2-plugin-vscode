@@ -1,4 +1,4 @@
-const { schema, array } = require('../data_types')
+const { schema, array, version } = require('../data_types')
 
 module.exports = class ScenarioUniform {
     /* eslint-disable no-unused-vars */
@@ -13,8 +13,12 @@ module.exports = class ScenarioUniform {
                     items: this.cache.scenarios,
                     isUnique: true,
                 }),
+                fake_server_scenarios: array({
+                    items: this.cache.scenarios,
+                    isUnique: true,
+                }),
             },
-            required: ['scenarios'],
+            required: ['fake_server_scenarios', 'scenarios'],
         })
     }
 }

@@ -1,4 +1,4 @@
-const { schema, float, array, boolean, version } = require('../data_types')
+const { schema, float, array, boolean } = require('../data_types')
 
 module.exports = class MeshMaterial {
     /* eslint-disable no-unused-vars */
@@ -9,16 +9,13 @@ module.exports = class MeshMaterial {
     create() {
         return schema({
             keys: {
-                version: version(),
-                base_color_texture: this.cache.textures,
-                normal_texture: this.cache.textures,
-                mask_texture: this.cache.textures,
-                occlusion_roughness_metallic_texture: this.cache.textures,
+                base_color_texture: this.cache.textures(),
+                normal_texture: this.cache.textures(),
+                mask_texture: this.cache.textures(),
+                occlusion_roughness_metallic_texture: this.cache.textures(),
                 emissive_factor: float(),
                 emissive_hue_strength: float(),
-                base_color_factor: array({
-                    items: float(),
-                }),
+                base_color_factor: array({ items: float() }),
                 roughness_factor: float(),
                 metallic_factor: float(),
                 has_transparency: boolean(),

@@ -1,4 +1,4 @@
-const { schema, integer, string } = require('../data_types')
+const { schema, integer, hyperlink } = require('../data_types')
 
 module.exports = class WelcomeMessage {
     /* eslint-disable no-unused-vars */
@@ -10,8 +10,8 @@ module.exports = class WelcomeMessage {
         return schema({
             keys: {
                 version: integer(),
-                sins2_link: string(),
-                discord_link: string(),
+                sins2_link: hyperlink(),
+                discord_link: hyperlink(),
                 message: this.cache.localisation,
             },
         })

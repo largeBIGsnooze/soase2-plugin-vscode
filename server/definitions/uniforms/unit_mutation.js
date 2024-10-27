@@ -1,4 +1,4 @@
-const { schema, array, object, string, boolean } = require('../data_types')
+const { schema, array, object, string, boolean, version } = require('../data_types')
 
 module.exports = class UnitMutationUniform {
     /* eslint-disable no-unused-vars */
@@ -20,12 +20,14 @@ module.exports = class UnitMutationUniform {
 
     create() {
         return schema({
+            required: ['mutations', 'permission_infos', 'suppressors'],
             keys: {
                 mutations: array({
                     items: object({
                         keys: {
                             name: string(),
                             localized_name: this.cache.localisation,
+                            description: this.cache.localisation,
                             is_positive: boolean(),
                             show_in_buff_tooltip: boolean(),
                         },
@@ -42,8 +44,12 @@ module.exports = class UnitMutationUniform {
                         can_planet_be_damaged: this.mutation(),
                         can_have_hull_restored: this.mutation(),
                         can_have_armor_restored: this.mutation(),
+                        can_use_abilities_when_crippled: this.mutation(),
+                        can_create_retargeting_torpedoes: this.mutation(),
                         can_have_shields_bypassed: this.mutation(),
                         can_have_shields_restored: this.mutation(),
+                        can_use_weapons_when_crippled: this.mutation(),
+                        can_have_shields_burst_restored: this.mutation(),
                         can_passively_regenerate_hull: this.mutation(),
                         can_passively_regenerate_armor: this.mutation(),
                         can_passively_regenerate_shields: this.mutation(),

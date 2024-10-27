@@ -9,7 +9,7 @@ module.exports = class TextureAnimation {
     create() {
         return schema({
             keys: {
-                texture: this.cache.textures,
+                texture: this.cache.textures(),
                 total_frame_count: integer(),
                 column_frame_count: integer(),
                 start_top_left: vector2i(),

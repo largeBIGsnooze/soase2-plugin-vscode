@@ -1,4 +1,4 @@
-const { schema, array, object, string } = require('../data_types')
+const { schema, array, object, string, version } = require('../data_types')
 
 module.exports = class UnitTagUniform {
     /* eslint-disable no-unused-vars */
@@ -8,6 +8,7 @@ module.exports = class UnitTagUniform {
 
     create() {
         return schema({
+            required: ['unit_tags'],
             keys: {
                 unit_tags: array({
                     items: object({

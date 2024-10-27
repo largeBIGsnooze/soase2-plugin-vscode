@@ -1,34 +1,91 @@
 const Definitions = require('./definitions')
-const { enumerate, object, array, boolean, float } = require('./data_types')
-const { planet_modifier_types, weapon_modifier_types, unit_modifier_types, unit_factory_modifier_types, empire_modifier_types } = require('./modifier_types')
+const { enumerate, object, array, boolean, float, string } = require('./data_types')
+const {
+    planet_modifier_types,
+    weapon_modifier_types,
+    unit_modifier_types,
+    unit_factory_modifier_types,
+    empire_modifier_types,
+    exotic_factory_modifier_types,
+} = require('./modifier_types')
 
-class WeaponModifiers {
-    static create({ hasArrayValues: hasArrayValues }, data) {
-        let result
+class CultureModifiers {
+    constructor() {}
 
-        if (hasArrayValues)
-            result = {
-                values: array({
-                    items: float(false),
-                }),
-            }
-        else
-            result = {
-                value: float(false),
-            }
-
+    static create(data) {
         return array({
             items: object({
                 keys: {
-                    weapon_type: Definitions.getWeaponType(),
+                    modifier_type: enumerate({ items: empire_modifier_types() }),
+                    value_behavior: Definitions.value_behavior(),
+                    values: array({
+                        items: object({
+                            keys: {
+                                prerequisites: Definitions.prerequisites(data.research_subjects),
+                                value: float(),
+                            },
+                        }),
+                    }),
+                },
+            }),
+        })
+    }
+}
+
+class UnitItemWeaponModifiers {
+    static create(data) {
+        return array({
+            items: object({
+                keys: {
+                    modifier_type: enumerate({ items: weapon_modifier_types() }),
+                    tags: array({ items: data.weapon_tags, isUnique: true }),
+                    value_behavior: Definitions.value_behavior(),
+                    values: array({ items: float(false) }),
+                    weapon_type: Definitions.weapon_type(),
+                },
+            }),
+        })
+    }
+}
+class WeaponModifiers {
+    static buff_weapon_modifiers_definition(cache) {
+        return array({
+            items: object({
+                required: ['buff_weapon_modifier', 'buff_weapon_modifier_id'],
+                keys: {
+                    buff_weapon_modifier_id: string(),
+                    buff_weapon_modifier: object({
+                        required: ['modifier_type', 'value_behavior', 'value_id'],
+                        keys: {
+                            modifier_type: enumerate({ items: weapon_modifier_types() }),
+                            tags: array({
+                                desc: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+                                items: cache.weapon_tags,
+                                isUnique: true,
+                            }),
+                            weapon_type: Definitions.weapon_type(),
+                            value_behavior: Definitions.value_behavior(),
+                            value_id: cache.action_values(),
+                        },
+                    }),
+                },
+            }),
+        })
+    }
+
+    static create(data) {
+        return array({
+            items: object({
+                required: ['value', 'value_behavior'],
+                keys: {
+                    weapon_type: Definitions.weapon_type(),
                     modifier_type: enumerate({
                         items: weapon_modifier_types(),
                     }),
                     value_behavior: Definitions.value_behavior(),
-                    buff_weapon_modifier_id: data['weapon_modifier_ids'],
-                    value_id: data['action_values'],
-                    ...result,
-                    prerequisites: Definitions.prerequisites(data['research_subjects']),
+                    buff_weapon_modifier_id: data.weapon_modifier_ids,
+                    value: float(false),
+                    prerequisites: Definitions.research_prerequisites(data.research_subjects),
                     tags: array({
                         items: data['weapon_tags'],
                         isUnique: true,
@@ -39,9 +96,10 @@ class WeaponModifiers {
     }
 }
 
-class UnitModifiers {
+class UnitItemUnitModifiers {
     constructor() {}
-    static createBuff(data) {
+
+    static create(data) {
         return array({
             items: object({
                 keys: {
@@ -49,41 +107,56 @@ class UnitModifiers {
                         items: unit_modifier_types(),
                     }),
                     value_behavior: Definitions.value_behavior(),
-                    value_id: data['action_values'],
-                    buff_unit_modifier_id: data['buff_unit_modifiers'],
+                    values: array({ items: float(false) }),
+                    tags: array({
+                        items: data.ship_tags,
+                        isUnique: true,
+                    }),
                 },
             }),
         })
     }
-    static create({ hasArrayValues: hasArrayValues, prerequisites: prerequisites = {} }, data) {
-        let result
+}
 
-        if (hasArrayValues)
-            result = {
-                values: array({
-                    items: float(false),
-                }),
-            }
-        else
-            result = {
-                value: float(false),
-            }
+class UnitModifiers {
+    constructor() {}
 
+    static create(data, { isFloatValueProperty: isFloatValueProperty } = {}) {
         return array({
             items: object({
+                required: ['modifier_type', 'value', 'value_behavior'],
                 keys: {
+                    value_id: data['action_values'],
+                    buff_unit_modifier_id: data['buff_unit_modifiers'],
                     is_pseudo_positive_buff: boolean(),
                     modifier_type: enumerate({
                         items: unit_modifier_types(),
                     }),
+                    prerequisites: Definitions.research_prerequisites(data['research_subjects']),
                     value_behavior: Definitions.value_behavior(),
-                    ...result,
+                    value: isFloatValueProperty ? float(false) : data['action_values'],
                     tags: array({
                         items: data['ship_tags'],
                         isUnique: true,
                     }),
                     tag: data['ship_tags'],
-                    prerequisites,
+                },
+            }),
+        })
+    }
+}
+
+class UnitItemExoticFactoryModifiers {
+    constructor() {}
+    static create() {
+        return array({
+            items: object({
+                keys: {
+                    modifier_type: enumerate({
+                        items: exotic_factory_modifier_types(),
+                    }),
+                    value_behavior: Definitions.value_behavior(),
+                    values: array({ items: float(false) }),
                 },
             }),
         })
@@ -93,9 +166,10 @@ class UnitModifiers {
 class ExoticFactoryModifiers {
     constructor() {}
 
-    static create(exotics) {
+    static create(data) {
         return array({
             items: object({
+                required: ['modifier_type', 'value', 'value_behavior'],
                 keys: {
                     modifier_type: enumerate({
                         items: unit_factory_modifier_types(),
@@ -103,7 +177,7 @@ class ExoticFactoryModifiers {
                     value_behavior: Definitions.value_behavior(),
                     value: float(false),
                     exotic_types: array({
-                        items: exotics,
+                        items: data['exotics'],
                         isUnique: true,
                     }),
                 },
@@ -112,43 +186,44 @@ class ExoticFactoryModifiers {
     }
 }
 
-class PlanetModifiers {
+class UnitItemPlanetModifiers {
     constructor() {}
 
-    static createResearchSubject(planets) {
+    static create(data) {
         return array({
             items: object({
                 keys: {
                     modifier_type: enumerate({
                         items: planet_modifier_types(),
                     }),
+                    required_planet_type: data['planets'],
                     value_behavior: Definitions.value_behavior(),
-                    value: float(false),
-                    planet_types: array({
-                        items: planets,
-                        isUnique: true,
-                    }),
-                    dynamic_multiplier: enumerate({
-                        items: ['inverse_used_supply_percentage'],
-                    }),
-                },
-                required: ['modifier_type', 'value_behavior', 'value'],
-            }),
-        })
-    }
-
-    static create(planet_modifier_ids) {
-        return array({
-            items: object({
-                keys: {
-                    modifier_type: enumerate({
-                        items: planet_modifier_types(),
-                    }),
-                    value_behavior: Definitions.value_behavior(),
-                    buff_planet_modifier_id: planet_modifier_ids,
                     values: array({
                         items: float(false),
                     }),
+                },
+            }),
+        })
+    }
+}
+class PlanetModifiers {
+    constructor() {}
+
+    static create(data) {
+        return array({
+            items: object({
+                required: ['modifier_type', 'value_behavior', 'value'],
+                keys: {
+                    prerequisites: Definitions.research_prerequisites(data.research_subjects),
+                    planet_types: array({ items: data.planets, isUnique: true }),
+                    value: float(false),
+                    modifier_type: enumerate({ items: planet_modifier_types() }),
+                    dynamic_multiplier: enumerate({
+                        items: ['used_supply_percentage', 'inverse_used_supply_percentage'],
+                    }),
+                    value_behavior: Definitions.value_behavior(),
+                    buff_planet_modifier_id: data.planet_modifier_ids,
+                    values: array({ items: float(false) }),
                 },
             }),
         })
@@ -158,50 +233,65 @@ class PlanetModifiers {
 class PlanetTypeGroups {
     constructor() {}
 
-    static create(planets, research_subjects) {
+    static create(data) {
         return array({
             items: object({
                 keys: {
                     planet_types: array({
-                        items: planets,
+                        items: data['planets'],
                         isUnique: true,
                     }),
-                    build_prerequisites: Definitions.prerequisites(research_subjects),
+                    build_prerequisites: Definitions.prerequisites(data['research_subjects']),
                 },
             }),
         })
     }
 }
 
-class UnitFactoryModifiers {
+class UnitItemUnitFactoryModifiers {
     constructor() {}
 
-    static create({ hasArrayValues: hasArrayValues }, build_kinds) {
-        let arrayResults
-
-        if (hasArrayValues)
-            arrayResults = {
-                values: array({
-                    items: float(false),
-                }),
-            }
-        else
-            arrayResults = {
-                value: float(false),
-            }
-
+    static create() {
         return array({
             items: object({
                 keys: {
-                    modifier_type: enumerate({
-                        items: unit_factory_modifier_types(),
-                    }),
+                    modifier_type: enumerate({ items: unit_factory_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
-                    ...arrayResults,
-                    build_kinds: array({
-                        items: build_kinds,
-                        isUnique: true,
-                    }),
+                    values: array({ items: float(false) }),
+                },
+            }),
+        })
+    }
+}
+class UnitFactoryModifiers {
+    constructor() {}
+
+    static create(data) {
+        return array({
+            items: object({
+                keys: {
+                    modifier_type: enumerate({ items: unit_factory_modifier_types() }),
+                    value: float(false),
+                    value_behavior: Definitions.value_behavior(),
+                    build_kinds: array({ items: data['build_kinds'], isUnique: true }),
+                },
+            }),
+        })
+    }
+}
+
+class StrikecraftModifiers {
+    constructor() {}
+
+    static create(data) {
+        return array({
+            items: object({
+                required: ['modifier_type', 'value', 'value_behavior'],
+                keys: {
+                    modifier_type: enumerate({ items: ['squadron_size'] }),
+                    strikecraft_kinds: array({ items: data.strikecraft_kinds, isUnique: true }),
+                    value: float(),
+                    value_behavior: Definitions.value_behavior(),
                 },
             }),
         })
@@ -211,21 +301,17 @@ class UnitFactoryModifiers {
 class PlayerModifiers {
     constructor() {}
 
-    static create(research_subjects) {
+    static create(data, { UnitModifierFloatValue: UnitModifierFloatValue } = {}) {
         return object({
             keys: {
-                npc_modifiers: NpcModifiers.create(research_subjects),
+                npc_modifiers: NpcModifiers.create(data),
+                weapon_modifiers: WeaponModifiers.create(data),
                 empire_modifiers: EmpireModifiers.create(),
-                planet_modifiers: PlanetModifiers.create(),
-            },
-        })
-    }
-    static createResearchSubject(research_subjects, planets) {
-        return object({
-            keys: {
-                npc_modifiers: NpcModifiers.create(research_subjects),
-                empire_modifiers: EmpireModifiers.create(),
-                planet_modifiers: PlanetModifiers.createResearchSubject(planets),
+                unit_modifiers: UnitModifiers.create(data, { isFloatValueProperty: UnitModifierFloatValue }),
+                planet_modifiers: PlanetModifiers.create(data),
+                strikecraft_modifiers: StrikecraftModifiers.create(data),
+                unit_factory_modifiers: UnitFactoryModifiers.create(data),
+                exotic_factory_modifiers: ExoticFactoryModifiers.create(data),
             },
         })
     }
@@ -234,29 +320,16 @@ class PlayerModifiers {
 class NpcModifiers {
     constructor() {}
 
-    static modifier_type() {
-        return enumerate({
-            items: ['sell_exotic_credits_received', 'auction_lost_refund_percentage', 'buy_metal_credits_cost', 'buy_crystal_credits_cost', 'send_raid_supply', 'auction_bid_any', 'sell_crystal_credits_received', 'sell_metal_credits_received', 'reputation_ability_cooldown_duration'],
-        })
-    }
-
-    static tags() {
-        return array({
-            items: enumerate({
-                items: ['pirates'],
-            }),
-        })
-    }
-
-    static create(research_subjects) {
+    static create(data) {
         return array({
             items: object({
+                required: ['modifier_type', 'value', 'value_behavior'],
                 keys: {
-                    modifier_type: NpcModifiers.modifier_type(),
+                    modifier_type: enumerate({ items: empire_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value: float(false),
-                    prerequisites: Definitions.prerequisites(research_subjects),
-                    tags: NpcModifiers.tags(),
+                    prerequisites: Definitions.prerequisites(data['research_subjects']),
+                    tags: array({ items: enumerate({ items: ['pirates'] }), isUnique: true }),
                 },
             }),
         })
@@ -269,10 +342,9 @@ class EmpireModifiers {
     static create() {
         return array({
             items: object({
+                required: ['modifier_type', 'value', 'value_behavior'],
                 keys: {
-                    modifier_type: enumerate({
-                        items: empire_modifier_types(),
-                    }),
+                    modifier_type: enumerate({ items: empire_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value: float(false),
                 },
@@ -284,11 +356,18 @@ class EmpireModifiers {
 module.exports = {
     EmpireModifiers,
     ExoticFactoryModifiers,
+    UnitItemUnitModifiers,
     NpcModifiers,
     PlanetModifiers,
     PlanetTypeGroups,
+    UnitItemUnitFactoryModifiers,
+    UnitItemWeaponModifiers,
     PlayerModifiers,
+    UnitItemPlanetModifiers,
     UnitFactoryModifiers,
     UnitModifiers,
+    CultureModifiers,
+    StrikecraftModifiers,
     WeaponModifiers,
+    UnitItemExoticFactoryModifiers,
 }

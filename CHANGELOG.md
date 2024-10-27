@@ -1,3 +1,7 @@
+## 0.4.4
+
+-   Updated to 28.16 version of the game
+
 ## 0.4.3
 
 -   Refactored a chunk of code

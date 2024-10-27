@@ -6,5 +6,5 @@ package-lock.json
 test
 playground
 jsconfig.json
-server/providers/definition.js
 server/definitions/gui/todo
+schemas

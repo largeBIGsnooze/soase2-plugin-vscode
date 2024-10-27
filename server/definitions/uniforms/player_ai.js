@@ -1,132 +1,115 @@
+const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
 const { schema, array, object, enumerate, float, boolean, percentage, integer, vector2f } = require('../data_types')
-const { EmpireModifiers, PlanetModifiers } = require('../modifier_definitions')
+const Definitions = require('../definitions')
+const {
+    EmpireModifiers,
+    PlanetModifiers,
+    WeaponModifiers,
+    UnitModifiers,
+    UnitFactoryModifiers,
+    StrikecraftModifiers,
+    NpcModifiers,
+    ExoticFactoryModifiers,
+} = require('../modifier_definitions')
 
 module.exports = class PlayerAiUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
+        this.json = new DiagnosticReporter(fileText, diagnostics)
         this.cache = cache
     }
 
-    type() {
-        return enumerate({
-            items: ['constant', 'per_planet_count', 'per_built_supply', 'per_max_supply'],
-        })
-    }
-
-    behaviors() {
+    behaviors_definition(ctx, ptr) {
         return object({
+            required: [
+                'chance_to_ally_with_other_players',
+                'defense_to_offsense_spend_ratio',
+                'desired_explore_ship_count',
+                'steal_ships_from_roam_fleets_to_defend_supply_percentage',
+            ],
             keys: {
-                desired_explore_ship_count: object({
-                    keys: {
-                        type: enumerate({
-                            items: ['constant'],
-                        }),
-                        value: integer(),
-                    },
-                }),
+                desired_explore_ship_count: Definitions.desired_explore_ship_count(
+                    ctx?.desired_explore_ship_count,
+                    ptr + '/desired_explore_ship_count',
+                    this.json
+                ),
+                steal_ships_from_roam_fleets_to_defend_supply_percentage: float(),
+                chance_to_ally_with_other_players: vector2f(),
+                defense_to_offsense_spend_ratio: float(),
             },
         })
     }
 
-    properties() {
-        const contents = () =>
-            object({
-                keys: {
-                    type: this.type(),
-                    per_count: integer(),
-                    value: integer(),
-                    max_value: integer(),
-                },
-            })
+    modifiers_definition() {
+        return object({
+            keys: {
+                empire_modifiers: EmpireModifiers.create(),
+                planet_modifiers: PlanetModifiers.create(this.cache),
+                weapon_modifiers: WeaponModifiers.create(this.cache),
+                unit_modifiers: UnitModifiers.create(this.cache),
+                unit_factory_modifiers: UnitFactoryModifiers.create(this.cache),
+                strikecraft_modifiers: StrikecraftModifiers.create(this.cache),
+                npc_modifiers: NpcModifiers.create(this.cache),
+                exotic_factory_modifiers: ExoticFactoryModifiers.create(this.cache),
+            },
+        })
+    }
 
-        return {
-            desired_ship_factory_planet_counts: contents(),
-            desired_ship_factory_planet_density_scalar: contents(),
-            desired_explore_mission_count: contents(),
-            desired_ship_factory_planet_counts: contents(),
-            desired_colonize_mission_count: contents(),
-            desired_exotic_factory_count: contents(),
-            desired_attack_gravity_well_mission_count: contents(),
-            desired_starbase_count: contents(),
-            desired_capital_ship_count: contents(),
-            desired_unlock_unit_count: contents(),
-            bonus_modifiers: object({
-                keys: {
-                    empire_modifiers: EmpireModifiers.create(),
-                    planet_modifiers: PlanetModifiers.createResearchSubject(this.cache.planets),
-                },
-            }),
-        }
+    difficulty_definition() {
+        return object({
+            required: ['description', 'icon', 'name', 'update_interval'],
+            keys: {
+                icon: this.cache.textures(),
+                name: this.cache.localisation,
+                description: this.cache.localisation,
+                update_interval: float(),
+                can_buy_or_sell_npc_market_assets: boolean(),
+                will_make_npc_auction_bid_chance: percentage(),
+                will_ally_with_other_ai_players_chance: percentage(),
+                fleet_attack_timeout_duration_in_minutes: integer(),
+                fleet_colonize_timeout_duration_in_minutes: integer(),
+                will_fleet_retreat: boolean(),
+                will_attack_other_ai_before_human_players: boolean(),
+                will_build_super_weapons: boolean(),
+                fleet_will_probably_defeat_ratio_range: array({ items: float() }),
+                max_supply_percentage_relative_to_human_players: float(),
+                max_fleet_capital_ship_count: integer(),
+                when_build_titan_in_minutes: vector2f(),
+                chance_for_full_bid_on_auctions: float(),
+                bonus_modifiers: this.modifiers_definition(),
+            },
+        })
     }
 
     create() {
         return schema({
+            required: [
+                'asset_ai_trade_values',
+                'behaviors',
+                'capital_ship_build_kind',
+                'difficulties',
+                'random_exotics',
+                'ship_factory_build_kinds',
+                'titan_build_kind',
+            ],
             keys: {
                 difficulties: object({
                     keys: {
-                        easy: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
-                        medium: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
-                        hard: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
-                        unfair: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
-                        nightmare: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
-                        impossible: object({
-                            keys: {
-                                update_interval: float(),
-                                can_buy_or_sell_npc_market_assets: boolean(),
-                                will_make_npc_auction_bid_chance: percentage(),
-                                will_ally_with_other_ai_players_chance: percentage(),
-                                ...this.properties(),
-                            },
-                        }),
+                        easy: this.difficulty_definition(),
+                        medium: this.difficulty_definition(),
+                        hard: this.difficulty_definition(),
+                        unfair: this.difficulty_definition(),
+                        nightmare: this.difficulty_definition(),
+                        impossible: this.difficulty_definition(),
                     },
                     required: ['easy', 'medium', 'hard', 'unfair', 'nightmare', 'impossible'],
                 }),
                 behaviors: object({
                     keys: {
-                        aggressive: this.behaviors(),
-                        defensive: this.behaviors(),
-                        research: this.behaviors(),
-                        economic: this.behaviors(),
+                        aggressive: this.behaviors_definition(this.json?.data?.behaviors?.aggressive, '/behaviors/aggressive'),
+                        defensive: this.behaviors_definition(this.json?.data?.behaviors?.defensive, '/behaviors/defensive'),
+                        // research: this.behaviors_definition(this.json?.data?.behaviors?.research, '/behaviors/research'),
+                        // economic: this.behaviors_definition(this.json?.data?.behaviors?.economic, '/behaviors/economic'),
                     },
                 }),
                 random_research_subject_tier_tolerance: integer(),
@@ -154,6 +137,7 @@ module.exports = class PlayerAiUniform {
                     items: this.cache.exotics,
                     isUnique: true,
                 }),
+                asset_ai_trade_values: Definitions.assets(),
             },
         })
     }

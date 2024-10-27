@@ -1,4 +1,4 @@
-const { schema, object, array, boolean } = require('../data_types')
+const { schema, object } = require('../data_types')
 const Definitions = require('../modifier_definitions')
 
 module.exports = class DialogueWithClawFrameButtonStyle extends Definitions {

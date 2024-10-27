@@ -1,5 +1,6 @@
-const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate } = require('../data_types')
+const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate, version } = require('../data_types')
 
+// TODO: Re-check for newer versions
 module.exports = class GalaxyGeneratorUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
@@ -42,7 +43,7 @@ module.exports = class GalaxyGeneratorUniform {
                                     keys: {
                                         skybox: this.cache.skyboxes,
                                         probability: float(),
-                                        name: this.cache.fillings('fixtures'),
+                                        name: this.cache.fixture_fillings,
                                     },
                                 }),
                             }),
@@ -116,11 +117,12 @@ module.exports = class GalaxyGeneratorUniform {
                         keys: {
                             editor_color: color(),
                             is_existence_known_to_all: boolean(),
-                            primary_random_fixture_filling_name: this.cache.fillings('random_fixtures'),
-                            secondary_random_fixture_filling_name: this.cache.fillings('random_fixtures'),
-                            primary_random_fixture_with_moon_filling_name: this.cache.fillings('random_fixtures'),
+                            editor_visual_tag: string(),
+                            primary_random_fixture_filling_name: this.cache.random_fixture_fillings,
+                            secondary_random_fixture_filling_name: this.cache.random_fixture_fillings,
+                            primary_random_fixture_with_moon_filling_name: this.cache.random_fixture_fillings,
                             is_primary_fixture_player_home_planet: boolean(),
-                            gravity_wells: this.cache.fillings('all'),
+                            gravity_wells: this.cache.gravity_wells,
                         },
                     }),
                 },
@@ -181,6 +183,41 @@ module.exports = class GalaxyGeneratorUniform {
         })
     }
 
+    gravity_well_orbit_durations_by_hierarchy_depth_definition() {
+        return array({
+            items: object({
+                keys: {
+                    min: object({
+                        keys: {
+                            radius: float(),
+                            time_in_hours: float(),
+                        },
+                    }),
+                    max: object({
+                        keys: {
+                            radius: float(),
+                            time_in_hours: float(),
+                        },
+                    }),
+                },
+            }),
+        })
+    }
+
+    fillings_definition() {
+        return object({
+            keys: {
+                npc_fillings: this.npc_fillings(),
+                random_gravity_well_fillings: this.random_gravity_well_fillings(),
+                gravity_well_fillings: this.gravity_well_fillings(),
+                random_fixture_fillings: this.random_fixture_fillings(),
+                node_fillings: this.node_fillings(),
+                fixture_fillings: this.fixture_fillings(),
+                moon_fillings: this.moon_fillings(),
+            },
+        })
+    }
+
     create() {
         return schema({
             keys: {
@@ -188,24 +225,7 @@ module.exports = class GalaxyGeneratorUniform {
                 gravity_well_y_offsets_by_hierarchy_depth: array({
                     items: vector2f(),
                 }),
-                gravity_well_orbit_durations_by_hierarchy_depth: array({
-                    items: object({
-                        keys: {
-                            min: object({
-                                keys: {
-                                    radius: float(),
-                                    time_in_hours: float(),
-                                },
-                            }),
-                            max: object({
-                                keys: {
-                                    radius: float(),
-                                    time_in_hours: float(),
-                                },
-                            }),
-                        },
-                    }),
-                }),
+                gravity_well_orbit_durations_by_hierarchy_depth: this.gravity_well_orbit_durations_by_hierarchy_depth_definition(),
                 secondary_fixture_y_offset: vector2f(),
                 min_jumps_to_any_home_planet_for_loot_level: array({
                     items: integer(),
@@ -213,17 +233,7 @@ module.exports = class GalaxyGeneratorUniform {
                 player_phase_resonance_points: array({
                     items: integer(),
                 }),
-                fillings: object({
-                    keys: {
-                        npc_fillings: this.npc_fillings(),
-                        random_gravity_well_fillings: this.random_gravity_well_fillings(),
-                        gravity_well_fillings: this.gravity_well_fillings(),
-                        random_fixture_fillings: this.random_fixture_fillings(),
-                        node_fillings: this.node_fillings(),
-                        fixture_fillings: this.fixture_fillings(),
-                        moon_fillings: this.moon_fillings(),
-                    },
-                }),
+                fillings: this.fillings_definition(),
             },
         })
     }

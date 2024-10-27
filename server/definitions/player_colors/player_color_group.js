@@ -1,4 +1,4 @@
-const { schema, color, array } = require('../data_types')
+const { schema, color, array, object } = require('../data_types')
 
 module.exports = class PlayerColorGroup {
     /* eslint-disable no-unused-vars */
@@ -7,13 +7,22 @@ module.exports = class PlayerColorGroup {
     create() {
         return schema({
             keys: {
-                primary_color: color(),
+                user_interface_color: color(),
+                pip_color: color(),
                 main_view_planet_background_color: color(),
-                secondary_colors: array({
-                    items: color(),
+                mesh_colors: array({
+                    items: object({
+                        required: ['primary', 'secondary', 'primary_emissive', 'secondary_emissive'],
+                        keys: {
+                            primary: color(),
+                            secondary: color(),
+                            primary_emissive: color(),
+                            secondary_emissive: color(),
+                        },
+                    }),
                 }),
             },
-            required: ['primary_color', 'main_view_planet_background_color', 'secondary_colors'],
+            required: ['user_interface_color', 'main_view_planet_background_color', 'mesh_colors'],
         })
     }
 }

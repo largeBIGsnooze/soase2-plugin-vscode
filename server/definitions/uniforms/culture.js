@@ -1,4 +1,4 @@
-const { schema, float } = require('../data_types')
+const { schema, float, version } = require('../data_types')
 
 module.exports = class CultureUniform {
     /* eslint-disable no-unused-vars */
@@ -6,6 +6,7 @@ module.exports = class CultureUniform {
 
     create() {
         return schema({
+            required: ['propagate_culture_cutoff_rate'],
             keys: {
                 propagate_culture_cutoff_rate: float(),
             },

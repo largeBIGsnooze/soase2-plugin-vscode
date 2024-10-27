@@ -1,4 +1,4 @@
-const { schema, string, object, integer } = require('../data_types')
+const { schema, string, object } = require('../data_types')
 const Definitions = require('../modifier_definitions')
 
 module.exports = class DebugStartNpcAuctionWindow extends Definitions {

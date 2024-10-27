@@ -13,12 +13,23 @@ module.exports = class AttackTargetTypeGroupUniform {
                     items: object({
                         keys: {
                             unit_attack_target_type_group_id: string(),
-                            // TODO: Find out the proper definitions
                             unit_attack_target_type_group: object({
                                 keys: {
                                     types: array({
                                         items: enumerate({
-                                            items: ['torpedo', 'strikecraft', 'corvette', 'heavy', 'capital', 'starbase', 'titan', 'light', 'lrm', 'flak', 'defense'],
+                                            items: [
+                                                'torpedo',
+                                                'strikecraft',
+                                                'corvette',
+                                                'heavy',
+                                                'capital',
+                                                'starbase',
+                                                'titan',
+                                                'light',
+                                                'lrm',
+                                                'flak',
+                                                'defense',
+                                            ],
                                         }),
                                         isUnique: true,
                                     }),

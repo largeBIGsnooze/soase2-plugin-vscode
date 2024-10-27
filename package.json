@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "0.4.3",
+    "version": "1.0.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -49,15 +49,6 @@
                     "scope": "application",
                     "default": "",
                     "description": "The location of your mod for caching variables"
-                },
-                "soase2-plugin.language": {
-                    "scope": "application",
-                    "type": "string",
-                    "enum": [
-                        "english"
-                    ],
-                    "default": "english",
-                    "description": "Localisation for on-hover information, etc..."
                 },
                 "soase2-plugin.extensions.ignore": {
                     "type": "array",
@@ -110,6 +101,7 @@
                     "beam_effect",
                     "exhaust_trail_effect",
                     "entity_manifest",
+                    "particle_effect",
                     "unit_item",
                     "npc_reward",
                     "unit",
@@ -142,7 +134,10 @@
                     "skybox",
                     "texture_animation",
                     "uniforms",
-                    "welcome_message"
+                    "welcome_message",
+                    "galaxy_chart.json",
+                    "scenario_info.json",
+                    "galaxy_chart_fillings.json"
                 ],
                 "configuration": "./syntaxes/language-configuration.json",
                 "icon": {
@@ -186,9 +181,10 @@
         ]
     },
     "scripts": {
+        "test": "node ./test/index.js",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "esbuild-base": "esbuild ./server/client.js ./server/lsp-connection.js --bundle --outdir=out/ --external:vscode --format=cjs --platform=node",
+        "esbuild-base": "esbuild ./server/client.js ./server/lsp_connection.js --bundle --outdir=out/ --external:vscode --format=cjs --platform=node",
         "lint": "eslint .",
         "prettier": "npx prettier . --write",
         "package": "vsce package"
@@ -201,17 +197,13 @@
         "@vscode/test-electron": "^2.3.9",
         "esbuild": "^0.20.0",
         "eslint": "^8.41.0",
-        "prettier": "3.2.5",
         "typescript": "^5.1.3"
     },
     "dependencies": {
-        "ajv": "^8.12.0",
-        "ajv-errors": "^3.0.0",
-        "chokidar": "^3.6.0",
         "fast-glob": "^3.3.2",
         "json-source-map": "^0.6.1",
-        "lodash": "^4.17.21",
         "lorem-ipsum": "^2.0.8",
+        "update": "^0.4.2",
         "vscode-json-languageservice": "^5.3.5",
         "vscode-languageclient": "^9.0.1",
         "vscode-languageserver": "^8.1.0"

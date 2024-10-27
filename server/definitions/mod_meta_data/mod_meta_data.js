@@ -25,9 +25,10 @@ module.exports = class ModMetaData {
                 short_description: string(),
                 long_description: string(),
                 logos: object({
+                    required: ['small_logo', 'large_logo'],
                     keys: {
-                        small_logo: this.cache.modLogos,
-                        large_logo: this.cache.modLogos,
+                        small_logo: this.cache.mod_images,
+                        large_logo: this.cache.mod_images,
                     },
                 }),
             },

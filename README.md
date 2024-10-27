@@ -36,7 +36,6 @@ Open via: `SOASE2: Configuration`
 ## Configuration
 
 ```json
-"soase2-plugin.language": "english" // Language for on-hover tooltips and so on.
 
 "soase2-plugin.cache.game": "E:/SinsIITesting" //  Location of your game/mod (ensure that it is the root directory)
 

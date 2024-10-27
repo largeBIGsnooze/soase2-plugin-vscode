@@ -1,4 +1,4 @@
-const { schema, string, object, integer } = require('../data_types')
+const { schema, object } = require('../data_types')
 const Definitions = require('../modifier_definitions')
 
 module.exports = class BindInputMappingDialog extends Definitions {

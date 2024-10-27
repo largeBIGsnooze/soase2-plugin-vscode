@@ -9,9 +9,8 @@ module.exports = class BeamEffect {
     create() {
         return schema({
             keys: {
-                version: version(),
-                glow_texture: this.cache.textures,
-                core_texture: this.cache.textures,
+                glow_texture: this.cache.textures(),
+                core_texture: this.cache.textures(),
                 glow_color: color(),
                 core_color: color(),
                 width: float(),
@@ -41,7 +40,7 @@ module.exports = class BeamEffect {
                 }),
                 basic_constants: object({
                     keys: {
-                        depth_fade_opacity: percentage(),
+                        depth_fade_opacity: float(),
                         emissive_factor: float(),
                         alpha_ramp_curvature: float(),
                         alpha_ramp_steepness: float(),

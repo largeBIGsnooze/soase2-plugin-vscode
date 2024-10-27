@@ -5,8 +5,9 @@ const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
 const { readdirSync } = require('fs')
-const { EntityParser } = require('./data/file-handler')
+const { EntityParser } = require('./data/file_handler')
 const Config = require('./utils/config')
+const { base64images } = require('./utils/base64images')
 
 module.exports = class Command {
     constructor(client) {
@@ -147,7 +148,11 @@ module.exports = class Command {
         let isValidating = false
         commands.registerCommand(commandName, async () => {
             if (!this.isValidGamePath(await this.getInstallationFolder())) {
-                const selection = await window.showErrorMessage('Could not locate mod metadata. Would you like to change path?', 'Set Folder', 'Cancel')
+                const selection = await window.showErrorMessage(
+                    'Could not locate mod metadata. Would you like to change path?',
+                    'Set Folder',
+                    'Cancel'
+                )
 
                 if (selection === 'Set Folder') {
                     commands.executeCommand('soase2-plugin.changeWorkspace')
@@ -214,7 +219,9 @@ module.exports = class Command {
         if (mode === 'unzip') {
             try {
                 mkdirSync(path.join(gamePath, 'scenarios', zip))
-                execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) => (err ? this.client.debug(err) : null))
+                execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) =>
+                    err ? this.client.debug(err) : null
+                )
                 window.showInformationMessage(`Scenario unzipped: ${zipPath}.scenario`)
             } catch (e) {
                 window.showErrorMessage(`Scenario: ${zipPath}, already exists`)
@@ -226,7 +233,9 @@ module.exports = class Command {
                     return
                 }
                 unlinkSync(path.resolve(zipPath, `${zipPath}.scenario`))
-                execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) => (err ? this.client.debug(err) : null)).on('exit', () => {
+                execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) =>
+                    err ? this.client.debug(err) : null
+                ).on('exit', () => {
                     readdirSync(zipPath)?.map((e) => unlinkSync(path.resolve(zipPath, e)))
                     rmdirSync(zipPath)
                 })
@@ -296,30 +305,33 @@ module.exports = class Command {
     }
 
     showModCreatedDialog(folderPath) {
-        window.showInformationMessage(`Mod created: ${folderPath}, would you like to set it as the current working folder?`, 'Yes', 'No', 'Reveal in explorer').then(async (e) => {
-            switch (e) {
-                case 'Yes': {
-                    await this.updateWorkspaceAndCache(folderPath)
-                    window.showInformationMessage('Happy modding! 🙂')
-                    break
+        window
+            .showInformationMessage(
+                `Mod created: ${folderPath}, would you like to set it as the current working folder?`,
+                'Yes',
+                'No',
+                'Reveal in explorer'
+            )
+            .then(async (e) => {
+                switch (e) {
+                    case 'Yes': {
+                        await this.updateWorkspaceAndCache(folderPath)
+                        window.showInformationMessage('Happy modding! 🙂')
+                        break
+                    }
+                    case 'Reveal in explorer': {
+                        commands.executeCommand('revealFileInOS', Uri.file(folderPath))
+                        break
+                    }
+                    default:
+                        break
                 }
-                case 'Reveal in explorer': {
-                    commands.executeCommand('revealFileInOS', Uri.file(folderPath))
-                    break
-                }
-                default: {
-                }
-            }
-        })
-    }
-
-    generateImage(filePath, fileName, base64) {
-        writeFileSync(path.resolve(filePath, fileName), Buffer.from(base64, 'base64'))
+            })
     }
 
     generateBoilerModImages(filePath) {
-        this.generateImage(filePath, `${path.basename(filePath)}_small.png`, CONSTANTS.mods.meta_data.small_logo)
-        this.generateImage(filePath, `${path.basename(filePath)}_large.png`, CONSTANTS.mods.meta_data.large_logo)
+        writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_small.png`), Buffer.from(base64images[0], 'base64'))
+        writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_large.png`), Buffer.from(base64images[1], 'base64'))
     }
 
     createCustomDirMod(folderName) {

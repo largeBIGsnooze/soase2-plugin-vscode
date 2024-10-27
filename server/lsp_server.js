@@ -1,13 +1,11 @@
 const onCompletionProvider = require('./providers/completion')
 const onHoverProvider = require('./providers/hover')
-//const onDefinitionProvider = require('./providers/definition')
 const EntityLoader = require('./definitions/entity_loader')
 const onDocumentFormattingProvider = require('./providers/formatting')
 const { Log } = require('./utils/logger')
 const Parser = require('./parser')
-const { CONSTANTS, ERROR } = require('./constants')
-const { DiagnosticReporter } = require('./data/diagnostic-reporter')
-
+const { CONSTANTS } = require('./constants')
+const { DiagnosticReporter } = require('./data/diagnostic_reporter')
 module.exports = class Lsp {
     /**
      * Constructor
@@ -20,9 +18,19 @@ module.exports = class Lsp {
 
         this.entityDefinition = new EntityLoader(this.options.languageService, this.options.schemaService)
         this.onCompletionProvider = new onCompletionProvider(this.options.languageService, this.options.schemaService)
-        this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService, this.options.connection)
-        //this.onDefinition = new onDefinitionProvider();
+        this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService)
         this.onDocumentFormatting = new onDocumentFormattingProvider(this.options.connection)
+        this.onDidChangeContent = this.debounce(this.onDidChangeContent.bind(this), 750)
+    }
+    /**
+     * Debouncing function
+     */
+    debounce(func, timeout) {
+        let timer
+        return (...args) => {
+            clearTimeout(timer)
+            timer = setTimeout(() => func.apply(this, args), timeout)
+        }
     }
     /**
      * Returns data requested by the client
@@ -68,24 +76,46 @@ module.exports = class Lsp {
         })
 
         Log.info(`${CONSTANTS.source} initialized, version: ${CONSTANTS.version}`)
-        Log.info('Operational files: ', JSON.stringify(results, null, 4))
+        // Log.info('Operational files: ', JSON.stringify(results, null, 4))
+        Log.info(`Validating: ${Object.keys(results).length} entities!`)
 
         Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
 
         this.options.connection.onRequest(
             'function/validateFiles',
             async () =>
-                await new Parser(this.options.connection, this.options.languageService, this.options.schemaService, await this.getGameInstallationFolder(), {
-                    filesWithDiagnostics: filesWithDiagnostics,
-                })
+                await new Parser(
+                    this.options.connection,
+                    this.options.languageService,
+                    this.options.schemaService,
+                    await this.getGameInstallationFolder(),
+                    {
+                        filesWithDiagnostics: filesWithDiagnostics,
+                    }
+                )
                     .validate()
                     .catch((e) => Log.error(e))
         )
-        this.options.connection.onRequest('function/clearDiagnostics', async () => await Parser.clearDiagnostics(filesWithDiagnostics, this.options.connection))
+        this.options.connection.onRequest(
+            'function/clearDiagnostics',
+            async () => await Parser.clearDiagnostics(filesWithDiagnostics, this.options.connection)
+        )
 
-        this.options.connection.onRequest('function/clearCache', async () => (Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())))
+        this.options.connection.onRequest('function/clearCache', async () => {
+            Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
+        })
     }
 
+    async onDidSave(params) {}
+
+    async onDidOpen(params) {}
+
+    async onDidClose(params) {
+        return await this.options.connection.sendDiagnostics({
+            uri: params.document.uri,
+            diagnostics: [],
+        })
+    }
     /**
      * Validates currently opened text document
      * @param {*} params
@@ -96,21 +126,17 @@ module.exports = class Lsp {
         const uri = params.document.uri
         EntityLoader.diagnostics = []
 
+        this.entityDefinition.init({
+            params: params,
+            gameInstallationFolder: await this.getGameInstallationFolder(),
+            cache: Lsp.cache,
+        })
         if (text.trim().length === 0) new DiagnosticReporter(text, EntityLoader.diagnostics).invalidJSON()
-
-        this.entityDefinition.init(
-            {
-                params: params,
-                gameInstallationFolder: await this.getGameInstallationFolder(),
-            },
-            Lsp.cache
-        )
-
         const diagnostics = await this.entityDefinition.jsonDoValidation(text, uri)
 
-        return await this.options.connection.sendDiagnostics({
+        await this.options.connection.sendDiagnostics({
             uri: uri,
-            diagnostics: [].concat(EntityLoader.diagnostics, diagnostics),
+            diagnostics: [].concat(diagnostics, EntityLoader.diagnostics),
         })
     }
 }

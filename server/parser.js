@@ -3,7 +3,7 @@ const { pathToFileURL } = require('url')
 const fs = require('fs')
 const EntityLoader = require('./definitions/entity_loader')
 const { Log } = require('./utils/logger')
-const { DiagnosticReporter } = require('./data/diagnostic-reporter')
+const { DiagnosticReporter } = require('./data/diagnostic_reporter')
 
 module.exports = class Parser {
     /**
@@ -22,17 +22,18 @@ module.exports = class Parser {
         this.entityDefinition = new EntityLoader(languageService, schemaService)
 
         this.filesWithDiagnostics = filesWithDiagnostics
+        this.validatedFiles = 0
     }
     /**
      * Retrieves data from the client
      */
     async fetchRequests() {
-        const [folders, extensions] = await Promise.all([await this.connection.sendRequest('ignore/folders'), await this.connection.sendRequest('ignore/extensions')])
+        const [folders, extensions] = await Promise.all([
+            this.connection.sendRequest('ignore/folders'),
+            this.connection.sendRequest('ignore/extensions'),
+        ])
 
-        return {
-            folders: folders,
-            extensions: extensions,
-        }
+        return { folders, extensions }
     }
     /**
      * Validates all files against their relevant schemas
@@ -45,7 +46,7 @@ module.exports = class Parser {
 
         await this.processFolder(this.gameInstallationFolder, folders, extensions, cache)
 
-        Log.info('Execution time:', `${process.hrtime(start)[0]}s`)
+        Log.info('Execution time:', `${process.hrtime(start)[0]}s, validated: ${this.validatedFiles} entities`)
         return process.hrtime(start)[0]
     }
     /**
@@ -77,9 +78,10 @@ module.exports = class Parser {
 
                         const start = process.hrtime()
                         await this.processFile(currentFilePath, cache)
+                        this.validatedFiles++
 
                         Log.info(file, `- ${(process.hrtime(start)[1] / 1000000).toFixed(3)}ms`)
-                    } else Log.info(`Skipping: ${file}`)
+                    }
                 }
             }
         } catch (err) {
@@ -96,26 +98,18 @@ module.exports = class Parser {
             const fileText = fs.readFileSync(filePath, 'utf-8')
 
             EntityLoader.diagnostics = []
-            const reporter = new DiagnosticReporter(fileText, EntityLoader.diagnostics)
 
-            if (fileText.trim().length === 0) reporter.invalidJSON()
+            if (fileText.trim().length === 0) new DiagnosticReporter(fileText, EntityLoader.diagnostics).invalidJSON()
             else if (!JSON.parse(fileText)) return
 
-            this.entityDefinition.init(
-                {
-                    gameInstallationFolder: this.gameInstallationFolder,
-                    fileText: fileText,
-                    filePath: filePath,
-                },
-                cache
-            )
+            this.entityDefinition.init({ gameInstallationFolder: this.gameInstallationFolder, fileText: fileText, filePath: filePath, cache: cache })
             const generalDiagnostics = await this.entityDefinition.jsonDoValidation(fileText, filePath)
 
             if (generalDiagnostics[0] || Array.from(EntityLoader.diagnostics).length > 0) this.filesWithDiagnostics.push(filePath)
 
             await this.connection.sendDiagnostics({
                 uri: pathToFileURL(filePath).href,
-                diagnostics: [].concat(EntityLoader.diagnostics, generalDiagnostics),
+                diagnostics: [...EntityLoader.diagnostics, ...generalDiagnostics],
             })
         } catch (err) {
             Log.error(`Error during processing file: '${path.basename(filePath)}' with error: ${err.message}`)

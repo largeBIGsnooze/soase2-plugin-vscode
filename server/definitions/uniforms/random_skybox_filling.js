@@ -1,4 +1,4 @@
-const { array, object, string, schema, float } = require('../data_types')
+const { array, object, string, schema, float, version } = require('../data_types')
 
 module.exports = class RandomSkyboxFillingUniforms {
     /* eslint-disable no-unused-vars */
@@ -9,6 +9,7 @@ module.exports = class RandomSkyboxFillingUniforms {
     random_skybox_fillings() {
         return array({
             items: object({
+                required: ['filling', 'name'],
                 keys: {
                     name: string(),
                     filling: object({
@@ -30,10 +31,11 @@ module.exports = class RandomSkyboxFillingUniforms {
 
     create() {
         return schema({
+            required: ['random_skybox_fillings', 'dark_skybox'],
             keys: {
+                dark_skybox: this.cache.skyboxes,
                 random_skybox_fillings: this.random_skybox_fillings(),
             },
-            required: ['random_skybox_fillings'],
         })
     }
 }

@@ -1,5 +1,5 @@
 const { EntityParser } = require('../../data/file_handler')
-const { schema, array, object, string, float, vector2f, boolean, enumerate, version } = require('../data_types')
+const { schema, array, object, string, float, vector2f, boolean, enumerate } = require('../data_types')
 
 module.exports = class UnitUniform {
     /* eslint-disable no-unused-vars */

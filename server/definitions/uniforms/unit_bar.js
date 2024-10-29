@@ -1,4 +1,4 @@
-const { schema, object, float, percentage, integer, color, version } = require('../data_types')
+const { schema, object, float, percentage, integer, color } = require('../data_types')
 
 module.exports = class UnitBarUniform {
     /* eslint-disable no-unused-vars */

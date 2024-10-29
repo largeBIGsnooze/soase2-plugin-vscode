@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, object, enumerate, boolean, vector2i, float, integer, array } = require('../data_types')
 const UI = require('../ui_definitions')
 
@@ -13,10 +14,10 @@ module.exports = class Brush {
             keys: {
                 texture: this.cache.textures(),
                 shader_type: enumerate({
-                    desc: "Control the shader this brush will be rendered with. Default is 'normal'",
+                    desc: loc_keys.SHADER_TYPE,
                     items: ['normal', 'normal_overlay', 'disabled', 'focused', 'pressed', 'hovered', 'hovered_overlay', 'yuv_video'],
                 }),
-                alpha_multiply: float(true, 'Alpha multiply the brush texture when this state is active', undefined, 1),
+                alpha_multiply: float(true, 'Alpha multiply the brush texture when this state is active', 0, 1),
             },
             required: ['texture'],
         })
@@ -25,26 +26,22 @@ module.exports = class Brush {
     create() {
         return schema({
             keys: {
-                normal_state: this.brush_state('Normal or default state of the brush'),
-                disabled_state: this.brush_state('The UI element is disabled.'),
-                focused_state: this.brush_state('The UI element has focus. All keyboard input will be directed here before others.'),
-                pressed_state: this.brush_state('The UI element has be pressed, typically indicating the mouse button is down.'),
-                hovered_state: this.brush_state('The UI element is hovered, typically the mouse cursor is over it.'),
-                margins: UI.margins(
-                    'When stretched will define the 9 pieces that are composited. \nhttps://docs.unity3d.com/Manual/9SliceSprites.html'
-                ),
-                is_transient: boolean(
-                    'If true this texture will be loaded and loaded on demand and NOT optimized onto a texture page. Only make true for large textures that should not stay resident.'
-                ),
+                normal_state: this.brush_state(loc_keys.NORMAL_STATE),
+                disabled_state: this.brush_state(loc_keys.DISABLED_STATE),
+                focused_state: this.brush_state(loc_keys.FOCUSED_STATE),
+                pressed_state: this.brush_state(loc_keys.PRESSED_STATE),
+                hovered_state: this.brush_state(loc_keys.HOVERED_STATE),
+                margins: UI.margins(loc_keys.MARGINS),
+                is_transient: boolean(loc_keys.IS_TRANSIENT),
                 dpi_source: enumerate({
                     items: ['user_interface', 'current_display_size'],
                 }),
                 supported_dpis: array({
-                    desc: 'What DPI this brush natively supports for higher resolution textures.\nBy convention texture names must be post-fixed with the DPI value to be found.\nFor example picture.png would also need picture150.png side-by-side if supported DPI of 150 was added.\nTypically should be [150, 200] if this feature is being used.',
+                    desc: loc_keys.SUPPORTED_DPIS,
                     items: integer(false, 100),
                 }),
                 tiles: object({
-                    desc: 'Allows a brush to consist of multiple distinct pieces. Typically used for flipbook animations.',
+                    desc: loc_keys.TILES,
                     keys: {
                         total_count: float(),
                         column_count: float(),

@@ -77,6 +77,8 @@ const GalaxyChartFillings = require('./galaxy_chart/galaxy_chart_fillings')
 const ParticleEffect = require('./particle_effects/particle_effect')
 
 const path = require('path')
+const ScenarioScene = require('./galaxy_chart/scenario_scene')
+const GalaxyChartGeneratorParams = require('./galaxy_chart/galaxy_chart_generator_params')
 
 module.exports = class EntityLoader extends Document {
     static diagnostics = []
@@ -165,6 +167,8 @@ module.exports = class EntityLoader extends Document {
         ['galaxy_chart.json']: GalaxyChart,
         ['scenario_info.json']: ScenarioInfo,
         ['galaxy_chart_fillings.json']: GalaxyChartFillings,
+        ['.scenario_scene']: ScenarioScene,
+        ['galaxy_chart_generator_params.json']: GalaxyChartGeneratorParams,
     }
     static entities = {
         ['.mod_meta_data']: ModMetaData,
@@ -186,6 +190,7 @@ module.exports = class EntityLoader extends Document {
         localized_text: LocalizedText,
         mesh_material: MeshMaterial,
     }
+
     static files = {
         ...this.entities,
         ...this.uniforms,

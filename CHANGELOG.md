@@ -1,3 +1,6 @@
+## 0.4.5
+-   Bug fixes
+
 ## 0.4.4
 
 -   Updated to 28.16 version of the game

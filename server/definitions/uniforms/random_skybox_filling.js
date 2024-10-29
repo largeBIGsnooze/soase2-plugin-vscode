@@ -1,4 +1,4 @@
-const { array, object, string, schema, float, version } = require('../data_types')
+const { array, object, string, schema, float } = require('../data_types')
 
 module.exports = class RandomSkyboxFillingUniforms {
     /* eslint-disable no-unused-vars */

@@ -298,7 +298,8 @@ module.exports = class Ability {
     }
 
     validateOperators(constraint, action_ptr, constraint_idx) {
-        Definitions.validateActionUnitOperator(constraint, action_ptr + `/${constraint_idx}`, this.json, this.cache)
+        Definitions.validateConstraints(constraint, action_ptr + `/${constraint_idx}`, this.json)
+        Definitions.validateActionUnitOperator(constraint, action_ptr + `/${constraint_idx}`, this.json)
         Definitions.validateActionPosition(constraint, action_ptr + `/${constraint_idx}`, this.json)
         Definitions.validateActionDirection(constraint, action_ptr + `/${constraint_idx}`, this.json)
 

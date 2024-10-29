@@ -1,4 +1,4 @@
-const { schema, array, object, string, boolean, version } = require('../data_types')
+const { schema, array, object, string, boolean } = require('../data_types')
 
 module.exports = class UnitMutationUniform {
     /* eslint-disable no-unused-vars */

@@ -3,15 +3,14 @@ const { workspace } = require('vscode')
 module.exports = class Config {
     constructor() {}
 
-    static config() {
+    static copy() {
         return workspace.getConfiguration('soase2-plugin')
     }
 
-    static async get(data) {
-        return await this.config().get(data)
+    static async getWorkspaceFolder() {
+        return await this.copy().get('cache.game')
     }
-
-    static async update(data, update, configuration) {
-        return await this.config().update(data, update, configuration)
+    static async setWorkspace(dir, configuration) {
+        return await this.copy().update('cache.game', dir, configuration)
     }
 }

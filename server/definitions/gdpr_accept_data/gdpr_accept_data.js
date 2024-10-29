@@ -1,4 +1,4 @@
-const { schema, integer, string } = require('../data_types')
+const { schema, integer, hyperlink } = require('../data_types')
 
 module.exports = class GdprAcceptData {
     /* eslint-disable no-unused-vars */
@@ -10,7 +10,7 @@ module.exports = class GdprAcceptData {
         return schema({
             keys: {
                 version: integer(),
-                policy_link: string(),
+                policy_link: hyperlink(),
                 message: this.cache.localisation,
             },
         })

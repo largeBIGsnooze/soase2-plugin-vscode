@@ -1,4 +1,4 @@
-const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate, version } = require('../data_types')
+const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate } = require('../data_types')
 
 // TODO: Re-check for newer versions
 module.exports = class GalaxyGeneratorUniform {
@@ -164,6 +164,8 @@ module.exports = class GalaxyGeneratorUniform {
                                         orbit_parent: boolean(),
                                         sync_orbit_to_parent: boolean(),
                                         use_parent_ownership: boolean(),
+                                        ignore_orbit_overlap_checks: boolean(),
+                                        orbit_speed_scalar: float(),
                                         planet_offset: vector2f(),
                                         counts: array({
                                             items: object({

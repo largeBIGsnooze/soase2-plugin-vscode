@@ -132,11 +132,11 @@ module.exports = class Lsp {
             cache: Lsp.cache,
         })
         if (text.trim().length === 0) new DiagnosticReporter(text, EntityLoader.diagnostics).invalidJSON()
-        const diagnostics = await this.entityDefinition.jsonDoValidation(text, uri)
+        const generalDiagnostics = await this.entityDefinition.jsonDoValidation(text, uri)
 
         await this.options.connection.sendDiagnostics({
             uri: uri,
-            diagnostics: [].concat(diagnostics, EntityLoader.diagnostics),
+            diagnostics: [...generalDiagnostics, ...EntityLoader.diagnostics],
         })
     }
 }

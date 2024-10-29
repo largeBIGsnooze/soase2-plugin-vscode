@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -68,8 +68,7 @@
                     "default": [
                         "textures",
                         "videos",
-                        "meshes",
-                        "scenarios"
+                        "meshes"
                     ],
                     "description": "Folders to ignore"
                 },
@@ -137,7 +136,9 @@
                     "welcome_message",
                     "galaxy_chart.json",
                     "scenario_info.json",
-                    "galaxy_chart_fillings.json"
+                    "galaxy_chart_fillings.json",
+                    ".scenario_scene",
+                    "galaxy_chart_generator_params.json"
                 ],
                 "configuration": "./syntaxes/language-configuration.json",
                 "icon": {
@@ -200,9 +201,9 @@
         "typescript": "^5.1.3"
     },
     "dependencies": {
+        "chokidar": "^4.0.1",
         "fast-glob": "^3.3.2",
         "json-source-map": "^0.6.1",
-        "lorem-ipsum": "^2.0.8",
         "update": "^0.4.2",
         "vscode-json-languageservice": "^5.3.5",
         "vscode-languageclient": "^9.0.1",

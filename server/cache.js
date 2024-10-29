@@ -3,9 +3,11 @@ const { enumerate, string } = require('./definitions/data_types')
 const { EntityParser } = require('./data/file_handler')
 const { Log } = require('./utils/logger')
 const fs = require('fs')
+const loc_keys = require('./loc_keys')
+const chokidar = require('chokidar')
 module.exports = async (modFolder) => {
     const cache = {}
-    const watchers = new Map()
+    const filewatchers = new Map()
     const reader = new EntityParser(modFolder)
     let textures, action_values
 
@@ -36,51 +38,54 @@ module.exports = async (modFolder) => {
     const setWatcher = (caches, folder, extensions, callback) => {
         const folderPath = path.resolve(modFolder, folder)
 
-        if (!fs.existsSync(folderPath) || watchers.has(folderPath)) {
+        if (!fs.existsSync(folderPath) || filewatchers.has(folderPath)) {
             return
         }
 
-        const watcher = fs
-            .watch(folderPath, (event, fileName) => {
+        const filewatcher = chokidar
+            .watch(folder, {
+                ignored: (path, stats) => stats?.isFile() && !extensions.some((e) => path.endsWith(e)),
+                usePolling: true,
+                interval: 100,
+                persistent: true,
+                ignoreInitial: true,
+                cwd: modFolder,
+            })
+            .on('all', (event, fileName) => {
                 try {
-                    if (fileName == null) return
-
-                    const name = fileName.toLowerCase()
-                    if (event == 'rename' && !fs.existsSync(path.resolve(folder, name))) {
-                        if (extensions.some((e) => name.endsWith(e))) {
-                            for (const cache of caches) {
-                                try {
-                                    const idx = cache.enum.findIndex((e) => e === path.basename(name, path.extname(name)))
-                                    if (idx !== -1) {
-                                        cache.enum.splice(idx, 1)
-                                    }
-                                } catch (e) {
-                                    console.log('Error at: ', cache)
+                    const name = path.basename(fileName, path.extname(fileName)).toLowerCase()
+                    if (name === null) return
+                    if (event == 'unlink') {
+                        for (const cache of caches) {
+                            try {
+                                const idx = cache.enum.findIndex((e) => e === name)
+                                if (idx !== -1) {
+                                    cache.enum.splice(idx, 1)
                                 }
+                            } catch (e) {
+                                console.log('Error at: ', cache)
                             }
                         }
                     }
 
-                    if (event == 'change') {
-                        if (extensions.some((e) => name.endsWith(e))) {
-                            callback().forEach((result, i) => {
-                                if (caches[i].type == 'textures') {
-                                    textures = result
-                                } else if (caches[i].type == 'action_values') {
-                                    action_values = result
-                                } else {
-                                    caches[i].enum = result
-                                }
-                            })
-                        }
+                    if (event == 'change' || event == 'add') {
+                        callback().forEach((result, i) => {
+                            if (caches[i].type == 'textures') {
+                                textures = result
+                            } else if (caches[i].type == 'action_values') {
+                                action_values = result
+                            } else {
+                                caches[i].enum = result
+                            }
+                        })
                     }
                 } catch (err) {
                     Log.error(err, folder, extensions)
                 }
             })
             .on('error', () => {})
-        watchers.set(folderPath, watcher)
-        return watcher
+        filewatchers.set(folderPath, filewatcher)
+        return filewatcher
     }
 
     const initCache = () => {
@@ -91,31 +96,27 @@ module.exports = async (modFolder) => {
             items: reader.parsePlayerIcons(),
         })
         cache.research_fields = enumerate({
-            desc: 'Sections of the research tree it will be placed on',
+            desc: loc_keys.RESEARCH_FIELDS,
             items: reader.parseResearchFields(),
         })
         cache.player_portraits = enumerate({
             items: reader.parsePlayerPortraits(),
         })
         cache.localisation = enumerate({
-            desc: '*.localized_text strings',
+            desc: loc_keys.LOCALIZED_TEXT,
             items: reader.parseLocalisation(),
         })
         cache.research_subjects = enumerate({
             items: reader.parseEntityManifest('research_subject'),
         })
         cache.planet_components = enumerate({
-            items: reader.parseComponents({
-                component: 'planet_component',
-            }),
+            items: reader.parseComponents('planet_component'),
         })
         cache.strikecraft_units = enumerate({
             items: reader.parseStrikecraftUnits(),
         })
         cache.ship_components = enumerate({
-            items: reader.parseComponents({
-                component: 'ship_component',
-            }),
+            items: reader.parseComponents('ship_component'),
         })
         cache.unit_items = enumerate({
             items: reader.parseUnitItems(),
@@ -163,24 +164,18 @@ module.exports = async (modFolder) => {
             items: reader.parseFontsTtf(),
         })
         cache.sounds = enumerate({
-            items: reader.parseSounds({
-                ext: 'sound',
-            }),
+            items: reader.parseSounds('sound'),
         })
         cache.ogg = enumerate({
-            items: reader.parseSounds({
-                ext: 'ogg',
-            }),
+            items: reader.parseSounds('ogg'),
         })
-
         textures = reader.parseTextures()
-        cache.textures = (desc = 'Name of texture') => {
+        cache.textures = (desc = loc_keys.TEXTURES) => {
             return enumerate({
                 desc: desc,
                 items: textures,
             })
         }
-
         cache.particle_effects = enumerate({
             items: reader.parseParticleEffects(),
         })
@@ -223,6 +218,7 @@ module.exports = async (modFolder) => {
             items: reader.parseAttackTargetTypeGroups(),
         })
         cache.ship_tags = enumerate({
+            desc: loc_keys.SHIP_TAGS,
             items: reader.parseShipTags(),
         })
         cache.user_interface_sounds = enumerate({
@@ -233,6 +229,8 @@ module.exports = async (modFolder) => {
         cache.random_fixture_fillings = enumerate({ items: reader.parseGravityWellRandomFixtureFillings() })
         cache.gravity_well_fillings = enumerate({ items: reader.parseGravityWellFillings() })
         cache.random_gravity_well_fillings = enumerate({ items: reader.parseGravityWellRandomFillings() })
+        cache.moon_fillings = enumerate({ items: reader.parseMoonFillings() })
+        cache.node_fillings = enumerate({ items: reader.parseNodeFillings() })
 
         cache.npc_tags = enumerate({
             items: reader.parseNpcTags(),
@@ -255,6 +253,9 @@ module.exports = async (modFolder) => {
         })
         cache.planet_modifier_ids = enumerate({
             items: reader.parseBuffPlanetModifiers(),
+        })
+        cache.random_skybox_fillings = enumerate({
+            items: reader.parseRandomSkyboxFillings(),
         })
         cache.npc_rewards = enumerate({
             items: [...reader.parseEntityManifest('npc_reward'), ''],
@@ -281,6 +282,7 @@ module.exports = async (modFolder) => {
             items: reader.parseEntityManifest('formation'),
         })
         cache.weapons = enumerate({
+            desc: loc_keys.WEAPONS,
             items: reader.parseEntityManifest('weapon'),
         })
         cache.mutations = enumerate({
@@ -317,7 +319,7 @@ module.exports = async (modFolder) => {
             items: reader.parseDebrisUniform(),
         })
         cache.max_tier_count = enumerate({
-            desc: 'Research tier',
+            desc: loc_keys.RESEARCH_TIER,
             items: reader.parseResearchTierCount(),
             isIntType: true,
         })
@@ -391,7 +393,6 @@ module.exports = async (modFolder) => {
                 cache.crystal_asteroids,
                 cache.fleet_units,
 
-                cache.weapons,
                 cache.planet_files,
 
                 cache.planet_components,
@@ -401,7 +402,6 @@ module.exports = async (modFolder) => {
                 cache.planet_bonuses,
                 cache.planet_artifacts,
 
-                cache.unit_skins,
                 cache.effect_alias_bindings,
                 cache.child_meshes,
 
@@ -421,6 +421,18 @@ module.exports = async (modFolder) => {
                 cache.planet_modifier_ids,
                 cache.buff_unit_factory_modifiers,
                 cache.buff_empire_ids,
+
+                cache.unit_skins,
+                cache.units,
+                cache.buffs,
+                cache.research_subjects,
+                cache.npc_rewards,
+                cache.formations,
+                cache.action_data_sources,
+                cache.players,
+                cache.abilities,
+                cache.weapons,
+                cache.exotic_entities,
             ],
             'entities',
             [
@@ -428,7 +440,6 @@ module.exports = async (modFolder) => {
                 'unit',
                 'unit',
                 'unit',
-                'weapon',
                 'planet',
 
                 'unit_item',
@@ -440,7 +451,6 @@ module.exports = async (modFolder) => {
 
                 'unit_skin',
                 'unit_skin',
-                'unit_skin',
 
                 'player',
                 'player',
@@ -458,27 +468,33 @@ module.exports = async (modFolder) => {
                 'action_data_source',
                 'action_data_source',
                 'action_data_source',
+
+                'unit_skin.entity_manifest',
+                'unit.entity_manifest',
+                'buff.entity_manifest',
+                'research_subject.entity_manifest',
+                'npc_reward.entity_manifest',
+                'formation.entity_manifest',
+                'action_data_source.entity_manifest',
+                'player.entity_manifest',
+                'ability.entity_manifest',
+                'weapon.entity_manifest',
+                'exotic.entity_manifest',
             ],
             () => [
                 reader.parseStrikecraftUnits(),
                 reader.parseMetalAsteroids(),
                 reader.parseCrystalAsteroids(),
                 reader.parseFleetUnits(),
-                reader.parseEntityManifest('weapon'),
                 reader.parsePlanetFiles(),
 
-                reader.parseComponents({
-                    component: 'planet_component',
-                }),
-                reader.parseComponents({
-                    component: 'ship_component',
-                }),
+                reader.parseComponents('planet_component'),
+                reader.parseComponents('ship_component'),
                 reader.parseUnitItems(),
                 reader.parseLoots(),
                 reader.parsePlanetBonuses(),
                 reader.parsePlanetArtifacts(),
 
-                reader.parseEntityManifest('unit_skin'),
                 reader.parseEffectAliasBindings(),
                 reader.parseChildMeshes(),
 
@@ -498,8 +514,19 @@ module.exports = async (modFolder) => {
                 reader.parseBuffPlanetModifiers(),
                 reader.parseBuffUnitFactoryModifiers(),
                 reader.parseBuffModifierIds(),
-            ],
-            true
+
+                reader.parseEntityManifest('unit_skin'),
+                reader.parseEntityManifest('unit'),
+                reader.parseEntityManifest('buff'),
+                reader.parseEntityManifest('research_subject'),
+                reader.parseEntityManifest('npc_reward'),
+                reader.parseEntityManifest('formation'),
+                reader.parseEntityManifest('action_data_source'),
+                reader.parseEntityManifest('player'),
+                reader.parseEntityManifest('ability'),
+                reader.parseEntityManifest('weapon'),
+                reader.parseEntityManifest('exotic'),
+            ]
         )
 
         setWatcher(
@@ -521,6 +548,7 @@ module.exports = async (modFolder) => {
                 cache.max_tier_count,
                 cache.target_filters_uniforms,
                 cache.special_operation_kinds,
+                cache.random_skybox_fillings,
             ],
             'uniforms',
             [
@@ -540,6 +568,7 @@ module.exports = async (modFolder) => {
                 'research.uniforms',
                 'target_filter.uniforms',
                 'special_operation_unit.uniforms',
+                'random_skybox_filling.uniforms',
             ],
             () => [
                 reader.parseDebrisUniform(),
@@ -559,8 +588,8 @@ module.exports = async (modFolder) => {
                 reader.parseResearchTierCount(),
                 reader.parseTargetFiltersUniform(),
                 reader.parseSpecialOperationUnitKinds(),
-            ],
-            true
+                reader.parseRandomSkyboxFillings(),
+            ]
         )
 
         setWatcher([cache.color_groups], 'player_colors', ['player_color_group'], () => [reader.parseColorGroups()])
@@ -572,72 +601,16 @@ module.exports = async (modFolder) => {
             ['particle_effect', 'beam_effect', 'shield_effect', 'exhaust_trail_effect'],
             () => [reader.parseParticleEffects(), reader.parseBeamEffects(), reader.parseShieldEffects(), reader.parseExhaustTrailEffects()]
         )
-        setWatcher(
-            [cache.death_sequences, cache.death_sequence_groups],
-            'death_sequences',
-            ['death_sequence', 'death_sequence_group'],
-            () => [reader.parseDeathSequences(), reader.parseDeathSequenceGroups()],
-            true
-        )
+        setWatcher([cache.death_sequences, cache.death_sequence_groups], 'death_sequences', ['death_sequence', 'death_sequence_group'], () => [
+            reader.parseDeathSequences(),
+            reader.parseDeathSequenceGroups(),
+        ])
         setWatcher([cache.brushes], 'brushes', ['brush'], () => [reader.parseBrushes()])
 
         setWatcher([{ type: 'textures', enum: textures }], 'textures', ['.png', '.dds'], () => [reader.parseTextures()])
 
-        // // Entity Manifests
-        setWatcher(
-            [
-                cache.unit_skins,
-                cache.units,
-                cache.buffs,
-                cache.research_subjects,
-                cache.npc_rewards,
-                cache.formations,
-                cache.action_data_sources,
-                cache.players,
-                cache.abilities,
-                cache.weapons,
-                cache.exotic_entities,
-            ],
-            'entities',
-            [
-                'unit_skin.entity_manifest',
-                'unit.entity_manifest',
-                'buff.entity_manifest',
-                'research_subject.entity_manifest',
-                'npc_reward.entity_manifest',
-                'formation.entity_manifest',
-                'action_data_source.entity_manifest',
-                'player.entity_manifest',
-                'ability.entity_manifest',
-                'weapon.entity_manifest',
-                'exotic.entity_manifest',
-            ],
-            () => [
-                reader.parseEntityManifest('unit_skin'),
-                reader.parseEntityManifest('unit'),
-                reader.parseEntityManifest('buff'),
-                reader.parseEntityManifest('research_subject'),
-                reader.parseEntityManifest('npc_reward'),
-                reader.parseEntityManifest('formation'),
-                reader.parseEntityManifest('action_data_source'),
-                reader.parseEntityManifest('player'),
-                reader.parseEntityManifest('ability'),
-                reader.parseEntityManifest('weapon'),
-                reader.parseEntityManifest('exotic'),
-            ],
-            true
-        )
-        // //
-
         setWatcher([cache.colors], 'colors', ['named_colors.named_colors'], () => [reader.parseColorGroups()])
-        setWatcher([cache.sounds, cache.ogg], 'sounds', ['sound', 'ogg'], () => [
-            reader.parseSounds({
-                ext: 'sound',
-            }),
-            reader.parseSounds({
-                ext: 'ogg',
-            }),
-        ])
+        setWatcher([cache.ogg], 'sounds', ['.ogg'], () => [reader.parseSounds('ogg')])
         setWatcher(
             [
                 cache.fixture_fillings,
@@ -645,6 +618,8 @@ module.exports = async (modFolder) => {
                 cache.gravity_well_fillings,
                 cache.random_gravity_well_fillings,
                 cache.gravity_wells,
+                cache.moon_fillings,
+                cache.node_fillings,
             ],
             'uniforms',
             ['galaxy_generator.uniforms'],
@@ -659,28 +634,31 @@ module.exports = async (modFolder) => {
                     ...reader.parseGravityWellRandomFillings(),
                     ...reader.parseGravityWellFixtureFillings(),
                 ],
-            ],
-            true
+                reader.parseMoonFillings(),
+                reader.parseNodeFillings(),
+            ]
         )
     }
 
     initCache()
     initWatchers()
 
-    fs.watch(modFolder, (parentEvent, parentFolder) => {
-        if (parentEvent == 'rename') {
-            for (const folder of WATCHED_FOLDERS) {
-                if (parentFolder === folder) {
-                    for (const watcher of watchers.values()) {
-                        watcher.close()
-                    }
-                    watchers.clear()
-                    initWatchers()
-                    Log.info('Reloading watchers: ', Array.from(watchers.keys()).sort())
-                }
+    const reloadWatchers = (directory) => {
+        const dirName = path.basename(directory)
+        for (const folder of WATCHED_FOLDERS) {
+            if (dirName === folder) {
+                for (const watcher of filewatchers.values()) watcher.close()
+                filewatchers.clear()
+                initWatchers()
+                Log.info('Reloading watchers: ', Array.from(filewatchers.keys()).sort())
             }
         }
-    })
+    }
+
+    chokidar
+        .watch(modFolder, { ignoreInitial: true, depth: 1 })
+        .on('addDir', (directory) => reloadWatchers(directory))
+        .on('unlinkDir', (directory) => reloadWatchers(directory))
 
     return new Proxy(cache, {
         get: function (target, prop) {

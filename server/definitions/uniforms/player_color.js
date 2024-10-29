@@ -1,4 +1,4 @@
-const { schema, object, color, array, version } = require('../data_types')
+const { schema, object, color, array } = require('../data_types')
 
 module.exports = class PlayerColorUniform {
     /* eslint-disable no-unused-vars */

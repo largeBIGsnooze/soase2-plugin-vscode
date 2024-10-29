@@ -1,5 +1,5 @@
 const version = () => ({
-    description: 'Archive version',
+    markdownDescription: 'Archive version',
     type: 'number',
     minimum: 0,
 })
@@ -10,13 +10,15 @@ const float = (isMinimum = true, desc = '', minimum = undefined, maximum = undef
         ...(minimum !== undefined ? { minimum: minimum } : {}),
         ...(maximum !== undefined ? { maximum: maximum } : {}),
         ...(isMinimum ? { minimum: 0 } : {}),
+        markdownDescription: desc,
         description: desc,
     }
 }
 const integer = (negative = false, desc = '', exclusiveMinimum) => {
     if (exclusiveMinimum) {
         return {
-            desc: desc,
+            markdownDescription: desc,
+            description: desc,
             type: 'integer',
             exclusiveMinimum: exclusiveMinimum,
         }
@@ -24,12 +26,14 @@ const integer = (negative = false, desc = '', exclusiveMinimum) => {
 
     return negative
         ? {
-              desc: desc,
+              markdownDescription: desc,
+              description: desc,
               type: 'integer',
           }
         : {
               type: 'integer',
-              desc: desc,
+              markdownDescription: desc,
+              description: desc,
               minimum: 0,
           }
 }
@@ -41,12 +45,14 @@ const angle = () => ({
 })
 
 const boolean = (desc = '') => ({
+    markdownDescription: desc,
     description: desc,
     type: 'boolean',
 })
 
 const string = (desc = '') => ({
     type: 'string',
+    markdownDescription: desc,
     description: desc,
 })
 
@@ -83,6 +89,7 @@ const object = ({
     desc: desc = '',
 }) => ({
     type: 'object',
+    markdownDescription: desc,
     description: desc,
     patternProperties: {
         ...pkeys,
@@ -97,23 +104,27 @@ const object = ({
 })
 
 const enumerate = ({ desc: desc = '', items: [...items], isIntType = false }) => {
-    if (!items || items.length == 0)
+    try {
+        return {
+            type: isIntType ? 'integer' : 'string',
+            markdownDescription: desc,
+            description: desc,
+            enum: [...items],
+            uniqueItems: true,
+            minItems: 1,
+        }
+    } catch {
         return {
             type: 'string',
             enum: [''],
         }
-    return {
-        type: isIntType ? 'integer' : 'string',
-        description: desc,
-        enum: [...items],
-        uniqueItems: true,
-        minItems: 1,
     }
 }
 
 const exclusiveArray = ({ items: items, maxItems: maxItems, minItems: minItems, desc: desc = '' }) => ({
     type: 'array',
     items: items,
+    markdownDescription: desc,
     description: desc,
     minItems: minItems,
     maxItems: maxItems,
@@ -133,6 +144,7 @@ const array = ({ items: items, isUnique: isUnique = false, desc: desc = '', isCo
     type: 'array',
     items: items,
     uniqueItems: isUnique,
+    markdownDescription: desc,
     description: desc,
     minItems: isConstraints ? 2 : 0,
     maxItems: isConstraints ? 5 : 999,
@@ -140,6 +152,7 @@ const array = ({ items: items, isUnique: isUnique = false, desc: desc = '', isCo
 
 const vector3f = (desc = '') => ({
     type: 'array',
+    markdownDescription: desc,
     description: desc,
     items: {
         type: 'number',
@@ -149,6 +162,7 @@ const vector3f = (desc = '') => ({
 })
 const vector9f = (desc = '') => ({
     type: 'array',
+    markdownDescription: desc,
     description: desc,
     items: {
         type: 'number',
@@ -158,7 +172,8 @@ const vector9f = (desc = '') => ({
 })
 
 const vector2i = (desc = '') => ({
-    desc: desc,
+    markdownDescription: desc,
+    description: desc,
     type: 'array',
     items: {
         type: 'integer',
@@ -194,6 +209,7 @@ const vector4i = () => ({
 
 const percentage = (desc = '') => ({
     type: 'number',
+    markdownDescription: desc,
     description: desc,
     minimum: 0,
     maximum: 1,

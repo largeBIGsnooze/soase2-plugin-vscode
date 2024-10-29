@@ -1,6 +1,6 @@
 const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri, ProgressLocation } = require('vscode')
 const path = require('path')
-const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync } = require('fs')
+const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync, lstatSync } = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
@@ -98,14 +98,21 @@ module.exports = class Command {
         }
     }
 
+    async getAvaliableScenarioFoldersQuickpicks() {
+        return new EntityParser(await Config.getWorkspaceFolder()).read(['scenarios/*'], { directories: true }).map((e) => ({
+            label: e.basename,
+            detail: e.uri,
+        }))
+    }
+
     async getAvaliableScenarioQuickpicks() {
-        return new EntityParser(await this.getInstallationFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
+        return new EntityParser(await Config.getWorkspaceFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     zipScenarioCommand(commandName) {
         commands.registerCommand(commandName, async () => {
             this.showQuickpicks(
-                await this.getAvaliableScenarioQuickpicks(),
+                await this.getAvaliableScenarioFoldersQuickpicks(),
                 async (option) =>
                     await this.manageScenario(option, {
                         mode: 'zip',
@@ -147,7 +154,7 @@ module.exports = class Command {
 
         let isValidating = false
         commands.registerCommand(commandName, async () => {
-            if (!this.isValidGamePath(await this.getInstallationFolder())) {
+            if (!this.isValidGamePath(await Config.getWorkspaceFolder())) {
                 const selection = await window.showErrorMessage(
                     'Could not locate mod metadata. Would you like to change path?',
                     'Set Folder',
@@ -181,8 +188,7 @@ module.exports = class Command {
         }
     }
 
-    async showSelectFolderDialog({ title: title, openLabel: openLabel, showRootInformation: showRootInformation = false } = {}, callback) {
-        if (showRootInformation) window.showInformationMessage('Ensure that you select the root directory of the game')
+    async showSelectFolderDialog(callback, { title: title, openLabel: openLabel } = {}) {
         await window
             .showOpenDialog({
                 title: title,
@@ -198,7 +204,7 @@ module.exports = class Command {
     }
 
     async manageScenario(zip, { mode: mode }) {
-        const gamePath = await this.getInstallationFolder()
+        const gamePath = await Config.getWorkspaceFolder()
 
         if (!existsSync(this.winrarPath)) {
             window.showErrorMessage('Make sure you have winrar installed on your computer')
@@ -211,18 +217,17 @@ module.exports = class Command {
         }
         const zipPath = path.resolve(gamePath, 'scenarios', zip)
 
-        if (!existsSync(`${zipPath}.scenario`)) {
-            window.showErrorMessage('Scenario not found')
-            return
-        }
-
         if (mode === 'unzip') {
+            if (!existsSync(`${zipPath}.scenario`)) {
+                window.showErrorMessage('Scenario not found')
+                return
+            }
             try {
                 mkdirSync(path.join(gamePath, 'scenarios', zip))
                 execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) =>
                     err ? this.client.debug(err) : null
-                )
-                window.showInformationMessage(`Scenario unzipped: ${zipPath}.scenario`)
+                ).on('exit', () => unlinkSync(`${zipPath}.scenario`))
+                window.showInformationMessage(`Scenario unzipped at: ${zipPath}`)
             } catch (e) {
                 window.showErrorMessage(`Scenario: ${zipPath}, already exists`)
             }
@@ -232,7 +237,6 @@ module.exports = class Command {
                     window.showErrorMessage('Cannot zip the selected scenario. Try unzipping it first')
                     return
                 }
-                unlinkSync(path.resolve(zipPath, `${zipPath}.scenario`))
                 execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) =>
                     err ? this.client.debug(err) : null
                 ).on('exit', () => {
@@ -246,30 +250,24 @@ module.exports = class Command {
         }
     }
 
-    async getInstallationFolder() {
-        return await Config.get('cache.game')
-    }
-
-    async setWorkspace(dir) {
-        return await Config.update('cache.game', dir, ConfigurationTarget.Global)
-    }
-
     async updateWorkspaceAndCache(dir) {
-        window.withProgress(
+        await window.withProgress(
             {
                 cancellable: false,
                 location: ProgressLocation.Notification,
             },
             async (prog) => {
-                prog.report({
-                    message: 'Reloading cache...',
-                })
+                prog.report({ message: 'Reloading cache...' })
                 await this.client.sendRequest('function/clearDiagnostics')
-                await this.setWorkspace(dir)
+                await Config.setWorkspace(dir, ConfigurationTarget.Global)
                 await this.client.sendRequest('function/clearCache')
-                window.showInformationMessage(`Workspace set to: '${dir}'. Happy modding! 🙂`)
             }
         )
+        const selection = await window.showInformationMessage(`Workspace set to: '${dir}', would you like to switch?`, 'Yes', 'Cancel')
+
+        if (selection === 'Yes') {
+            commands.executeCommand('vscode.openFolder', Uri.file(dir))
+        }
     }
 
     showQuickpicks(picks, callback) {
@@ -283,19 +281,14 @@ module.exports = class Command {
 
     changeWorkspaceCommand(commandName) {
         return commands.registerCommand(commandName, async () => {
-            this.showSelectFolderDialog(
-                {
-                    showRootInformation: true,
-                },
-                async (dir) => {
-                    if (!this.isValidGamePath(dir)) {
-                        window.showErrorMessage('Could not locate mod metadata')
-                        return
-                    }
-
-                    await this.updateWorkspaceAndCache(dir)
+            window.showInformationMessage('Ensure that you select the root directory of the game')
+            this.showSelectFolderDialog(async (dir) => {
+                if (!this.isValidGamePath(dir)) {
+                    window.showWarningMessage('Could not locate mod metadata. Ensure it is the root directory')
+                    return
                 }
-            )
+                await this.updateWorkspaceAndCache(dir)
+            })
         })
     }
 
@@ -306,25 +299,10 @@ module.exports = class Command {
 
     showModCreatedDialog(folderPath) {
         window
-            .showInformationMessage(
-                `Mod created: ${folderPath}, would you like to set it as the current working folder?`,
-                'Yes',
-                'No',
-                'Reveal in explorer'
-            )
+            .showInformationMessage(`Mod created: '${folderPath}', would you like to set it as the current workspace?`, 'Yes', 'Cancel')
             .then(async (e) => {
-                switch (e) {
-                    case 'Yes': {
-                        await this.updateWorkspaceAndCache(folderPath)
-                        window.showInformationMessage('Happy modding! 🙂')
-                        break
-                    }
-                    case 'Reveal in explorer': {
-                        commands.executeCommand('revealFileInOS', Uri.file(folderPath))
-                        break
-                    }
-                    default:
-                        break
+                if (e === 'Yes') {
+                    await this.updateWorkspaceAndCache(folderPath)
                 }
             })
     }
@@ -336,13 +314,13 @@ module.exports = class Command {
 
     createCustomDirMod(folderName) {
         this.showSelectFolderDialog(
-            {
-                title: 'Create a mod',
-                openLabel: 'Save',
-            },
             async (dir) => {
                 const customPath = path.join(dir, folderName)
                 this.writeMod(customPath)
+            },
+            {
+                title: 'Create a mod',
+                openLabel: 'Save',
             }
         )
     }

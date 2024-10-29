@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { object, array, string, enumerate, boolean, float, schema } = require('../data_types')
 const Definitions = require('../definitions')
 const {
@@ -173,9 +174,7 @@ module.exports = class Buff extends Ability {
         return schema({
             keys: {
                 active_duration: this.cache.action_values('This buff will be made dead after this duration time has elapsed'),
-                are_mutations_finite: boolean(
-                    "Change how the other parts of the simulation handle these mutations. For example if finite disabling mutations won't cause other queries to fail based on capabilities of the unit (`can_hypersapace`). default=true"
-                ),
+                are_mutations_finite: boolean(loc_keys.ARE_MUTATIONS_FINITE),
                 disable_collision_displacement_with_first_spawner: boolean('default=false'),
                 empire_modifiers: this.empire_modifiers_definition(),
                 exotic_factory_modifiers: this.exotic_factory_modifiers_definition(),
@@ -215,7 +214,7 @@ module.exports = class Buff extends Ability {
                     },
                 }),
                 stacking_ownership_type: enumerate({
-                    desc: 'Controls how duplicate instances are gr<ouped together for stacking. per_player=each player has their own stack. for_all_players=all players share the same stack. default=for_all_players',
+                    desc: loc_keys.STACKING_OWNERSHIP_TYPE,
                     items: ['per_player', 'for_all_players', 'per_source_ability'],
                 }),
                 suppress_scuttle_ui_notifications: boolean('default=false'),

@@ -1,3 +1,4 @@
+const loc_keys = require('../loc_keys')
 const _ = require('./data_types')
 
 module.exports = class Definitions {
@@ -810,7 +811,6 @@ module.exports = class Definitions {
             } else if (Array.isArray(ctx.math_operators)) {
                 ctx.math_operators.forEach((math_op, idx) => this.action_math_operator(json, cache, math_op, ptr + `/${idx}`))
             }
-
             switch (ctx.operator_type) {
                 case 'min':
                 case 'max':
@@ -847,6 +847,8 @@ module.exports = class Definitions {
                         ['operand_value'],
                         properties
                     )
+                    break
+                default:
                     break
             }
         } catch {}
@@ -892,12 +894,6 @@ module.exports = class Definitions {
                 'percentage_with_sign',
                 'percentage_one_decimal_place_with_sign',
             ],
-        })
-    }
-
-    static planet_modifier_id() {
-        return _.enumerate({
-            items: ['track_build_time', 'structure_build_time'],
         })
     }
 
@@ -1070,16 +1066,16 @@ module.exports = class Definitions {
                     operator_type: _.enumerate({ items: ['create_buff_agent', 'create_unit', 'create_torpedo', 'play_point_effect'] }),
                     buff_agent_effect_size_reference_unit: this.action_unit({
                         cache: cache,
-                        desc: 'determines the action_effect size of the buff agent that is created, default is current_spawner',
+                        desc: loc_keys.BUFF_AGENT_EFFECT_SIZE_REFERENCE_UNIT,
                     }),
-                    is_culture_provider: _.boolean('specify whether the buff_agent supports culture_provider functionality or not. default=false'),
+                    is_culture_provider: _.boolean(loc_keys.IS_CULTURE_PROVIDER),
 
                     buff_on_created_unit: cache.buffs,
                     buff_on_agent: cache.buffs,
                     copy_parent_buff_memory_values: _.boolean('default=false'),
                     hyperspace_destination_position: this.action_position(ctx, ptr, cache, json, 0, 2),
                     is_change_gravity_well_to_hyperspace_destination_enabled: _.boolean(
-                        'Set to false if this unit is not intended to live on in the destination gravity well. For example orbital cannon shell.'
+                        loc_keys.IS_CHANGE_GRAVITY_WELL_TO_HYPERSPACE_DESTINATION_ENABLED
                     ),
                     is_self_building: _.boolean('default=false'),
                     special_operation_unit_kind: cache.special_operation_kinds,

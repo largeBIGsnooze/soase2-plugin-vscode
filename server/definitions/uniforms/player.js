@@ -1,4 +1,4 @@
-const { schema, integer, array, float, object, string, percentage, boolean, vector2f, version } = require('../data_types')
+const { schema, integer, array, float, object, string, percentage, boolean, vector2f } = require('../data_types')
 
 module.exports = class PlayerUniform {
     /* eslint-disable no-unused-vars */

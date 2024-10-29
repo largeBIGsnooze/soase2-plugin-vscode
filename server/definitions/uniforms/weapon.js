@@ -1,4 +1,4 @@
-const { schema, array, object, string, float, version } = require('../data_types')
+const { schema, array, object, string, float } = require('../data_types')
 
 module.exports = class WeaponUniform {
     /* eslint-disable no-unused-vars */

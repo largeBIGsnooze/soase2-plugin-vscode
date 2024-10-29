@@ -1,5 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
-const { schema, array, object, enumerate, float, boolean, percentage, integer, vector2f } = require('../data_types')
+const { schema, array, object, float, boolean, percentage, integer, vector2f } = require('../data_types')
 const Definitions = require('../definitions')
 const {
     EmpireModifiers,

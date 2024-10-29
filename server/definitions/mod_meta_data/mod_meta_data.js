@@ -1,12 +1,11 @@
-const { integer, string, object, schema } = require('../data_types')
-const { LoremIpsum } = require('lorem-ipsum')
+const { string, object, schema, enumerate } = require('../data_types')
 module.exports = class ModMetaData {
     static boilerPlate = (display_name) => ({
-        compatibility_version: 1,
+        compatibility_version: 2,
         display_name: display_name,
         display_version: '0.0.0',
-        short_description: new LoremIpsum().generateWords(5),
-        long_description: new LoremIpsum().generateWords(30),
+        short_description: '',
+        long_description: '',
         logos: {
             small_logo: `${display_name}_small.png`,
             large_logo: `${display_name}_large.png`,
@@ -19,7 +18,7 @@ module.exports = class ModMetaData {
     create() {
         return schema({
             keys: {
-                compatibility_version: integer(),
+                compatibility_version: enumerate({ items: [2, 3], isIntType: true }),
                 display_name: string(),
                 display_version: string(),
                 short_description: string(),

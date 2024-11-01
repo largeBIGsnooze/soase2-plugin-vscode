@@ -1,4 +1,11 @@
-## 0.4.5
+## 1.3.0
+-   Removed chokidar dependency and opted for regular fs.watch() due to performance reasons, it should now be much faster
+-   Will now apply schemas on document switching
+
+## 1.2.0
+-   Increased update and filewatching intervals
+
+## 1.0.0
 -   Bug fixes
 
 ## 0.4.4

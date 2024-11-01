@@ -6,6 +6,7 @@ const { Log } = require('./utils/logger')
 const Parser = require('./parser')
 const { CONSTANTS } = require('./constants')
 const { DiagnosticReporter } = require('./data/diagnostic_reporter')
+
 module.exports = class Lsp {
     /**
      * Constructor
@@ -20,7 +21,7 @@ module.exports = class Lsp {
         this.onCompletionProvider = new onCompletionProvider(this.options.languageService, this.options.schemaService)
         this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService)
         this.onDocumentFormatting = new onDocumentFormattingProvider(this.options.connection)
-        this.onDidChangeContent = this.debounce(this.onDidChangeContent.bind(this), 750)
+        this.onDidChangeContent = this.debounce(this.onDidChangeContent.bind(this), 250)
     }
     /**
      * Debouncing function
@@ -104,6 +105,15 @@ module.exports = class Lsp {
         this.options.connection.onRequest('function/clearCache', async () => {
             Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
         })
+
+        this.options.connection.onRequest('change/editor', async ({ document, fileText }) => {
+            this.entityDefinition.init({
+                gameInstallationFolder: await this.getGameInstallationFolder(),
+                fileText: fileText,
+                filePath: document.uri.fsPath,
+                cache: Lsp.cache,
+            })
+        })
     }
 
     async onDidSave(params) {}
@@ -116,6 +126,7 @@ module.exports = class Lsp {
             diagnostics: [],
         })
     }
+
     /**
      * Validates currently opened text document
      * @param {*} params
@@ -136,7 +147,7 @@ module.exports = class Lsp {
 
         await this.options.connection.sendDiagnostics({
             uri: uri,
-            diagnostics: [...generalDiagnostics, ...EntityLoader.diagnostics],
+            diagnostics: [...generalDiagnostics, ...Parser.clearDuplicateDiagnostics(EntityLoader.diagnostics)],
         })
     }
 }

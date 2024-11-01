@@ -26,7 +26,8 @@ module.exports = class GravityWellProps {
                                 items: float(),
                             }),
                             meshes: array({
-                                items: string(),
+                                items: this.cache.meshes,
+                                isUnique: true,
                             }),
                         },
                         required: ['position', 'mesh_count', 'angular_speed', 'meshes'],

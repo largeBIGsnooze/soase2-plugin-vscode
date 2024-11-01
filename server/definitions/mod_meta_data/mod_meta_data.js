@@ -11,9 +11,7 @@ module.exports = class ModMetaData {
             large_logo: `${display_name}_large.png`,
         },
     })
-    constructor({}, diagnostics, gameInstallationFolder, cache) {
-        this.cache = cache
-    }
+    constructor({}, diagnostics, gameInstallationFolder, cache) {}
 
     create() {
         return schema({
@@ -26,8 +24,8 @@ module.exports = class ModMetaData {
                 logos: object({
                     required: ['small_logo', 'large_logo'],
                     keys: {
-                        small_logo: this.cache.mod_images,
-                        large_logo: this.cache.mod_images,
+                        small_logo: string(),
+                        large_logo: string(),
                     },
                 }),
             },

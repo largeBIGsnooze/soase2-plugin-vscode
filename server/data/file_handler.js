@@ -3,7 +3,6 @@ const path = require('path')
 const fg = require('fast-glob')
 const { Log } = require('../utils/logger')
 const { unit_modifier_types, unit_factory_modifier_types, weapon_modifier_types, planet_modifier_types } = require('../definitions/modifier_types')
-const { DiagnosticReporter } = require('./diagnostic_reporter')
 
 class EntityParser {
     constructor(gameFolder) {
@@ -55,7 +54,7 @@ class EntityParser {
 
     parseEntity(entity) {
         const raw = this.read(entity)
-        return raw[0].content
+        return raw[0]?.content
     }
 
     parseEntityManifest(manifest) {
@@ -76,9 +75,9 @@ class EntityParser {
     }
 
     parseTextures() {
-        const textures = this.read(['textures/*'], { read: false }).filter((e) => e.filename?.endsWith('.png') || e.filename?.endsWith('.dds'))
+        const textures = this.read(['textures/*.dds', 'textures/*.png'], { read: false })
 
-        return [...textures.map((e) => e.basename), '']
+        return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
     }
     parseFontsTtf() {
         return this.read(['fonts/*.ttf'], {
@@ -117,12 +116,9 @@ class EntityParser {
         return Array.from(child_meshes_set)
     }
     parseParticleEffects() {
-        return [
-            ...this.read(['effects/*.particle_effect'], {
-                read: false,
-            }).map((e) => e.basename),
-            ...this.parseEffectAliasBindings(),
-        ]
+        return this.read(['effects/*.particle_effect'], {
+            read: false,
+        }).map((e) => e.basename)
     }
     parseEffectAliasBindings() {
         const effect_alias_binding_set = new Set()

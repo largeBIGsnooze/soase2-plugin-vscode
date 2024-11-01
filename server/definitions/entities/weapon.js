@@ -24,12 +24,6 @@ module.exports = class Weapon {
                     torpedo_firing_definition: object({
                         keys: {
                             spawned_unit: this.cache.units,
-                            buff: this.cache.buffs,
-                            buff_data_source: this.cache.action_data_sources,
-                            damage_variable_id: this.cache.float_variables,
-                            penetration_variable_id: this.cache.float_variables,
-                            bypass_shields_chance_variable_id: this.cache.float_variables,
-                            duration_variable_id: this.cache.float_variables,
                             duration: float(),
                             bypass_shields_chance: percentage(),
                             enable_steering_distance_as_radius_scalar: float(),

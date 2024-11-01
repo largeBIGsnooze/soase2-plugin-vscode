@@ -329,7 +329,7 @@ module.exports = class Ability {
 
         return object({
             keys: {
-                constraint: Definitions.action_constraint(ctx?.time_actions, ptr + '/time_actions', this.cache, this.json),
+                constraint: Definitions.action_constraint(ctx?.time_actions, ptr + '/time_actions', this.cache, this.json, 1, 2),
                 actions: array({
                     items: Definitions.action(ctx, ptr, this.cache, this.json, json_builder),
                 }),

@@ -1,9 +1,11 @@
-const { workspace } = require('vscode')
+const { workspace, window } = require('vscode')
 const { LanguageClient, TransportKind } = require('vscode-languageclient/node')
 const path = require('path')
 const Command = require('./commands')
 const api = require('./api')
 const { CONSTANTS } = require('./constants')
+const Config = require('./utils/config')
+const Lsp = require('./lsp_server')
 
 let client
 
@@ -46,16 +48,22 @@ async function activate(ctx) {
     client
         .start()
         .then(async () => {
-            client.onRequest('cache/game_installation', () => workspace.getConfiguration('soase2-plugin').get('cache.game'))
-            client.onRequest('ignore/folders', () => workspace.getConfiguration('soase2-plugin').get('folders.ignore'))
-            client.onRequest('ignore/extensions', () => workspace.getConfiguration('soase2-plugin').get('extensions.ignore'))
-            client.onRequest('formatter/tabs', () => workspace.getConfiguration('soase2-plugin').get('formatter.tabs'))
+            client.onRequest('cache/game_installation', () => Config.getWorkspaceFolder())
+            client.onRequest('ignore/folders', () => Config.getIgnoredFolders())
+            client.onRequest('ignore/extensions', () => Config.getIgnoredExtensions())
+            client.onRequest('formatter/tabs', () => Config.getFormatterTabsAmount())
         })
         .catch((err) => this.client.debug(err))
 
-    // setTimeout(() => {
-    // 	validateButton.exec()
-    // }, 2000)
+    window.onDidChangeActiveTextEditor(async (editor) => {
+        if (editor) {
+            const fileText = editor.document.getText()
+            await client.sendRequest('change/editor', {
+                document: editor.document,
+                fileText: fileText,
+            })
+        }
+    })
 
     ctx.subscriptions.push(
         command.openConfiguration(),

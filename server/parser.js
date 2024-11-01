@@ -109,12 +109,26 @@ module.exports = class Parser {
 
             await this.connection.sendDiagnostics({
                 uri: pathToFileURL(filePath).href,
-                diagnostics: [...EntityLoader.diagnostics, ...generalDiagnostics],
+                diagnostics: [...Parser.clearDuplicateDiagnostics(EntityLoader.diagnostics), ...generalDiagnostics],
             })
         } catch (err) {
             Log.error(`Error during processing file: '${path.basename(filePath)}' with error: ${err.message}`)
         }
     }
+
+    static clearDuplicateDiagnostics(diagnostics) {
+        const uniqueDiagnostics = new Set()
+        return diagnostics.filter((diag) => {
+            const key = `${diag.message}-${diag.range.start.line}:${diag.range.start.character}-${diag.range.end.line}:${diag.range.end.character}`
+
+            if (!uniqueDiagnostics.has(key)) {
+                uniqueDiagnostics.add(key)
+                return true
+            }
+            return false
+        })
+    }
+
     /**
      * Clears all diagnostics from files
      * @param {Array} files

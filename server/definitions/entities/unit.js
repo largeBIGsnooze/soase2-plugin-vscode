@@ -788,6 +788,7 @@ module.exports = class Unit {
                 max_count_to_fleet_supply_ratio: float(),
                 max_empire_owned_count_percentage: percentage(),
                 attack_ship_weight_scalar: float(),
+                can_rotate: boolean(),
                 max_count_at_planet: Definitions.desired_explore_ship_count(
                     this.json?.data?.player_ai?.max_count_at_planet,
                     '/player_ai/max_count_at_planet',

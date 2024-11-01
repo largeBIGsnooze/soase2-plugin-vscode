@@ -1508,6 +1508,7 @@ module.exports = class Definitions {
                 'prerequisites',
                 'unit',
                 'unit_constraint',
+                "constraints"
             ]
             switch (ctx.constraint_type) {
                 case 'all_finite_time_actions_done':
@@ -1589,9 +1590,9 @@ module.exports = class Definitions {
             }
         } catch {}
 
-        if (ctx?.constraint) {
-            this.validateActionConstraintType(ctx?.constraint, ptr + '/constraint', json)
-        }
+        // if (ctx?.constraint) {
+        //     // this.validateActionConstraintType(ctx?.constraint, ptr + '/constraint', json)
+        // }
     }
 
     static action_constraint(ctx, ptr, cache, json, depth = 0, maxDepth = 5) {
@@ -2080,7 +2081,9 @@ module.exports = class Definitions {
             switch (ctx.constraint_type) {
                 case 'composite_not':
                     json.validate_keys(ptr, ctx, ['constraint'], _)
-                    this.validateConstraints(ctx.constraint, `${ptr}/constraint`, json)
+                    if (ctx.constraint) {
+                        this.validateConstraints(ctx.constraint, `${ptr}/constraint`, json)
+                    }
                     break
                 case 'composite_or':
                 case 'composite_and':
@@ -2223,7 +2226,7 @@ module.exports = class Definitions {
             keys: {
                 ownerships: Definitions.ownerships(),
                 constraints: _.array({
-                    items: this.constraint(ctx, ptr, cache, json, 0, 2),
+                    items: this.constraint(ctx, ptr, cache, json, 0, 1),
                 }),
                 respect_can_be_targeted_permissions: _.boolean('default=true'),
                 unit_types: _.array({ items: Definitions.target_filter_unit_type(), isUnique: true }),

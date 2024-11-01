@@ -4,663 +4,658 @@ const { EntityParser } = require('./data/file_handler')
 const { Log } = require('./utils/logger')
 const fs = require('fs')
 const loc_keys = require('./loc_keys')
-const chokidar = require('chokidar')
-module.exports = async (modFolder) => {
-    const cache = {}
-    const filewatchers = new Map()
-    const reader = new EntityParser(modFolder)
-    let textures, action_values
 
-    const WATCHED_FOLDERS = [
-        'brushes',
-        'colors',
-        'cursors',
-        'death_sequences',
-        'effects',
-        'entities',
-        'textures',
-        'fonts',
-        'gravity_well_props',
-        'gui',
-        'localized_text',
-        'meshes',
-        'mesh_materials',
-        'player_colors',
-        'player_icons',
-        'player_portraits',
-        'scenarios',
-        'skyboxes',
-        'sounds',
-        'texture_animations',
-        'uniforms',
-    ]
+class Filewatcher {
+    constructor(gameFolder, textures, action_values, cache) {
+        this.gameFolder = gameFolder
+        this.filewatchers = new Map()
+        this.reader = new EntityParser(this.gameFolder)
+        this.textures = textures
+        this.action_values = action_values
+        this.cache = cache
+        this.WATCHED_FOLDERS = [
+            'brushes',
+            'colors',
+            'cursors',
+            'death_sequences',
+            'effects',
+            'entities',
+            'textures',
+            'fonts',
+            'gravity_well_props',
+            'gui',
+            'localized_text',
+            'meshes',
+            'mesh_materials',
+            'player_colors',
+            'player_icons',
+            'player_portraits',
+            'scenarios',
+            'skyboxes',
+            'sounds',
+            'texture_animations',
+            'uniforms',
+        ]
+    }
 
-    const setWatcher = (caches, folder, extensions, callback) => {
-        const folderPath = path.resolve(modFolder, folder)
+    getFilewatchers() {
+        return this.filewatchers
+    }
 
-        if (!fs.existsSync(folderPath) || filewatchers.has(folderPath)) {
-            return
+    clearFilewatchers() {
+        for (const [key, watcher] of this.filewatchers) {
+            watcher.close()
+            this.filewatchers.delete(key)
+        }
+    }
+
+    watchDir(dir, callback) {
+        const watchFolder = path.resolve(this.gameFolder, dir)
+        if (!fs.existsSync(watchFolder)) return
+        if (this.filewatchers.has(dir)) {
+            this.filewatchers.get(dir).close()
         }
 
-        const filewatcher = chokidar
-            .watch(folder, {
-                ignored: (path, stats) => stats?.isFile() && !extensions.some((e) => path.endsWith(e)),
-                usePolling: true,
-                interval: 100,
-                persistent: true,
-                ignoreInitial: true,
-                cwd: modFolder,
-            })
-            .on('all', (event, fileName) => {
-                try {
-                    const name = path.basename(fileName, path.extname(fileName)).toLowerCase()
-                    if (name === null) return
-                    if (event == 'unlink') {
-                        for (const cache of caches) {
-                            try {
-                                const idx = cache.enum.findIndex((e) => e === name)
-                                if (idx !== -1) {
-                                    cache.enum.splice(idx, 1)
-                                }
-                            } catch (e) {
-                                console.log('Error at: ', cache)
-                            }
-                        }
+        let timeout
+        const watcher = fs
+            .watch(watchFolder, { recursive: false }, (event, filename) => {
+                if (filename === null) return
+                if (event === 'rename') {
+                    callback(filename)
+                    console.log(event, filename)
+                } else if (event === 'change') {
+                    if (!timeout) {
+                        callback(filename)
+                        console.log(event, filename)
+                        timeout = setTimeout(() => {
+                            timeout = null
+                        }, 50)
                     }
-
-                    if (event == 'change' || event == 'add') {
-                        callback().forEach((result, i) => {
-                            if (caches[i].type == 'textures') {
-                                textures = result
-                            } else if (caches[i].type == 'action_values') {
-                                action_values = result
-                            } else {
-                                caches[i].enum = result
-                            }
-                        })
-                    }
-                } catch (err) {
-                    Log.error(err, folder, extensions)
                 }
             })
             .on('error', () => {})
-        filewatchers.set(folderPath, filewatcher)
-        return filewatcher
+        this.filewatchers.set(dir, watcher)
     }
 
-    const initCache = () => {
-        cache.exotic_entities = enumerate({
-            items: reader.parseEntityManifest('exotic'),
+    watchRoot() {
+        fs.watch(this.gameFolder, (event, eventFolder) => {
+            if (event === 'rename') {
+                for (const folder of this.WATCHED_FOLDERS) {
+                    if (eventFolder === folder) {
+                        this.clearFilewatchers()
+                        this.cache = this.getCacheStorage()
+                        this.watch()
+                        console.log('Reloading watchers...', Array.from(this.filewatchers.keys()))
+                    }
+                }
+            }
         })
-        cache.player_icons = enumerate({
-            items: reader.parsePlayerIcons(),
+    }
+
+    getCacheStorage() {
+        this.cache.exotic_entities = enumerate({
+            items: this.reader.parseEntityManifest('exotic'),
         })
-        cache.research_fields = enumerate({
+        this.cache.player_icons = enumerate({
+            items: this.reader.parsePlayerIcons(),
+        })
+        this.cache.research_fields = enumerate({
             desc: loc_keys.RESEARCH_FIELDS,
-            items: reader.parseResearchFields(),
+            items: this.reader.parseResearchFields(),
         })
-        cache.player_portraits = enumerate({
-            items: reader.parsePlayerPortraits(),
+        this.cache.player_portraits = enumerate({
+            items: this.reader.parsePlayerPortraits(),
         })
-        cache.localisation = enumerate({
+        this.cache.localisation = enumerate({
             desc: loc_keys.LOCALIZED_TEXT,
-            items: reader.parseLocalisation(),
+            items: this.reader.parseLocalisation(),
         })
-        cache.research_subjects = enumerate({
-            items: reader.parseEntityManifest('research_subject'),
+        this.cache.research_subjects = enumerate({
+            items: this.reader.parseEntityManifest('research_subject'),
         })
-        cache.planet_components = enumerate({
-            items: reader.parseComponents('planet_component'),
+        this.cache.planet_components = enumerate({
+            items: this.reader.parseComponents('planet_component'),
         })
-        cache.strikecraft_units = enumerate({
-            items: reader.parseStrikecraftUnits(),
+        this.cache.strikecraft_units = enumerate({
+            items: this.reader.parseStrikecraftUnits(),
         })
-        cache.ship_components = enumerate({
-            items: reader.parseComponents('ship_component'),
+        this.cache.ship_components = enumerate({
+            items: this.reader.parseComponents('ship_component'),
         })
-        cache.unit_items = enumerate({
-            items: reader.parseUnitItems(),
+        this.cache.unit_items = enumerate({
+            items: this.reader.parseUnitItems(),
         })
-        cache.planets = enumerate({
-            items: reader.parsePlanets(),
+        this.cache.planets = enumerate({
+            items: this.reader.parsePlanets(),
         })
-        cache.build_kinds = enumerate({
-            items: reader.parseUnitBuildKinds(),
+        this.cache.build_kinds = enumerate({
+            items: this.reader.parseUnitBuildKinds(),
         })
-        cache.color_groups = enumerate({
-            items: reader.parseColorGroups(),
+        this.cache.color_groups = enumerate({
+            items: this.reader.parseColorGroups(),
         })
-        cache.exotics = enumerate({
-            items: reader.parseExotics(),
+        this.cache.exotics = enumerate({
+            items: this.reader.parseExotics(),
         })
-        cache.race_names = enumerate({
-            items: reader.parseRaceNames(),
+        this.cache.race_names = enumerate({
+            items: this.reader.parseRaceNames(),
         })
-        cache.fleet_units = enumerate({
-            items: reader.parseFleetUnits(),
+        this.cache.fleet_units = enumerate({
+            items: this.reader.parseFleetUnits(),
         })
-        cache.exhaust_trail_effects = enumerate({
-            items: reader.parseExhaustTrailEffects(),
+        this.cache.exhaust_trail_effects = enumerate({
+            items: this.reader.parseExhaustTrailEffects(),
         })
-        cache.gravity_well_props = enumerate({
-            items: reader.parseGravityWellProps(),
+        this.cache.gravity_well_props = enumerate({
+            items: this.reader.parseGravityWellProps(),
         })
-        cache.texture_animations = enumerate({
-            items: reader.parseTextureAnimations(),
+        this.cache.texture_animations = enumerate({
+            items: this.reader.parseTextureAnimations(),
         })
-        cache.unit_group_names = enumerate({
-            items: reader.parseUnitNames(),
+        this.cache.unit_group_names = enumerate({
+            items: this.reader.parseUnitNames(),
         })
-        cache.skyboxes = enumerate({
-            items: reader.parseSkyboxes(),
+        this.cache.skyboxes = enumerate({
+            items: this.reader.parseSkyboxes(),
         })
-        cache.units = enumerate({
-            items: reader.parseEntityManifest('unit'),
+        this.cache.units = enumerate({
+            items: this.reader.parseEntityManifest('unit'),
         })
-        cache.buffs = enumerate({
-            items: reader.parseEntityManifest('buff'),
+        this.cache.buffs = enumerate({
+            items: this.reader.parseEntityManifest('buff'),
         })
-        cache.ttf = enumerate({
-            items: reader.parseFontsTtf(),
+        this.cache.ttf = enumerate({
+            items: this.reader.parseFontsTtf(),
         })
-        cache.sounds = enumerate({
-            items: reader.parseSounds('sound'),
+        this.cache.sounds = enumerate({
+            items: this.reader.parseSounds('sound'),
         })
-        cache.ogg = enumerate({
-            items: reader.parseSounds('ogg'),
+        this.cache.ogg = enumerate({
+            items: this.reader.parseSounds('ogg'),
         })
-        textures = reader.parseTextures()
-        cache.textures = (desc = loc_keys.TEXTURES) => {
+        this.textures = this.reader.parseTextures()
+        this.cache.textures = (desc = loc_keys.TEXTURES) => {
             return enumerate({
                 desc: desc,
-                items: textures,
+                items: this.textures,
             })
         }
-        cache.particle_effects = enumerate({
-            items: reader.parseParticleEffects(),
+        this.cache.particle_effects = enumerate({
+            items: [...this.reader.parseParticleEffects(), ...this.reader.parseEffectAliasBindings()],
         })
-        cache.effect_alias_bindings = enumerate({
-            items: reader.parseEffectAliasBindings(),
+        this.cache.effect_alias_bindings = enumerate({
+            items: this.reader.parseEffectAliasBindings(),
         })
-        cache.brushes = enumerate({
-            items: reader.parseBrushes(),
+        this.cache.brushes = enumerate({
+            items: this.reader.parseBrushes(),
         })
-        cache.colors = enumerate({
-            items: reader.parseColors(),
+        this.cache.colors = enumerate({
+            items: this.reader.parseColors(),
         })
-        cache.fonts = enumerate({
-            items: reader
+        this.cache.fonts = enumerate({
+            items: this.reader
                 .read(['fonts/*.font'], {
                     read: false,
                 })
                 .map((e) => e.basename),
         })
-        cache.abilities = enumerate({
-            items: reader.parseEntityManifest('ability'),
+        this.cache.abilities = enumerate({
+            items: this.reader.parseEntityManifest('ability'),
         })
-        cache.unit_skins = enumerate({
-            items: reader.parseEntityManifest('unit_skin'),
+        this.cache.unit_skins = enumerate({
+            items: this.reader.parseEntityManifest('unit_skin'),
         })
-        cache.attack_target_types = string()
-        cache.unit_item_build_group_ids = enumerate({
-            items: reader.parseUnitItemBuildGroupIds(),
+        this.cache.attack_target_types = string()
+        this.cache.unit_item_build_group_ids = enumerate({
+            items: this.reader.parseUnitItemBuildGroupIds(),
         })
-        cache.unit_build_group_ids = enumerate({
-            items: reader.parseUnitBuildGroupIds(),
+        this.cache.unit_build_group_ids = enumerate({
+            items: this.reader.parseUnitBuildGroupIds(),
         })
-        cache.scenarios = enumerate({
-            items: reader.parseScenarios(),
+        this.cache.scenarios = enumerate({
+            items: this.reader.parseScenarios(),
         })
-        cache.shield_effects = enumerate({
-            items: reader.parseShieldEffects(),
+        this.cache.shield_effects = enumerate({
+            items: this.reader.parseShieldEffects(),
         })
-        cache.attack_target_type_groups = enumerate({
-            items: reader.parseAttackTargetTypeGroups(),
+        this.cache.attack_target_type_groups = enumerate({
+            items: this.reader.parseAttackTargetTypeGroups(),
         })
-        cache.ship_tags = enumerate({
+        this.cache.ship_tags = enumerate({
             desc: loc_keys.SHIP_TAGS,
-            items: reader.parseShipTags(),
+            items: this.reader.parseShipTags(),
         })
-        cache.user_interface_sounds = enumerate({
-            items: reader.parseUserInterfaceSounds(),
+        this.cache.user_interface_sounds = enumerate({
+            items: this.reader.parseUserInterfaceSounds(),
         })
 
-        cache.fixture_fillings = enumerate({ items: reader.parseGravityWellFixtureFillings() })
-        cache.random_fixture_fillings = enumerate({ items: reader.parseGravityWellRandomFixtureFillings() })
-        cache.gravity_well_fillings = enumerate({ items: reader.parseGravityWellFillings() })
-        cache.random_gravity_well_fillings = enumerate({ items: reader.parseGravityWellRandomFillings() })
-        cache.moon_fillings = enumerate({ items: reader.parseMoonFillings() })
-        cache.node_fillings = enumerate({ items: reader.parseNodeFillings() })
+        this.cache.fixture_fillings = enumerate({ items: this.reader.parseGravityWellFixtureFillings() })
+        this.cache.random_fixture_fillings = enumerate({ items: this.reader.parseGravityWellRandomFixtureFillings() })
+        this.cache.gravity_well_fillings = enumerate({ items: this.reader.parseGravityWellFillings() })
+        this.cache.random_gravity_well_fillings = enumerate({ items: this.reader.parseGravityWellRandomFillings() })
+        this.cache.moon_fillings = enumerate({ items: this.reader.parseMoonFillings() })
+        this.cache.node_fillings = enumerate({ items: this.reader.parseNodeFillings() })
 
-        cache.npc_tags = enumerate({
-            items: reader.parseNpcTags(),
+        this.cache.npc_tags = enumerate({
+            items: this.reader.parseNpcTags(),
         })
-        cache.meshes = enumerate({
-            items: reader.parseMeshes(),
+        this.cache.meshes = enumerate({
+            items: this.reader.parseMeshes(),
         })
-        cache.special_operation_kinds = enumerate({
-            items: reader.parseSpecialOperationUnitKinds(),
+        this.cache.special_operation_kinds = enumerate({
+            items: this.reader.parseSpecialOperationUnitKinds(),
         })
-        action_values = reader.parseActionValues()
-        cache.action_values = (desc = '') => {
+        this.action_values = this.reader.parseActionValues()
+        this.cache.action_values = (desc = '') => {
             return enumerate({
                 desc: desc,
-                items: action_values,
+                items: this.action_values,
             })
         }
-        cache.weapon_modifier_ids = enumerate({
-            items: reader.parseBuffWeaponModifiers(),
+        this.cache.weapon_modifier_ids = enumerate({
+            items: this.reader.parseBuffWeaponModifiers(),
         })
-        cache.planet_modifier_ids = enumerate({
-            items: reader.parseBuffPlanetModifiers(),
+        this.cache.planet_modifier_ids = enumerate({
+            items: this.reader.parseBuffPlanetModifiers(),
         })
-        cache.random_skybox_fillings = enumerate({
-            items: reader.parseRandomSkyboxFillings(),
+        this.cache.random_skybox_fillings = enumerate({
+            items: this.reader.parseRandomSkyboxFillings(),
         })
-        cache.npc_rewards = enumerate({
-            items: [...reader.parseEntityManifest('npc_reward'), ''],
+        this.cache.npc_rewards = enumerate({
+            items: [...this.reader.parseEntityManifest('npc_reward'), ''],
         })
-        cache.child_meshes = enumerate({
-            items: reader.parseChildMeshes(),
+        this.cache.child_meshes = enumerate({
+            items: this.reader.parseChildMeshes(),
         })
-        cache.mesh_materials = enumerate({
-            items: reader.parseMeshMaterials(),
+        this.cache.mesh_materials = enumerate({
+            items: this.reader.parseMeshMaterials(),
         })
-        cache.pip_groups = enumerate({
-            items: reader.parsePipGroups(),
+        this.cache.pip_groups = enumerate({
+            items: this.reader.parsePipGroups(),
         })
-        cache.mainview_groups = enumerate({
-            items: reader.parseMainviewGroups(),
+        this.cache.mainview_groups = enumerate({
+            items: this.reader.parseMainviewGroups(),
         })
-        cache.death_sequence_groups = enumerate({
-            items: reader.parseDeathSequenceGroups(),
+        this.cache.death_sequence_groups = enumerate({
+            items: this.reader.parseDeathSequenceGroups(),
         })
-        cache.death_sequences = enumerate({
-            items: reader.parseDeathSequences(),
+        this.cache.death_sequences = enumerate({
+            items: this.reader.parseDeathSequences(),
         })
-        cache.formations = enumerate({
-            items: reader.parseEntityManifest('formation'),
+        this.cache.formations = enumerate({
+            items: this.reader.parseEntityManifest('formation'),
         })
-        cache.weapons = enumerate({
+        this.cache.weapons = enumerate({
             desc: loc_keys.WEAPONS,
-            items: reader.parseEntityManifest('weapon'),
+            items: this.reader.parseEntityManifest('weapon'),
         })
-        cache.mutations = enumerate({
-            items: reader.parseUnitMutations(),
+        this.cache.mutations = enumerate({
+            items: this.reader.parseUnitMutations(),
         })
-        cache.players = enumerate({
-            items: reader.parseEntityManifest('player'),
+        this.cache.players = enumerate({
+            items: this.reader.parseEntityManifest('player'),
         })
-        cache.strikecraft_kinds = enumerate({
-            items: reader.parseStrikecraft(),
+        this.cache.strikecraft_kinds = enumerate({
+            items: this.reader.parseStrikecraft(),
         })
-        cache.action_data_sources = enumerate({
-            items: reader.parseEntityManifest('action_data_source'),
+        this.cache.action_data_sources = enumerate({
+            items: this.reader.parseEntityManifest('action_data_source'),
         })
-        cache.target_filters = enumerate({
-            items: [...reader.parseTargetFilters(), ...reader.parseTargetFiltersUniform()],
+        this.cache.target_filters = enumerate({
+            items: [...this.reader.parseTargetFilters(), ...this.reader.parseTargetFiltersUniform()],
         })
-        cache.buff_empire_ids = enumerate({
-            items: reader.parseBuffModifierIds(),
+        this.cache.buff_empire_ids = enumerate({
+            items: this.reader.parseBuffModifierIds(),
         })
-        cache.beam_effects = enumerate({
-            items: reader.parseBeamEffects(),
+        this.cache.beam_effects = enumerate({
+            items: this.reader.parseBeamEffects(),
         })
-        cache.target_filters_uniforms = enumerate({
-            items: reader.parseTargetFiltersUniform(),
+        this.cache.target_filters_uniforms = enumerate({
+            items: this.reader.parseTargetFiltersUniform(),
         })
-        cache.buff_actions = enumerate({
-            items: reader.parseBuffActions(),
+        this.cache.buff_actions = enumerate({
+            items: this.reader.parseBuffActions(),
         })
-        cache.hud_skins = enumerate({
-            items: reader.parseHudSkins(),
+        this.cache.hud_skins = enumerate({
+            items: this.reader.parseHudSkins(),
         })
-        cache.debris = enumerate({
-            items: reader.parseDebrisUniform(),
+        this.cache.debris = enumerate({
+            items: this.reader.parseDebrisUniform(),
         })
-        cache.max_tier_count = enumerate({
+        this.cache.max_tier_count = enumerate({
             desc: loc_keys.RESEARCH_TIER,
-            items: reader.parseResearchTierCount(),
+            items: this.reader.parseResearchTierCount(),
             isIntType: true,
         })
-        cache.float_variables = enumerate({
-            items: reader.parseFloatVariables(),
+        this.cache.float_variables = enumerate({
+            items: this.reader.parseFloatVariables(),
         })
-        cache.unit_variables = enumerate({
-            items: reader.parseUnitVariableIds(),
+        this.cache.unit_variables = enumerate({
+            items: this.reader.parseUnitVariableIds(),
         })
-        cache.buff_unit_factory_modifiers = enumerate({
-            items: reader.parseBuffUnitFactoryModifiers(),
+        this.cache.buff_unit_factory_modifiers = enumerate({
+            items: this.reader.parseBuffUnitFactoryModifiers(),
         })
-        cache.buff_unit_modifiers = enumerate({
-            items: reader.parseBuffUnitModifiers(),
+        this.cache.buff_unit_modifiers = enumerate({
+            items: this.reader.parseBuffUnitModifiers(),
         })
-        cache.weapon_tags = enumerate({
-            items: reader.parseWeaponTags(),
+        this.cache.weapon_tags = enumerate({
+            items: this.reader.parseWeaponTags(),
         })
-        cache.loot = enumerate({
-            items: reader.parseLoots(),
+        this.cache.loot = enumerate({
+            items: this.reader.parseLoots(),
         })
-        cache.planet_files = enumerate({
-            items: reader.parsePlanetFiles(),
+        this.cache.planet_files = enumerate({
+            items: this.reader.parsePlanetFiles(),
         })
-        cache.metal_asteroids = enumerate({
-            items: reader.parseMetalAsteroids(),
+        this.cache.metal_asteroids = enumerate({
+            items: this.reader.parseMetalAsteroids(),
         })
-        cache.crystal_asteroids = enumerate({
-            items: reader.parseCrystalAsteroids(),
+        this.cache.crystal_asteroids = enumerate({
+            items: this.reader.parseCrystalAsteroids(),
         })
-        cache.planet_bonuses = enumerate({
-            items: reader.parsePlanetBonuses(),
+        this.cache.planet_bonuses = enumerate({
+            items: this.reader.parsePlanetBonuses(),
         })
-        cache.planet_artifacts = enumerate({
-            items: reader.parsePlanetArtifacts(),
+        this.cache.planet_artifacts = enumerate({
+            items: this.reader.parsePlanetArtifacts(),
         })
-        cache.mod_images = enumerate({
-            items: reader.parseModImages(),
-        })
+        // this.cache.mod_images = enumerate({
+        //     items: this.reader.parseModImages(),
+        // })
 
-        cache.gravity_wells = enumerate({
+        this.cache.gravity_wells = enumerate({
             items: [
-                ...reader.parseGravityWellFillings(),
-                ...reader.parseGravityWellRandomFixtureFillings(),
-                ...reader.parseGravityWellRandomFillings(),
-                ...reader.parseGravityWellFixtureFillings(),
+                ...this.reader.parseGravityWellFillings(),
+                ...this.reader.parseGravityWellRandomFixtureFillings(),
+                ...this.reader.parseGravityWellRandomFillings(),
+                ...this.reader.parseGravityWellFixtureFillings(),
             ],
         })
-    }
-
-    const initWatchers = () => {
-        setWatcher([cache.localisation], 'localized_text', ['en.localized_text'], () => [reader.parseLocalisation()])
-
-        setWatcher([cache.scenarios], 'scenarios', ['scenario'], () => [reader.parseScenarios()])
-        setWatcher([cache.pip_groups], 'gui', ['hud_bookmarks_window.gui'], () => [reader.parsePipGroups()])
-        setWatcher([cache.gravity_well_props], 'gravity_well_props', ['gravity_well_props'], () => [reader.parseGravityWellProps()])
-        setWatcher([cache.texture_animations], 'texture_animations', ['texture_animation'], () => [reader.parseTextureAnimations()])
-
-        setWatcher([cache.skyboxes], 'skyboxes', ['skybox'], () => [reader.parseSkyboxes()])
-        setWatcher([cache.player_icons], 'player_icons', ['player_icon'], () => [reader.parsePlayerIcons()])
-
-        setWatcher([cache.player_portraits], 'player_portraits', ['player_portrait'], () => [reader.parsePlayerPortraits()])
-        setWatcher([cache.mod_images], '', ['png'], () => [reader.parseModImages()])
-        setWatcher([cache.mesh_materials], 'mesh_materials', ['mesh_material'], () => [reader.parseMeshMaterials()])
-        setWatcher([cache.meshes], 'meshes', ['mesh'], () => [reader.parseMeshes()])
-
-        setWatcher(
-            [
-                cache.strikecraft_units,
-                cache.metal_asteroids,
-                cache.crystal_asteroids,
-                cache.fleet_units,
-
-                cache.planet_files,
-
-                cache.planet_components,
-                cache.ship_components,
-                cache.unit_items,
-                cache.loot,
-                cache.planet_bonuses,
-                cache.planet_artifacts,
-
-                cache.effect_alias_bindings,
-                cache.child_meshes,
-
-                cache.user_interface_sounds,
-                cache.research_fields,
-                cache.unit_group_names,
-                cache.unit_item_build_group_ids,
-                cache.unit_build_group_ids,
-
-                cache.target_filters,
-                { type: 'action_values', enum: action_values },
-                cache.float_variables,
-                cache.buff_actions,
-                cache.unit_variables,
-                cache.buff_unit_modifiers,
-                cache.weapon_modifier_ids,
-                cache.planet_modifier_ids,
-                cache.buff_unit_factory_modifiers,
-                cache.buff_empire_ids,
-
-                cache.unit_skins,
-                cache.units,
-                cache.buffs,
-                cache.research_subjects,
-                cache.npc_rewards,
-                cache.formations,
-                cache.action_data_sources,
-                cache.players,
-                cache.abilities,
-                cache.weapons,
-                cache.exotic_entities,
-            ],
-            'entities',
-            [
-                'unit',
-                'unit',
-                'unit',
-                'unit',
-                'planet',
-
-                'unit_item',
-                'unit_item',
-                'unit_item',
-                'unit_item',
-                'unit_item',
-                'unit_item',
-
-                'unit_skin',
-                'unit_skin',
-
-                'player',
-                'player',
-                'player',
-                'player',
-                'player',
-
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-                'action_data_source',
-
-                'unit_skin.entity_manifest',
-                'unit.entity_manifest',
-                'buff.entity_manifest',
-                'research_subject.entity_manifest',
-                'npc_reward.entity_manifest',
-                'formation.entity_manifest',
-                'action_data_source.entity_manifest',
-                'player.entity_manifest',
-                'ability.entity_manifest',
-                'weapon.entity_manifest',
-                'exotic.entity_manifest',
-            ],
-            () => [
-                reader.parseStrikecraftUnits(),
-                reader.parseMetalAsteroids(),
-                reader.parseCrystalAsteroids(),
-                reader.parseFleetUnits(),
-                reader.parsePlanetFiles(),
-
-                reader.parseComponents('planet_component'),
-                reader.parseComponents('ship_component'),
-                reader.parseUnitItems(),
-                reader.parseLoots(),
-                reader.parsePlanetBonuses(),
-                reader.parsePlanetArtifacts(),
-
-                reader.parseEffectAliasBindings(),
-                reader.parseChildMeshes(),
-
-                reader.parseUserInterfaceSounds(),
-                reader.parseResearchFields(),
-                reader.parseUnitNames(),
-                reader.parseUnitItemBuildGroupIds(),
-                reader.parseUnitBuildGroupIds(),
-
-                [...reader.parseTargetFilters(), ...reader.parseTargetFiltersUniform()],
-                reader.parseActionValues(),
-                reader.parseFloatVariables(),
-                reader.parseBuffActions(),
-                reader.parseUnitVariableIds(),
-                reader.parseBuffUnitModifiers(),
-                reader.parseBuffWeaponModifiers(),
-                reader.parseBuffPlanetModifiers(),
-                reader.parseBuffUnitFactoryModifiers(),
-                reader.parseBuffModifierIds(),
-
-                reader.parseEntityManifest('unit_skin'),
-                reader.parseEntityManifest('unit'),
-                reader.parseEntityManifest('buff'),
-                reader.parseEntityManifest('research_subject'),
-                reader.parseEntityManifest('npc_reward'),
-                reader.parseEntityManifest('formation'),
-                reader.parseEntityManifest('action_data_source'),
-                reader.parseEntityManifest('player'),
-                reader.parseEntityManifest('ability'),
-                reader.parseEntityManifest('weapon'),
-                reader.parseEntityManifest('exotic'),
-            ]
-        )
-
-        setWatcher(
-            [
-                cache.debris,
-                cache.planets,
-                cache.exotics,
-                cache.build_kinds,
-                cache.unit_group_names,
-                cache.hud_skins,
-                cache.npc_tags,
-                cache.mainview_groups,
-                cache.attack_target_types,
-                cache.attack_target_type_groups,
-                cache.ship_tags,
-                cache.mutations,
-                cache.strikecraft_kinds,
-                cache.weapon_tags,
-                cache.max_tier_count,
-                cache.target_filters_uniforms,
-                cache.special_operation_kinds,
-                cache.random_skybox_fillings,
-            ],
-            'uniforms',
-            [
-                'debris.uniforms',
-                'planet.uniforms',
-                'exotic.uniforms',
-                'unit_build.uniforms',
-                'unit.uniforms',
-                'hud_skin.uniforms',
-                'player.uniforms',
-                'main_view.uniforms',
-                'attack_target_type_group.uniforms',
-                'unit_tag.uniforms',
-                'unit_mutation.uniforms',
-                'strikecraft.uniforms',
-                'weapon_tags.uniforms',
-                'research.uniforms',
-                'target_filter.uniforms',
-                'special_operation_unit.uniforms',
-                'random_skybox_filling.uniforms',
-            ],
-            () => [
-                reader.parseDebrisUniform(),
-                reader.parsePlanets(),
-                reader.parseExotics(),
-                reader.parseUnitBuildKinds(),
-                reader.parseUnitNames(),
-                reader.parseHudSkins(),
-                reader.parseNpcTags(),
-                reader.parseMainviewGroups(),
-                string(),
-                reader.parseAttackTargetTypeGroups(),
-                reader.parseShipTags(),
-                reader.parseUnitMutations(),
-                reader.parseStrikecraft(),
-                reader.parseWeaponTags(),
-                reader.parseResearchTierCount(),
-                reader.parseTargetFiltersUniform(),
-                reader.parseSpecialOperationUnitKinds(),
-                reader.parseRandomSkyboxFillings(),
-            ]
-        )
-
-        setWatcher([cache.color_groups], 'player_colors', ['player_color_group'], () => [reader.parseColorGroups()])
-        setWatcher([cache.ttf, cache.fonts], 'fonts', ['ttf', 'font'], () => [reader.parseFontsTtf(), reader.parseFonts()])
-
-        setWatcher(
-            [cache.particle_effects, cache.beam_effects, cache.shield_effects, cache.exhaust_trail_effects],
-            'effects',
-            ['particle_effect', 'beam_effect', 'shield_effect', 'exhaust_trail_effect'],
-            () => [reader.parseParticleEffects(), reader.parseBeamEffects(), reader.parseShieldEffects(), reader.parseExhaustTrailEffects()]
-        )
-        setWatcher([cache.death_sequences, cache.death_sequence_groups], 'death_sequences', ['death_sequence', 'death_sequence_group'], () => [
-            reader.parseDeathSequences(),
-            reader.parseDeathSequenceGroups(),
-        ])
-        setWatcher([cache.brushes], 'brushes', ['brush'], () => [reader.parseBrushes()])
-
-        setWatcher([{ type: 'textures', enum: textures }], 'textures', ['.png', '.dds'], () => [reader.parseTextures()])
-
-        setWatcher([cache.colors], 'colors', ['named_colors.named_colors'], () => [reader.parseColorGroups()])
-        setWatcher([cache.ogg], 'sounds', ['.ogg'], () => [reader.parseSounds('ogg')])
-        setWatcher(
-            [
-                cache.fixture_fillings,
-                cache.random_fixture_fillings,
-                cache.gravity_well_fillings,
-                cache.random_gravity_well_fillings,
-                cache.gravity_wells,
-                cache.moon_fillings,
-                cache.node_fillings,
-            ],
-            'uniforms',
-            ['galaxy_generator.uniforms'],
-            () => [
-                reader.parseGravityWellFixtureFillings(),
-                reader.parseGravityWellRandomFixtureFillings(),
-                reader.parseGravityWellFillings(),
-                reader.parseGravityWellRandomFillings(),
-                [
-                    ...reader.parseGravityWellFillings(),
-                    ...reader.parseGravityWellRandomFixtureFillings(),
-                    ...reader.parseGravityWellRandomFillings(),
-                    ...reader.parseGravityWellFixtureFillings(),
-                ],
-                reader.parseMoonFillings(),
-                reader.parseNodeFillings(),
-            ]
-        )
-    }
-
-    initCache()
-    initWatchers()
-
-    const reloadWatchers = (directory) => {
-        const dirName = path.basename(directory)
-        for (const folder of WATCHED_FOLDERS) {
-            if (dirName === folder) {
-                for (const watcher of filewatchers.values()) watcher.close()
-                filewatchers.clear()
-                initWatchers()
-                Log.info('Reloading watchers: ', Array.from(filewatchers.keys()).sort())
-            }
+        this.cache.textures = (desc = loc_keys.TEXTURES) => {
+            return enumerate({
+                desc: desc,
+                items: this.textures,
+            })
         }
+        return this.cache
     }
 
-    chokidar
-        .watch(modFolder, { ignoreInitial: true, depth: 1 })
-        .on('addDir', (directory) => reloadWatchers(directory))
-        .on('unlinkDir', (directory) => reloadWatchers(directory))
+    watch() {
+        this.watchDir('textures', (textureName) => {
+            if (textureName?.endsWith('.dds') || textureName?.endsWith('.png')) {
+                this.textures = this.reader.parseTextures()
+            }
+        })
+        this.watchDir('effects', (entityName) => {
+            if (entityName?.endsWith('.particle_effect')) {
+                this.cache.particle_effects.enum = [...this.reader.parseParticleEffects(), ...this.reader.parseEffectAliasBindings()]
+            }
+            if (entityName?.endsWith('.shield_effect')) {
+                this.cache.shield_effects.enum = this.reader.parseShieldEffects()
+            }
+            if (entityName?.endsWith('.beam_effect')) {
+                this.cache.beam_effects.enum = this.reader.parseBeamEffects()
+            }
+            if (entityName?.endsWith('.exhaust_trail_effects')) {
+                this.cache.exhaust_trail_effects.enum = this.reader.parseExhaustTrailEffects()
+            }
+        })
+        this.watchDir('localized_text', (entityName) => {
+            if (entityName === 'en.localized_text') {
+                new Promise((resolve) =>
+                    setTimeout(() => {
+                        this.cache.localisation.enum = this.reader.parseLocalisation()
+                        resolve()
+                    }, 1000)
+                )
+            }
+        })
+        this.watchDir('scenarios', (entityName) => {
+            if (entityName?.endsWith('.scenario')) {
+                this.cache.scenarios.enum = this.reader.parseScenarios()
+            }
+        })
+        this.watchDir('gui', (entityName) => {
+            if (entityName === 'hud_bookmarks_window.gui') {
+                this.cache.pip_groups.enum = this.reader.parsePipGroups()
+            }
+        })
+        this.watchDir('gravity_well_props', (entityName) => {
+            if (entityName?.endsWith('.gravity_well_props')) {
+                this.cache.gravity_well_props.enum = this.reader.parseGravityWellProps()
+            }
+        })
+        this.watchDir('texture_animations', (entityName) => {
+            if (entityName?.endsWith('.texture_animation')) {
+                this.cache.texture_animations.enum = this.reader.parseTextureAnimations()
+            }
+        })
+        this.watchDir('skyboxes', (entityName) => {
+            if (entityName?.endsWith('.skybox')) {
+                this.cache.skyboxes.enum = this.reader.parseSkyboxes()
+            }
+        })
+        this.watchDir('player_icons', (entityName) => {
+            if (entityName?.endsWith('.player_icon')) {
+                this.cache.player_icons.enum = this.reader.parsePlayerIcons()
+            }
+        })
+        this.watchDir('player_portraits', (entityName) => {
+            if (entityName?.endsWith('.player_portrait')) {
+                this.cache.player_portraits.enum = this.reader.parsePlayerPortraits()
+            }
+        })
+        this.watchDir('mesh_materials', (entityName) => {
+            if (entityName?.endsWith('.mesh_material')) {
+                this.cache.mesh_materials.enum = this.reader.parseMeshMaterials()
+            }
+        })
+        this.watchDir('meshes', (entityName) => {
+            if (entityName?.endsWith('.mesh')) {
+                this.cache.meshes.enum = this.reader.parseMeshes()
+            }
+        })
+        this.watchDir('entities', (entityName) => {
+            if (entityName?.endsWith('.unit')) {
+                this.cache.strikecraft_units.enum = this.reader.parseStrikecraftUnits()
+                this.cache.metal_asteroids.enum = this.reader.parseMetalAsteroids()
+                this.cache.crystal_asteroids.enum = this.reader.parseCrystalAsteroids()
+                this.cache.fleet_units.enum = this.reader.parseFleetUnits()
+            }
+            if (entityName?.endsWith('.planet')) {
+                this.cache.planet_files.enum = this.reader.parsePlanetFiles()
+            }
+            if (entityName?.endsWith('.unit_item')) {
+                this.cache.planet_components.enum = this.reader.parseComponents('planet_component')
+                this.cache.ship_components.enum = this.reader.parseComponents('ship_component')
+                this.cache.unit_items.enum = this.reader.parseUnitItems()
+                this.cache.loot.enum = this.reader.parseLoots()
+                this.cache.planet_bonuses.enum = this.reader.parsePlanetBonuses()
+                this.cache.planet_artifacts.enum = this.reader.parsePlanetArtifacts()
+            }
+            if (entityName?.endsWith('.unit_skin')) {
+                this.cache.effect_alias_bindings.enum = this.reader.parseEffectAliasBindings()
+                this.cache.child_meshes.enum = this.reader.parseChildMeshes()
+            }
 
-    return new Proxy(cache, {
+            if (entityName?.endsWith('.player')) {
+                this.cache.user_interface_sounds.enum = this.reader.parseUserInterfaceSounds()
+                this.cache.research_fields.enum = this.reader.parseResearchFields()
+                this.cache.unit_group_names.enum = this.reader.parseUnitNames()
+                this.cache.unit_item_build_group_ids.enum = this.reader.parseUnitItemBuildGroupIds()
+                this.cache.unit_build_group_ids.enum = this.reader.parseUnitBuildGroupIds()
+            }
+            if (entityName?.endsWith('.action_data_source')) {
+                this.cache.target_filters.enum = [...this.reader.parseTargetFilters(), ...this.reader.parseTargetFiltersUniform()]
+                this.cache.action_values.enum = this.reader.parseActionValues()
+                this.cache.float_variables.enum = this.reader.parseFloatVariables()
+                this.cache.buff_actions.enum = this.reader.parseBuffActions()
+                this.cache.unit_variables.enum = this.reader.parseUnitVariableIds()
+                this.cache.buff_unit_modifiers.enum = this.reader.parseBuffUnitModifiers()
+                this.cache.weapon_modifier_ids.enum = this.reader.parseBuffWeaponModifiers()
+                this.cache.planet_modifier_ids.enum = this.reader.parseBuffPlanetModifiers()
+                this.cache.buff_unit_factory_modifiers.enum = this.reader.parseBuffUnitFactoryModifiers()
+                this.cache.buff_empire_ids.enum = this.reader.parseBuffModifierIds()
+            }
+
+            if (entityName === 'unit_skin.entity_manifest') {
+                this.cache.unit_skins.enum = this.reader.parseEntityManifest('unit_skin')
+            }
+            if (entityName === 'unit.entity_manifest') {
+                this.cache.units.enum = this.reader.parseEntityManifest('unit')
+            }
+            if (entityName === 'buff.entity_manifest') {
+                this.cache.buffs.enum = this.reader.parseEntityManifest('buff')
+            }
+            if (entityName === 'research_subject.entity_manifest') {
+                this.cache.research_subjects.enum = this.reader.parseEntityManifest('research_subject')
+            }
+            if (entityName === 'npc_reward.entity_manifest') {
+                this.cache.npc_rewards.enum = this.reader.parseEntityManifest('npc_reward')
+            }
+            if (entityName === 'formation.entity_manifest') {
+                this.cache.formations.enum = this.reader.parseEntityManifest('formation')
+            }
+            if (entityName === 'action_data_source.entity_manifest') {
+                this.cache.action_data_sources.enum = this.reader.parseEntityManifest('action_data_source')
+            }
+            if (entityName === 'player.entity_manifest') {
+                this.cache.players.enum = this.reader.parseEntityManifest('player')
+            }
+            if (entityName === 'ability.entity_manifest') {
+                this.cache.abilities.enum = this.reader.parseEntityManifest('ability')
+            }
+            if (entityName === 'weapon.entity_manifest') {
+                this.cache.weapons.enum = this.reader.parseEntityManifest('weapon')
+            }
+            if (entityName === 'exotic.entity_manifest') {
+                this.cache.exotic_entities.enum = this.reader.parseEntityManifest('exotic')
+            }
+        })
+
+        this.watchDir('uniforms', (entityName) => {
+            if (entityName === 'debris.uniforms') {
+                this.cache.debris.enum = this.reader.parseDebrisUniform()
+            }
+            if (entityName === 'planet.uniforms') {
+                this.cache.planets.enum = this.reader.parsePlanets()
+            }
+            if (entityName === 'exotic.uniforms') {
+                this.cache.exotics.enum = this.reader.parseExotics()
+            }
+            if (entityName === 'unit_build.uniforms') {
+                this.cache.build_kinds.enum = this.reader.parseUnitBuildKinds()
+            }
+            if (entityName === 'unit.uniforms') {
+                this.cache.unit_group_names.enum = this.reader.parseUnitNames()
+            }
+            if (entityName === 'hud_skin.uniforms') {
+                this.cache.unit_group_names.enum = this.reader.parseHudSkins()
+            }
+            if (entityName === 'player.uniforms') {
+                this.cache.npc_tags.enum = this.reader.parseNpcTags()
+            }
+            if (entityName === 'main_view.uniforms') {
+                this.cache.mainview_groups.enum = this.reader.parseMainviewGroups()
+            }
+            if (entityName === 'attack_target_type_group.uniforms') {
+                this.cache.attack_target_types.enum = string()
+                this.cache.attack_target_type_groups.enum = this.reader.parseAttackTargetTypeGroups()
+            }
+            if (entityName === 'unit_tag.uniforms') {
+                this.cache.ship_tags.enum = this.reader.parseShipTags()
+            }
+            if (entityName === 'unit_mutation.uniforms') {
+                this.cache.mutations.enum = this.reader.parseUnitMutations()
+            }
+            if (entityName === 'strikecraft.uniforms') {
+                this.cache.strikecraft_kinds.enum = this.reader.parseStrikecraft()
+            }
+            if (entityName === 'weapon.uniforms') {
+                this.cache.weapon_tags.enum = this.reader.parseWeaponTags()
+            }
+            if (entityName === 'research.uniforms') {
+                this.cache.max_tier_count.enum = this.reader.parseResearchTierCount()
+            }
+            if (entityName === 'target_filter.uniforms') {
+                this.cache.target_filters_uniforms.enum = this.reader.parseTargetFiltersUniform()
+            }
+            if (entityName === 'special_operation_unit.uniforms') {
+                this.cache.special_operation_kinds.enum = this.reader.parseSpecialOperationUnitKinds()
+            }
+            if (entityName === 'random_skybox_filling.uniforms') {
+                this.cache.random_skybox_fillings.enum = this.reader.parseRandomSkyboxFillings()
+            }
+
+            if (entityName === 'galaxy_generator.uniforms') {
+                this.cache.fixture_fillings.enum = this.reader.parseGravityWellFixtureFillings()
+                this.cache.random_fixture_fillings.enum = this.reader.parseGravityWellRandomFixtureFillings()
+                this.cache.gravity_well_fillings.enum = this.reader.parseGravityWellFillings()
+                this.cache.random_gravity_well_fillings.enum = this.reader.parseGravityWellRandomFillings()
+                this.cache.gravity_wells.enum = [
+                    ...this.reader.parseGravityWellFillings(),
+                    ...this.reader.parseGravityWellRandomFixtureFillings(),
+                    ...this.reader.parseGravityWellRandomFillings(),
+                    ...this.reader.parseGravityWellFixtureFillings(),
+                ]
+                this.cache.moon_fillings.enum = this.reader.parseMoonFillings()
+                this.cache.node_fillings.enum = this.reader.parseNodeFillings()
+            }
+        })
+
+        this.watchDir('player_colors', (entityName) => {
+            if (entityName?.endsWith('.player_color_group')) {
+                this.cache.color_groups.enum = this.reader.parseColorGroups()
+            }
+        })
+        this.watchDir('fonts', (entityName) => {
+            if (entityName?.endsWith('.ttf')) {
+                this.cache.ttf.enum = this.reader.parseFontsTtf()
+            }
+            if (entityName?.endsWith('.font')) {
+                this.cache.fonts.enum = this.reader.parseFonts()
+            }
+        })
+        this.watchDir('death_sequences', (entityName) => {
+            if (entityName?.endsWith('.death_sequence')) {
+                this.cache.death_sequences.enum = this.reader.parseDeathSequences()
+            }
+            if (entityName?.endsWith('.death_sequence_group')) {
+                this.cache.death_sequence_groups.enum = this.reader.parseDeathSequenceGroups()
+            }
+        })
+        this.watchDir('brushes', (entityName) => {
+            if (entityName?.endsWith('.brush')) {
+                this.cache.brushes.enum = this.reader.parseBrushes()
+            }
+        })
+        this.watchDir('colors', (entityName) => {
+            if (entityName === 'named_colors.named_colors') {
+                this.cache.colors.enum = this.reader.parseColorGroups()
+            }
+        })
+        this.watchDir('sounds', (entityName) => {
+            if (entityName?.endsWith('.sound')) {
+                this.cache.sounds.enum = this.reader.parseSounds('sound')
+            }
+            if (entityName?.endsWith('.ogg')) {
+                this.cache.ogg.enum = this.reader.parseSounds('ogg')
+            }
+        })
+    }
+}
+
+module.exports = async (modFolder) => {
+    const cache = {}
+    let textures, action_values
+
+    const fw = new Filewatcher(modFolder, textures, action_values, cache)
+
+    fw.watch()
+    fw.watchRoot()
+
+    return new Proxy(fw.getCacheStorage(), {
         get: function (target, prop) {
             if (prop in target) return target[prop]
             if (prop === 'then' || prop === 'toJSON') return

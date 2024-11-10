@@ -1,10 +1,10 @@
-const { EntityParser } = require('../../data/file_handler')
+const { EntityReader } = require('../../data/file_handler')
 const { schema, array, object, string, float, vector2f, boolean, enumerate } = require('../data_types')
 
 module.exports = class UnitUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        this.entityReader = new EntityParser(gameInstallationFolder)
+        this.entityReader = new EntityReader(gameInstallationFolder)
         this.cache = cache
     }
 

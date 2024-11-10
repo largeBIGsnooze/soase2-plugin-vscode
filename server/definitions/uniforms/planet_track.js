@@ -1,4 +1,4 @@
-const { schema, object, version } = require('../data_types')
+const { schema, object } = require('../data_types')
 
 module.exports = class PlanetTrackUniform {
     /* eslint-disable no-unused-vars */

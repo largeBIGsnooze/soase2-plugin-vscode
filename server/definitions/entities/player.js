@@ -4,6 +4,7 @@ const { schema, float, string, object, array, integer, enumerate, vector2f, bool
 const { planet_modifier_types, unit_modifier_types, empire_modifier_types, weapon_modifier_types } = require('../modifier_types')
 const Definitions = require('../definitions')
 const { PlayerModifiers } = require('../modifier_definitions')
+const loc_keys = require('../../loc_keys')
 
 module.exports = class Player {
     /* eslint-disable no-unused-vars */
@@ -111,7 +112,7 @@ module.exports = class Player {
         })
     }
 
-    npc_track() {
+    npc_track_definition() {
         return object({
             keys: {
                 civilian_research_points: float(),
@@ -134,15 +135,15 @@ module.exports = class Player {
             },
         })
     }
-    tracks() {
+    tracks_definition() {
         return object({
             keys: {
-                commerce: array({ items: this.npc_track() }),
-                defense: array({ items: this.npc_track() }),
-                logistics: array({ items: this.npc_track() }),
-                mining: array({ items: this.npc_track() }),
-                research: array({ items: this.npc_track() }),
-                surveying: array({ items: this.npc_track() }),
+                commerce: array({ items: this.npc_track_definition() }),
+                defense: array({ items: this.npc_track_definition() }),
+                logistics: array({ items: this.npc_track_definition() }),
+                mining: array({ items: this.npc_track_definition() }),
+                research: array({ items: this.npc_track_definition() }),
+                surveying: array({ items: this.npc_track_definition() }),
             },
         })
     }
@@ -530,12 +531,12 @@ module.exports = class Player {
 
                 simple_planet_tracks: object({
                     keys: {
-                        defense: this.npc_track(),
-                        logistics: this.npc_track(),
-                        mining: this.npc_track(),
-                        commerce: this.npc_track(),
-                        research: this.npc_track(),
-                        surveying: this.npc_track(),
+                        defense: this.npc_track_definition(),
+                        logistics: this.npc_track_definition(),
+                        mining: this.npc_track_definition(),
+                        commerce: this.npc_track_definition(),
+                        research: this.npc_track_definition(),
+                        surveying: this.npc_track_definition(),
                     },
                 }),
                 simple_trade_capacity: this.trade_capacity_definition(),
@@ -965,7 +966,7 @@ module.exports = class Player {
                     planet_type: this.cache.planets,
                     can_ever_be_colonized: boolean(),
                     colonization_research_prerequisites: Definitions.research_prerequisites(this.cache.research_subjects),
-                    tracks: this.tracks(),
+                    tracks: this.tracks_definition(),
                     maintenance_cost_rates: array({ items: float() }),
                     trade_capacity_levels: array({ items: this.trade_capacity_definition(), isUnique: true }),
                 },
@@ -1241,7 +1242,7 @@ module.exports = class Player {
                 home_planet: this.player_home_planet_definition(),
                 starting_units_in_gravity_well: Definitions.spawn_units_definition(this.cache),
                 hyperspace_between_stars_research: array({
-                    desc: 'research required to travel between stars',
+                    desc: loc_keys.HYPERSPACE_BETWEEN_STARS_RESEARCH,
                     items: Definitions.prerequisites(this.cache.research_subjects),
                     isUnique: true,
                 }),
@@ -1293,20 +1294,7 @@ module.exports = class Player {
                     items: this.cache.ship_tags,
                     isUnique: true,
                 }),
-                starting_units_in_formations: array({
-                    items: object({
-                        keys: {
-                            required_units: array({
-                                items: object({
-                                    keys: {
-                                        unit: this.cache.units,
-                                        count: vector2f(),
-                                    },
-                                }),
-                            }),
-                        },
-                    }),
-                }),
+                starting_units_in_formations: array({ items: Definitions.spawn_units_definition(this.cache) }),
                 fleet_name_group: enumerate({ items: ['fleet'] }), // TODO: ?
                 starting_are_all_npcs_detected: boolean(),
                 starting_units_in_hyperspace_duration: float(true),
@@ -1465,7 +1453,7 @@ module.exports = class Player {
                     }),
                 }),
                 wormhole_research: array({
-                    desc: 'research required to travel through wormholes',
+                    desc: loc_keys.WORMHOLE_RESEARCH,
                     items: Definitions.prerequisites(this.cache.research_subjects),
                 }),
                 victory_gui: this.player_victory_gui_definition(),

@@ -1,12 +1,13 @@
-const { EntityParser } = require('../../data/file_handler')
+const { EntityReader } = require('../../data/file_handler')
 const { schema, boolean, array, enumerate } = require('../data_types')
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
 const { WARN } = require('../../constants')
+const loc_keys = require('../../loc_keys')
 module.exports = class EntityManifest {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
         this.json = new DiagnosticReporter(fileText, diagnostics)
-        this.reader = new EntityParser(gameInstallationFolder)
+        this.reader = new EntityReader(gameInstallationFolder)
         this.MANIFEST_ENTITIES = this.reader.read([`entities/*.${fileName}`], {
             read: false,
         })
@@ -24,7 +25,7 @@ module.exports = class EntityManifest {
         } catch {}
         return schema({
             keys: {
-                overwrite_ids: boolean('Whether or not to merge with vanilla definitions'),
+                overwrite_ids: boolean(loc_keys.OVERWRITE_IDS),
                 ids: array({
                     items: enumerate({ items: this.MANIFEST_ENTITIES.map((e) => e.basename) }),
                     isUnique: true,

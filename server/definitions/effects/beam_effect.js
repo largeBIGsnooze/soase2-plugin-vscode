@@ -1,4 +1,4 @@
-const { schema, float, color, object, enumerate, array, vector2f, percentage, version } = require('../data_types')
+const { schema, float, color, object, enumerate, array, vector2f } = require('../data_types')
 
 module.exports = class BeamEffect {
     /* eslint-disable no-unused-vars */

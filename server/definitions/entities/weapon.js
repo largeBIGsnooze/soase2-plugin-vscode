@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { float, vector3f, object, schema, enumerate, array, percentage } = require('../data_types')
 const Definitions = require('../definitions')
 const { WeaponModifiers } = require('../modifier_definitions')
@@ -10,13 +11,13 @@ module.exports = class Weapon {
         this.cache = cache
     }
 
-    getTurretType(type) {
+    isTurretType(type) {
         return this.json?.data?.turret?.type === type
     }
     isFiringType(type) {
         return this.json?.data?.firing?.firing_type === type
     }
-    torpedoDefinition() {
+    torpedo_definition() {
         try {
             if (this.isFiringType('spawn_torpedo')) {
                 this.json.validate_keys('/firing', this.json.data.firing, ['torpedo_firing_definition'], ['beam_duration', 'travel_speed'])
@@ -35,7 +36,7 @@ module.exports = class Weapon {
         } catch {}
     }
 
-    projectileDefinition() {
+    projectile_definition() {
         try {
             if (this.isFiringType('projectile')) {
                 this.json.validate_keys('/firing', this.json.data.firing, ['travel_speed'], ['beam_duration', 'torpedo_firing_definition'])
@@ -47,7 +48,7 @@ module.exports = class Weapon {
         } catch {}
     }
 
-    beamDefinition() {
+    beam_definition() {
         try {
             if (this.isFiringType('beam')) {
                 this.json.validate_keys('/firing', this.json.data.firing, ['beam_duration'], ['travel_speed', 'torpedo_firing_definition'])
@@ -60,14 +61,14 @@ module.exports = class Weapon {
 
     turret_definition() {
         try {
-            if (this.getTurretType('biaxial')) {
+            if (this.isTurretType('biaxial')) {
                 this.json.validate_keys('/turret', this.json.data.turret, ['biaxial_base_mesh', 'biaxial_barrel_mesh'], ['gimbal_mesh'])
                 return {
                     biaxial_base_mesh: this.cache.child_meshes,
                     biaxial_barrel_mesh: this.cache.child_meshes,
                     barrel_position: vector3f(),
                 }
-            } else if (this.getTurretType('gimbal')) {
+            } else if (this.isTurretType('gimbal')) {
                 this.json.validate_keys(
                     '/turret',
                     this.json.data.turret,
@@ -115,7 +116,6 @@ module.exports = class Weapon {
                     this.cache,
                     this.json
                 ),
-                hull_armor_penetration: float(),
                 tags: array({
                     items: this.cache.weapon_tags,
                     isUnique: true,
@@ -125,15 +125,15 @@ module.exports = class Weapon {
                     items: ['order_target_only', 'order_target_or_best_target_in_range', 'best_target_in_range'],
                 }),
                 firing: object({
-                    desc: 'if not provided the weapon will never fire (handy for simulating turrets that are cosmetic only like an eye)',
+                    desc: loc_keys.WEAPON_FIRING,
                     required: ['firing_type'],
                     keys: {
                         firing_type: enumerate({
                             items: ['projectile', 'beam', 'missile', 'spawn_torpedo'],
                         }),
-                        ...this.torpedoDefinition(),
-                        ...this.projectileDefinition(),
-                        ...this.beamDefinition(),
+                        ...this.torpedo_definition(),
+                        ...this.projectile_definition(),
+                        ...this.beam_definition(),
                     },
                 }),
                 effects: Definitions.weapon_effects_definition(this.cache),

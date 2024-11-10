@@ -433,8 +433,8 @@ module.exports = class Ability {
                     items: ['never', 'always', 'if_no_deliverable_destination'],
                 }),
                 gravity_well_distance_range: this.cache.action_values(),
-                jump_count_range: string('???'),
-                planet_preference: string('???'),
+                jump_count_range: this.cache.action_values(),
+                planet_preference: this.cache.action_values(),
                 target_definitions: this.ability_auto_cast_target_definition(ctx?.target_definitions, ptr + '/target_definitions'),
                 type: enumerate({
                     items: [

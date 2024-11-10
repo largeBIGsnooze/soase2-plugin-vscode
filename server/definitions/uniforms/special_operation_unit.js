@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, string, object, array, boolean, float, color, enumerate } = require('../data_types')
 
 module.exports = class SpecialOperationUnit {
@@ -9,6 +10,7 @@ module.exports = class SpecialOperationUnit {
     create() {
         return schema({
             keys: {
+                overwrite_special_operation_unit_kinds: boolean(loc_keys.OVERWRITE_IDS),
                 special_operation_unit_kinds: array({
                     items: object({
                         keys: {

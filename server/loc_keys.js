@@ -79,4 +79,48 @@ All keyboard input will be directed here before others.`,
 Control the shader this brush will be rendered with.
 
 Default is \`normal\``,
+    OVERWRITE_IDS: 'Whether or not to merge with vanilla definitions',
+    BUFF_EMPIRE_MODIFIER_ID: 'id of buff_empire_modifier found in `action_data_source`',
+    BUFF_WEAPON_MODIFIER_ID: 'id of buff_weapon_modifier found in `action_data_source`',
+    BUFF_UNIT_MODIFIER_ID: 'id of buff_unit_modifier found in `action_data_source`',
+    BUFF_PLANET_MODIFIER_ID: 'id of buff_planet_modifier_id found in `action_data_source`',
+    BUFF_UNIT_FACTORY_MODIFIER_ID: 'id of unit_factory_modifier found in `action_data_source`',
+    APPLY_DAMAGE: 'used for showing torpedo damage on tooltip',
+    BUFF_WEAPON_MODIFIER_TAGS: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+    HYPERSPACE_BETWEEN_STARS_RESEARCH: 'research required to travel between stars',
+    FIELD_COORD: 'The `X` and `Y` coordinates on the research screen.',
+    RESEARCH_TIME: 'Time it takes to finish the research subject, in **seconds**',
+    EXTRA_ROTATION: 'extra rotation applied to icon (due to icon being reused in selection window)',
+    ALPHA_MULTIPLY: 'Alpha multiply the brush texture when this state is active',
+    WEAPON_TAGS: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+    WORMHOLE_RESEARCH: 'research required to travel through wormholes',
+    SPECIAL_OPERATION_NAMES: 'Allows overriding the name when unit is a special operation unit (ex. garrison)',
+    CUSTOM_DEBRIS: 'Specific debris are big pieces only meant for this unit.',
+    WEAPON_FIRING: 'if not provided the weapon will never fire (handy for simulating turrets that are cosmetic only like an eye)',
+    EXECUTION_INTERVAL_COUNT_VALUE: 'Maximum number of executions. If not specified will execute infinitely.',
+    EXECUTION_INTERVAL_VALUE: 'Interval between each execution. If not specified will be executed every update.',
+    EXECUTIONS_PER_INTERVAL_VALUE: 'How many executions per interval. Default to 1.',
+    FIRST_ACTION_DELAY_TIME_VALUE: 'Delay before first execution',
+    ACTION_ID: 'optional reference to an action in action_data_source. only applies if this action is part of an action_group!',
+    CHANCE_VALUE: `
+\`0\`=constraint will never pass
+
+\`1\`=constraint will always pass
+`,
+    ACTIVE_DURATION: 'This buff will be made dead after this duration time has elapsed',
+    MAKE_DEAD_WHEAN_NO_CHILD_BUFFS_EXIST_DELAY_TIME: `
+Delay time before make_dead_when_no_child_buffs_exist is evaluated.
+
+Purpose is to allow child buffs time to be created.
+`,
+    SURFACE_RADIUS: `used for planetes to define the surface for abilities (see action value transform_type: \`surface_radius\`) as the radius of planets extends beyond the surface for gameplay reasons.`,
+    STRUCTURE_BUILD_RADIUS: `
+Radius taken up when building.
+
+Used to keep structures from one another.
+
+This property will always be empty if doesn't have a "build" component.
+
+It can be set for non-structures but will be unused by the game.
+`,
 }

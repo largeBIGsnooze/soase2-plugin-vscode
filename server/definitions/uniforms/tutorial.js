@@ -1,4 +1,5 @@
-const { schema, array, version } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, boolean } = require('../data_types')
 
 module.exports = class TutorialUniform {
     /* eslint-disable no-unused-vars */
@@ -9,6 +10,7 @@ module.exports = class TutorialUniform {
     create() {
         return schema({
             keys: {
+                overwrite_tutorials: boolean(loc_keys.OVERWRITE_IDS),
                 tutorials: array({
                     items: this.cache.scenarios,
                     isUnique: true,

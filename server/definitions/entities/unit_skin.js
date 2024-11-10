@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { schema, float, string, array, object, color, boolean, enumerate, vector2i, percentage, integer } = require('../data_types')
 const Definitions = require('../definitions')
 
@@ -178,7 +179,7 @@ module.exports = class UnitSkin {
                 tooltip_picture: this.cache.textures('Big picture used on tooltips when building unit. (459x216)'),
                 hud_selection_window_icon_offet: vector2i(),
                 special_operation_names: array({
-                    desc: 'Allows overriding the name when unit is a special operation unit (ex. garrison)',
+                    desc: loc_keys.SPECIAL_OPERATION_NAMES,
                     items: object({
                         keys: {
                             kind: this.cache.special_operation_kinds,
@@ -231,7 +232,7 @@ module.exports = class UnitSkin {
         return object({
             required: ['group'],
             keys: {
-                extra_rotation: float(false, 'extra rotation applied to icon (due to icon being reused in selection window)'),
+                extra_rotation: float(false, loc_keys.EXTRA_ROTATION),
                 group: this.cache.mainview_groups,
                 icon: this.cache.textures(),
                 selected_icon: this.cache.textures(),

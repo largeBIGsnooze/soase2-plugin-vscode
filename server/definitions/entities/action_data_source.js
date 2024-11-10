@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { float, string, schema, integer, array, object, enumerate } = require('../data_types')
 const Definitions = require('../definitions')
 const {
@@ -216,7 +217,7 @@ module.exports = class ActionDataSource extends Ability {
                                 items: weapon_modifier_types(),
                             }),
                             tags: array({
-                                desc: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+                                desc: loc_keys.BUFF_WEAPON_MODIFIER_TAGS,
                                 items: this.cache.weapon_tags,
                                 isUnique: true,
                             }),

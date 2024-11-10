@@ -1,11 +1,21 @@
-const { window, StatusBarAlignment, commands, workspace, ConfigurationTarget, QuickPickItemKind, Uri, ProgressLocation } = require('vscode')
+const {
+    window,
+    StatusBarAlignment,
+    commands,
+    workspace,
+    ConfigurationTarget,
+    QuickPickItemKind,
+    Uri,
+    ProgressLocation,
+    MarkdownString,
+} = require('vscode')
 const path = require('path')
-const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync, lstatSync } = require('fs')
+const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync, readFileSync } = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
 const { readdirSync } = require('fs')
-const { EntityParser } = require('./data/file_handler')
+const { EntityReader } = require('./data/file_handler')
 const Config = require('./utils/config')
 const { base64images } = require('./utils/base64images')
 
@@ -13,10 +23,12 @@ module.exports = class Command {
     constructor(client) {
         this.client = client
         this.winrarPath = path.resolve(process.env.ProgramFiles, 'winrar/winrar.exe')
+        this.sinsAppdataPath = path.resolve(process.env.LOCALAPPDATA, 'sins2')
+        this.enabledModsPath = path.resolve(this.sinsAppdataPath, 'settings', '.enabled_mods')
     }
 
-    openConfiguration() {
-        commands.registerCommand('soase2-plugin-open-menu', async () => {
+    openConfiguration(commandName) {
+        return commands.registerCommand(commandName, async () => {
             this.showQuickpicks(
                 [
                     {
@@ -30,6 +42,10 @@ module.exports = class Command {
                     {
                         label: '$(game) Create mod',
                         detail: 'Create a mod directory along with its metadata',
+                    },
+                    {
+                        label: '$(extensions-view-icon) Enable/Disable Mods',
+                        detail: 'Enable/Disable selected local Sins 2 mods',
                     },
                     {
                         label: '',
@@ -54,33 +70,37 @@ module.exports = class Command {
                 ],
                 (option, arr) => {
                     switch (option) {
-                        case arr[0].label: {
+                        case arr[0].label:
                             commands.executeCommand('soase2-plugin.validateFilesButton')
                             break
-                        }
-                        case arr[1].label: {
+
+                        case arr[1].label:
                             commands.executeCommand('soase2-plugin.changeWorkspace')
                             break
-                        }
-                        case arr[2].label: {
+
+                        case arr[2].label:
                             commands.executeCommand('soase2-plugin.create-mod')
                             break
-                        }
-                        case arr[4].label: {
+
+                        case arr[3].label:
+                            commands.executeCommand('soase2-plugin.manage-mods')
+                            break
+
+                        case arr[5].label:
                             commands.executeCommand('soase2-plugin.zip-scenario')
                             break
-                        }
-                        case arr[5].label: {
+
+                        case arr[6].label:
                             commands.executeCommand('soase2-plugin.unzip-scenario')
                             break
-                        }
-                        case arr[7].label: {
-                            const settingsPath = path.resolve(process.env.LOCALAPPDATA, 'sins2/settings/settings.json')
+
+                        case arr[8].label:
+                            const settingsPath = path.resolve(this.sinsAppdataPath, 'settings', 'settings.json')
                             workspace.openTextDocument(Uri.parse(settingsPath).fsPath).then((e) => window.showTextDocument(e))
                             break
-                        }
-                        default: {
-                        }
+
+                        default:
+                            break
                     }
                 }
             )
@@ -99,18 +119,17 @@ module.exports = class Command {
     }
 
     async getAvaliableScenarioFoldersQuickpicks() {
-        return new EntityParser(await Config.getWorkspaceFolder()).read(['scenarios/*'], { directories: true }).map((e) => ({
-            label: e.basename,
-            detail: e.uri,
-        }))
+        return new EntityReader(await Config.getWorkspaceFolder())
+            .read(['scenarios/*'], { directories: true })
+            .map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     async getAvaliableScenarioQuickpicks() {
-        return new EntityParser(await Config.getWorkspaceFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
+        return new EntityReader(await Config.getWorkspaceFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     zipScenarioCommand(commandName) {
-        commands.registerCommand(commandName, async () => {
+        return commands.registerCommand(commandName, async () => {
             this.showQuickpicks(
                 await this.getAvaliableScenarioFoldersQuickpicks(),
                 async (option) =>
@@ -122,7 +141,7 @@ module.exports = class Command {
     }
 
     unzipScenarioCommand(commandName) {
-        commands.registerCommand(commandName, async () => {
+        return commands.registerCommand(commandName, async () => {
             this.showQuickpicks(
                 await this.getAvaliableScenarioQuickpicks(),
                 async (option) =>
@@ -133,10 +152,26 @@ module.exports = class Command {
         })
     }
 
-    isValidGamePath(basePath) {
-        if (path.basename(basePath).startsWith('SinsII')) return true
-        if (basePath !== '' && readdirSync(basePath).some((e) => e.includes('.mod_meta_data'))) return true
-        return false
+    async showModFolderSelectionIfInvalid() {
+        if (!Config.isValidGamePath(await Config.getWorkspaceFolder())) {
+            const selection = await window.showErrorMessage('Could not locate mod metadata. Would you like to change path?', 'Set Folder', 'Cancel')
+
+            if (selection === 'Set Folder') {
+                commands.executeCommand('soase2-plugin.changeWorkspace')
+                return
+            }
+        }
+    }
+
+    statusBarSettings(commandName) {
+        const item = window.createStatusBarItem(StatusBarAlignment.Left)
+
+        item.text = '$(game) Sins of a Solar Empire 2'
+        item.tooltip = new MarkdownString(`Show \`${CONSTANTS.source}\` commands`)
+        item.command = commandName
+        item.show()
+
+        return commands.registerCommand(commandName, async () => commands.executeCommand('soase2-plugin-open-menu'))
     }
 
     validateFilesCommand(commandName) {
@@ -148,40 +183,27 @@ module.exports = class Command {
         }
 
         button.text = states.idle
-        button.tooltip = 'Press to validate all files in current directory'
-        button.command = commandName
-        button.show()
 
         let isValidating = false
-        commands.registerCommand(commandName, async () => {
-            if (!this.isValidGamePath(await Config.getWorkspaceFolder())) {
-                const selection = await window.showErrorMessage(
-                    'Could not locate mod metadata. Would you like to change path?',
-                    'Set Folder',
-                    'Cancel'
-                )
-
-                if (selection === 'Set Folder') {
-                    commands.executeCommand('soase2-plugin.changeWorkspace')
-                    return
-                }
-                return
-            }
+        const command = commands.registerCommand(commandName, async () => {
+            await this.showModFolderSelectionIfInvalid()
 
             if (isValidating) return
             try {
                 button.text = states.loading
                 isValidating = true
+                button.show()
                 const results = await this.client.sendRequest('function/validateFiles')
                 button.text = states.idle
                 isValidating = false
+                button.hide()
                 return results
             } catch (err) {
                 this.client.debug('Response failed: ', err)
             }
         })
         return {
-            command: button,
+            command: command,
             exec: async () => {
                 await commands.executeCommand(commandName)
             },
@@ -201,6 +223,59 @@ module.exports = class Command {
                 if (!dir && !dir[0]) window.showErrorMessage('Error in setting the path')
                 return await callback(dir[0].path.substring(1))
             })
+    }
+
+    manageMod(enabledMods, modFolder, modData, label) {
+        if (!existsSync(modData)) return
+
+        if (!enabledMods.enabled_mods.some((e) => e.folder_name === modFolder)) {
+            modData = JSON.parse(readFileSync(modData, 'utf-8'))
+
+            enabledMods.enabled_mods.push({
+                type: 0,
+                folder_name: modFolder,
+                display_name: modData.display_name,
+                display_version: modData.display_version,
+            })
+            window.showInformationMessage('Mod enabled: ' + label)
+        } else {
+            enabledMods.enabled_mods.splice(
+                enabledMods.enabled_mods.findIndex((e) => e === modFolder),
+                1
+            )
+            window.showInformationMessage('Mod disabled: ' + label)
+        }
+        writeFileSync(this.enabledModsPath, JSON.stringify(enabledMods, null, 2))
+    }
+
+    manageMods(commandName) {
+        return commands.registerCommand(commandName, async () => {
+            const enabledModsFile = JSON.parse(readFileSync(this.enabledModsPath, 'utf-8'))
+            const picks = new EntityReader(path.resolve(this.sinsAppdataPath, 'mods'))
+                .read(['*'], { directories: true, lower: false })
+                .flatMap((e) => {
+                    const isEnabled = enabledModsFile.enabled_mods.some((y) => y.folder_name === e.basename)
+                    const displayName = JSON.parse(readFileSync(path.resolve(path.normalize(e.uri, '../'), '.mod_meta_data'), 'utf-8')).display_name
+
+                    return [
+                        {
+                            label: displayName || e.basename,
+                            detail: e.uri,
+                            description: isEnabled ? 'Mod Enabled' : '',
+                            hidden: e.basename,
+                        },
+                        {
+                            label: '',
+                            kind: QuickPickItemKind.Separator,
+                        },
+                    ]
+                })
+
+            this.showQuickpicks(picks, (label, _, hidden) => {
+                const metadataPath = path.resolve(this.sinsAppdataPath, 'mods', hidden, '.mod_meta_data')
+                this.manageMod(enabledModsFile, hidden, metadataPath, label)
+            })
+        })
     }
 
     async manageScenario(zip, { mode: mode }) {
@@ -273,17 +348,17 @@ module.exports = class Command {
     showQuickpicks(picks, callback) {
         window
             .showQuickPick(picks, {
-                ignoreFocusOut: true,
+                // ignoreFocusOut: true,
                 placeHolder: 'Type your option...',
             })
-            .then((option) => callback(option.label, picks))
+            .then((option) => callback(option.label, picks, option?.hidden))
     }
 
     changeWorkspaceCommand(commandName) {
         return commands.registerCommand(commandName, async () => {
             window.showInformationMessage('Ensure that you select the root directory of the game')
             this.showSelectFolderDialog(async (dir) => {
-                if (!this.isValidGamePath(dir)) {
+                if (!Config.isValidGamePath(dir)) {
                     window.showWarningMessage('Could not locate mod metadata. Ensure it is the root directory')
                     return
                 }
@@ -332,7 +407,7 @@ module.exports = class Command {
         this.generateBoilerModImages(folderPath)
     }
 
-    createLocalDirMod(modFolderName, localPath = path.resolve(process.env.LOCALAPPDATA, 'sins2', 'mods', modFolderName)) {
+    createLocalDirMod(modFolderName, localPath = path.resolve(this.sinsAppdataPath, 'mods', modFolderName)) {
         if (existsSync(localPath)) {
             window.showErrorMessage('A mod with that name already exists in the local mod folder.')
             return
@@ -356,14 +431,13 @@ module.exports = class Command {
                     ],
                     (option, arr) => {
                         switch (option) {
-                            case arr[0].label: {
+                            case arr[0].label:
                                 this.createLocalDirMod(value)
                                 break
-                            }
-                            case arr[1].label: {
+
+                            case arr[1].label:
                                 this.createCustomDirMod(value)
                                 break
-                            }
                         }
                     }
                 )

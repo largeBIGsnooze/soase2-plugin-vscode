@@ -1671,7 +1671,7 @@ module.exports = class Definitions {
 
                 relationship_type: Definitions.relationship_type(),
 
-                chance_value: cache.action_values('0=constraint will never pass, 1=constraint will always pass'),
+                chance_value: cache.action_values(loc_keys.CHANCE_VALUE),
 
                 prerequisites: Definitions.research_prerequisites(cache.research_subjects),
 
@@ -1686,7 +1686,7 @@ module.exports = class Definitions {
         return _.object({
             // required: ['action_type'],
             keys: {
-                action_id: _.string('optional reference to an action in action_data_source. only applies if this action is part of an action_group!'),
+                action_id: _.string(loc_keys.ACTION_ID),
                 action_type: Definitions.action_type(),
                 constraint: Definitions.action_constraint(ctx, ptr, cache, json, 0, 2),
                 bonus_damage_value: cache.action_values(),

@@ -1,4 +1,5 @@
-const { schema, array, object, string, float } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, object, string, float, boolean } = require('../data_types')
 
 module.exports = class WeaponUniform {
     /* eslint-disable no-unused-vars */
@@ -10,6 +11,7 @@ module.exports = class WeaponUniform {
         return schema({
             required: ['weapon_tags', 'recently_fired_time_threshold'],
             keys: {
+                overwrite_weapon_tags: boolean(loc_keys.OVERWRITE_IDS),
                 recently_fired_time_threshold: float(),
                 weapon_tags: array({
                     items: object({

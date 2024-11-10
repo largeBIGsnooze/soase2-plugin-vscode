@@ -1,4 +1,5 @@
-const { schema, array, object, float, percentage, vector2f, integer, string } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, object, float, percentage, vector2f, integer, string, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class LootUniform {
@@ -77,6 +78,7 @@ module.exports = class LootUniform {
     create() {
         return schema({
             keys: {
+                overwrite_random_loots: boolean(loc_keys.OVERWRITE_IDS),
                 levels: array({
                     items: object({
                         required: [

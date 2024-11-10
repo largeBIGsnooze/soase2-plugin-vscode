@@ -1,4 +1,4 @@
-const { schema, float, string, object, enumerate, array, boolean } = require('../data_types')
+const { schema, float, object, enumerate, array, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 
 module.exports = class NotificationUniform {

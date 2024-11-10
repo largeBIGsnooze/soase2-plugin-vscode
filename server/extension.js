@@ -1,12 +1,10 @@
-const { workspace, window } = require('vscode')
+const { workspace, window, ConfigurationTarget } = require('vscode')
 const { LanguageClient, TransportKind } = require('vscode-languageclient/node')
 const path = require('path')
 const Command = require('./commands')
 const api = require('./api')
 const { CONSTANTS } = require('./constants')
 const Config = require('./utils/config')
-const Lsp = require('./lsp_server')
-
 let client
 
 const fileWatchers = [
@@ -16,6 +14,7 @@ const fileWatchers = [
 ]
 
 async function activate(ctx) {
+    const config = workspace.getConfiguration()
     const serverModule = ctx.asAbsolutePath(path.join('server', 'lsp_connection.js'))
     const serverOptions = {
         run: {
@@ -48,7 +47,8 @@ async function activate(ctx) {
     client
         .start()
         .then(async () => {
-            client.onRequest('cache/game_installation', () => Config.getWorkspaceFolder())
+            client.onRequest('cache/mod', () => Config.getWorkspaceFolder())
+            client.onRequest('cache/vanilla', () => Config.getVanillaInstallation())
             client.onRequest('ignore/folders', () => Config.getIgnoredFolders())
             client.onRequest('ignore/extensions', () => Config.getIgnoredExtensions())
             client.onRequest('formatter/tabs', () => Config.getFormatterTabsAmount())
@@ -65,13 +65,22 @@ async function activate(ctx) {
         }
     })
 
+
+    if (!config.get(`[${CONSTANTS.name}].editor.acceptSuggestionOnEnter`)) {
+        config.update(`[${CONSTANTS.name}]`, { 'editor.acceptSuggestionOnEnter': 'off' }, ConfigurationTarget.Global)
+    }
+
+    command.showModFolderSelectionIfInvalid()
+
     ctx.subscriptions.push(
-        command.openConfiguration(),
+        command.openConfiguration('soase2-plugin-open-menu'),
         command.validateFilesCommand('soase2-plugin.validateFilesButton').command,
         command.changeWorkspaceCommand('soase2-plugin.changeWorkspace'),
         command.createModCommand('soase2-plugin.create-mod'),
         command.unzipScenarioCommand('soase2-plugin.unzip-scenario'),
-        command.zipScenarioCommand('soase2-plugin.zip-scenario')
+        command.zipScenarioCommand('soase2-plugin.zip-scenario'),
+        command.manageMods('soase2-plugin.manage-mods'),
+        command.statusBarSettings('soase2-plugin.statusBarItem')
     )
 
     return api

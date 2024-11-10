@@ -1,4 +1,5 @@
-const { schema, array, version } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, boolean } = require('../data_types')
 
 module.exports = class ScenarioUniform {
     /* eslint-disable no-unused-vars */
@@ -9,6 +10,8 @@ module.exports = class ScenarioUniform {
     create() {
         return schema({
             keys: {
+                overwrite_scenarios: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_fake_server_scenarios: boolean(loc_keys.OVERWRITE_IDS),
                 scenarios: array({
                     items: this.cache.scenarios,
                     isUnique: true,

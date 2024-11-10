@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, object, string, array, enumerate, vector2f, float, percentage, boolean, integer } = require('../data_types')
 
 module.exports = class PlanetUniform {
@@ -81,6 +82,13 @@ module.exports = class PlanetUniform {
                 'structure_plate_spin_speed',
             ],
             keys: {
+                overwrite_metal_asteroids: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_crystal_asteroids: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_planets: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_planet_types: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_random_planet_bonuses: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_easter_egg_planet_bonuses: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_artifacts: boolean(loc_keys.OVERWRITE_IDS),
                 artifact_to_planet_count_ratio: float(),
                 planets: array({
                     items: this.cache.planet_files,

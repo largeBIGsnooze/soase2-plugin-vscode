@@ -1,4 +1,5 @@
-const { schema, array, object, string } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, object, string, boolean } = require('../data_types')
 
 module.exports = class UnitTagUniform {
     /* eslint-disable no-unused-vars */
@@ -10,6 +11,7 @@ module.exports = class UnitTagUniform {
         return schema({
             required: ['unit_tags'],
             keys: {
+                overwrite_unit_tags: boolean(loc_keys.OVERWRITE_IDS),
                 unit_tags: array({
                     items: object({
                         keys: {

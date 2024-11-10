@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, integer, array, float, object, string, percentage, boolean, vector2f } = require('../data_types')
 
 module.exports = class PlayerUniform {
@@ -135,6 +136,7 @@ module.exports = class PlayerUniform {
                 'research_overflow_tier_nth_root_modifier',
             ],
             keys: {
+                overwrite_pickable_players: boolean(loc_keys.OVERWRITE_IDS),
                 fallback_theme_picker_skybox: this.cache.skyboxes,
                 max_fleet_count: float(),
                 fleet_factory_rally_subspace_speed: float(),
@@ -142,15 +144,6 @@ module.exports = class PlayerUniform {
                 fleet_factory_rally_hyperspace_speed_between_stars: float(),
                 fleet_factory_rally_hyperspace_charge_time: float(),
                 estimated_fleet_factory_rally_time_per_jump: float(),
-                races: array({
-                    items: object({
-                        keys: {
-                            name: string(),
-                            localized_name: this.cache.localisation,
-                        },
-                    }),
-                    isUnique: true,
-                }),
                 pickable_players: array({
                     items: this.cache.players,
                     isUnique: true,

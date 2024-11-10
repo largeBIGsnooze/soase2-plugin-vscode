@@ -1,4 +1,5 @@
-const { schema, array, object, string } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, object, string, boolean } = require('../data_types')
 
 module.exports = class ExoticUniform {
     /* eslint-disable no-unused-vars */
@@ -9,6 +10,7 @@ module.exports = class ExoticUniform {
     create() {
         return schema({
             keys: {
+                overwrite_type_datas: boolean(loc_keys.OVERWRITE_IDS),
                 type_datas: array({
                     items: object({
                         keys: {

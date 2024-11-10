@@ -1,4 +1,5 @@
-const { schema, array, object, string, enumerate } = require('../data_types')
+const loc_keys = require('../../loc_keys')
+const { schema, array, object, string, enumerate, boolean } = require('../data_types')
 
 module.exports = class AttackTargetTypeGroupUniform {
     /* eslint-disable no-unused-vars */
@@ -9,6 +10,7 @@ module.exports = class AttackTargetTypeGroupUniform {
     create() {
         return schema({
             keys: {
+                overwrite_attack_target_type_groups: boolean(loc_keys.OVERWRITE_IDS),
                 attack_target_type_groups: array({
                     items: object({
                         keys: {

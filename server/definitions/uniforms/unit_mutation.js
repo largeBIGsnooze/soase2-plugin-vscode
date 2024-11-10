@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, array, object, string, boolean } = require('../data_types')
 
 module.exports = class UnitMutationUniform {
@@ -22,6 +23,9 @@ module.exports = class UnitMutationUniform {
         return schema({
             required: ['mutations', 'permission_infos', 'suppressors'],
             keys: {
+                overwrite_mutations: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_permission_infos: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_suppressors: boolean(loc_keys.OVERWRITE_IDS),
                 mutations: array({
                     items: object({
                         keys: {

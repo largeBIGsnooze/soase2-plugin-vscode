@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, object, array, string, float, vector3f, vector2f, integer, boolean, color, enumerate } = require('../data_types')
 
 // TODO: Re-check for newer versions
@@ -223,6 +224,14 @@ module.exports = class GalaxyGeneratorUniform {
     create() {
         return schema({
             keys: {
+                overwrite_fixture_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_gravity_well_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_moon_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_node_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_npc_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_random_fixture_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_random_gravity_well_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_random_skybox_fillings: boolean(loc_keys.OVERWRITE_IDS),
                 minimum_gravity_well_distances_by_hierarchy_depth: vector3f(),
                 gravity_well_y_offsets_by_hierarchy_depth: array({
                     items: vector2f(),

@@ -16,7 +16,7 @@ module.exports = class Lsp {
     static cache = {}
     constructor({ options: options }) {
         this.options = options
-
+        this.modFilewatchers = new Map()
         this.entityDefinition = new EntityLoader(this.options.languageService, this.options.schemaService)
         this.onCompletionProvider = new onCompletionProvider(this.options.languageService, this.options.schemaService)
         this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService)
@@ -36,8 +36,15 @@ module.exports = class Lsp {
     /**
      * Returns data requested by the client
      */
-    async getGameInstallationFolder() {
-        return await this.options.connection.sendRequest(`cache/game_installation`).then((result) => result)
+    async getFolders() {
+        const [modFolder, vanillaFolder] = await Promise.all([
+            this.options.connection.sendRequest('cache/mod'),
+            this.options.connection.sendRequest('cache/vanilla'),
+        ])
+        return {
+            modFolder,
+            vanillaFolder,
+        }
     }
 
     /**
@@ -80,35 +87,44 @@ module.exports = class Lsp {
         // Log.info('Operational files: ', JSON.stringify(results, null, 4))
         Log.info(`Validating: ${Object.keys(results).length} entities!`)
 
-        Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
+        const { modFolder, vanillaFolder } = await this.getFolders()
+        Lsp.cache = await require('./cache')({
+            modFolder: modFolder,
+            vanillaFolder: vanillaFolder,
+            modFilewatchers: this.modFilewatchers,
+        })
 
-        this.options.connection.onRequest(
-            'function/validateFiles',
-            async () =>
-                await new Parser(
-                    this.options.connection,
-                    this.options.languageService,
-                    this.options.schemaService,
-                    await this.getGameInstallationFolder(),
-                    {
-                        filesWithDiagnostics: filesWithDiagnostics,
-                    }
-                )
-                    .validate()
-                    .catch((e) => Log.error(e))
-        )
+        this.options.connection.onRequest('function/validateFiles', async () => {
+            const { modFolder, vanillaFolder } = await this.getFolders()
+            await new Parser(
+                this.options.connection,
+                this.options.languageService,
+                this.options.schemaService,
+                modFolder,
+                vanillaFolder,
+                filesWithDiagnostics,
+                Lsp.cache
+            )
+                .validate()
+                .catch((e) => Log.error(e))
+        })
         this.options.connection.onRequest(
             'function/clearDiagnostics',
             async () => await Parser.clearDiagnostics(filesWithDiagnostics, this.options.connection)
         )
 
         this.options.connection.onRequest('function/clearCache', async () => {
-            Lsp.cache = await require('./cache')(await this.getGameInstallationFolder())
+            const { modFolder, vanillaFolder } = await this.getFolders()
+            Lsp.cache = await require('./cache')({
+                vanillaFolder: vanillaFolder,
+                modFolder: modFolder,
+                modFilewatchers: this.modFilewatchers,
+            })
         })
 
         this.options.connection.onRequest('change/editor', async ({ document, fileText }) => {
             this.entityDefinition.init({
-                gameInstallationFolder: await this.getGameInstallationFolder(),
+                gameInstallationFolder: (await this.getFolders()).modFolder,
                 fileText: fileText,
                 filePath: document.uri.fsPath,
                 cache: Lsp.cache,
@@ -139,7 +155,7 @@ module.exports = class Lsp {
 
         this.entityDefinition.init({
             params: params,
-            gameInstallationFolder: await this.getGameInstallationFolder(),
+            gameInstallationFolder: (await this.getFolders()).modFolder,
             cache: Lsp.cache,
         })
         if (text.trim().length === 0) new DiagnosticReporter(text, EntityLoader.diagnostics).invalidJSON()

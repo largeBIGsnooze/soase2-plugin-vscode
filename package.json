@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "1.3.0",
+    "version": "1.7.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -29,7 +29,7 @@
         "theme": "dark"
     },
     "activationEvents": [
-        "onStartupFinished"
+        "onLanguage:sins_of_a_solar_empire_ii"
     ],
     "keywords": [
         "sins",
@@ -44,32 +44,30 @@
         "configuration": {
             "title": "SOASE2 configuration",
             "properties": {
-                "soase2-plugin.cache.game": {
+                "soase2-plugin.cache.mod": {
                     "type": "string",
                     "scope": "application",
                     "default": "",
                     "description": "The location of your mod for caching variables"
                 },
+                "soase2-plugin.cache.vanilla": {
+                    "type": "string",
+                    "scope": "application",
+                    "default": "",
+                    "description": "The location of your vanilla game installation (note: leave empty if you don't want to mod alongside vanilla)"
+                },
                 "soase2-plugin.extensions.ignore": {
                     "type": "array",
                     "uniqueItems": true,
                     "scope": "application",
-                    "default": [
-                        "ogg",
-                        "fxco",
-                        "dll"
-                    ],
+                    "default": [],
                     "description": "File extensions to ignore"
                 },
                 "soase2-plugin.folders.ignore": {
                     "type": "array",
                     "uniqueItems": true,
                     "scope": "application",
-                    "default": [
-                        "textures",
-                        "videos",
-                        "meshes"
-                    ],
+                    "default": [],
                     "description": "Folders to ignore"
                 },
                 "soase2-plugin.formatter.tabs": {
@@ -173,11 +171,15 @@
             },
             {
                 "command": "soase2-plugin.unzip-scenario",
-                "title": "SOASE2: Un-zips scenario"
+                "title": "SOASE2: Un-zip scenario"
             },
             {
                 "command": "soase2-plugin.zip-scenario",
-                "title": "SOASE2: Zips scenario"
+                "title": "SOASE2: Zip scenario"
+            },
+            {
+                "command": "soase2-plugin.manage-mods",
+                "title": "SOASE2: Enable/Disable Mods"
             }
         ]
     },

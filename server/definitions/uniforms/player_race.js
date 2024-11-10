@@ -1,3 +1,4 @@
+const loc_keys = require('../../loc_keys')
 const { schema, string, array, object, integer, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 
@@ -30,6 +31,7 @@ module.exports = class PlayerRaceUniform {
         return schema({
             required: ['races'],
             keys: {
+                overwrite_races: boolean(loc_keys.OVERWRITE_IDS),
                 races: array({
                     items: object({
                         required: ['localized_name', 'music', 'name'],

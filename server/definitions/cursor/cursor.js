@@ -1,4 +1,4 @@
-const { string, vector2f, schema } = require('../data_types')
+const { vector2f, schema } = require('../data_types')
 
 module.exports = class Cursor {
     /* eslint-disable no-unused-vars */

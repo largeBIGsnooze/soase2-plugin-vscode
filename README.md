@@ -1,8 +1,9 @@
 # Jabberwocky: Sins II Language Support
+![GitHub package.json version](https://img.shields.io/github/package-json/v/largeBIGsnooze/soase2-plugin-vscode?style=flat-square) ![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/cyno-studios.soase2-plugin-vscode?style=flat-square) ![GitHub License](https://img.shields.io/github/license/largeBIGsnooze/soase2-plugin-vscode?style=flat-square)
 
 **Jabberwocky** adds validation to Sins 2 game files for modding inside of **Visual Studio Code**
 
-![doc-image](./images/doc_image2.png)
+![doc_image](./images/doc_image2.png)
 
 ## Note
 
@@ -14,52 +15,39 @@ This extension is in preview and may stop working unexpectedly
 -   Autocompletion
 -   On-hover information
 
+## Installation
+
+- Install the extension through the [Marketplace]("https://marketplace.visualstudio.com/items?itemName=cyno-studios.soase2-plugin-vscode")
+
 ## Usage
 
-After installation you will need to set your workspace folder to the location of your mod via the following steps:
+After installation you will be prompted to select a valid workspace path.
+ - A valid path is one that contains the `.mod_meta_data` file in its root directory
+ - Vanilla game installation
 
--   Open the command pallete (`F1` or `CTRL+SHIFT+P`)
--   Type `open settings`
--   Choose `Open User Settings (JSON)`
--   Then modify/add the `"soase2-plugin.cache.game"` property with the directory path
-
-Or you can use a shortcut by typing `SOASE2: Change workspace folder` in the command pallete and following the prompt
-
-#### Menu:
-
-Quickpicks for various tasks listed below:
-
-Open via: `SOASE2: Configuration`
+You can use quickpicks to navigate through the various options avaliable, open by pressing ![status_bar](./images/status_bar_image.png) in the VS Code status bar.
 
 ![menu](./images/doc_menu.png)
 
 ## Configuration
 
 ```json
+//  Location of your mod (ensure that it is the root directory)
+"soase2-plugin.cache.mod": "E:/foo/bar/soner_2"
 
-"soase2-plugin.cache.game": "E:/SinsIITesting" //  Location of your game/mod (ensure that it is the root directory)
+//  Location of your vanilla game installation (optional if you're not modding alongside vanilla)
+"soase2-plugin.cache.vanilla": "E:/SinsII"
 
-"soase2-plugin.formatter.tabs": 4 // Amount of identation when formatting the file
+// Amount of identation when formatting the file
+"soase2-plugin.formatter.tabs": 4
 
-"soase2-plugin.folders.ignore": [ // Custom folders to be ignored
-    "fonts",
-    "textures",
-    "videos"
-]
+// Custom folders to be ignored
+"soase2-plugin.folders.ignore": [ "fonts" ]
 
-"soase2-plugin.extensions.ignore": [ // Custom extensions to be ignored
-    "ogg",
-    "mesh",
-    "fxco",
-    "scenario",
-    "dll"
-]
+// Custom extensions to be ignored
+"soase2-plugin.extensions.ignore": [ "ability", "buff" ]
 ```
 
 ## Credits
 
-**Stardock** for the Sins 2 Game Icon used in the files
-
-https://www.sinsofasolarempire2.com/
-
-https://www.stardock.com/
+**[Stardock]("https://www.stardock.com")** and **[Ironclad]("https://www.ironcladgames.com")** for the **[Sins of a Solar Empire 2]("https://www.sinsofasolarempire2.com")** icon used in the files

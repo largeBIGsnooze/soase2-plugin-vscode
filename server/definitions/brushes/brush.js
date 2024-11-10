@@ -17,7 +17,7 @@ module.exports = class Brush {
                     desc: loc_keys.SHADER_TYPE,
                     items: ['normal', 'normal_overlay', 'disabled', 'focused', 'pressed', 'hovered', 'hovered_overlay', 'yuv_video'],
                 }),
-                alpha_multiply: float(true, 'Alpha multiply the brush texture when this state is active', 0, 1),
+                alpha_multiply: float(true, loc_keys.ALPHA_MULTIPLY, 0, 1),
             },
             required: ['texture'],
         })

@@ -1,4 +1,4 @@
-const { schema, float, version } = require('../data_types')
+const { schema, float } = require('../data_types')
 
 module.exports = class FutureOrbitUniform {
     /* eslint-disable no-unused-vars */

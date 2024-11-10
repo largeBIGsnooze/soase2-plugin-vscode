@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { schema, array, object, string, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 
@@ -33,6 +34,7 @@ module.exports = class TargetFilterUniform {
     create() {
         return schema({
             keys: {
+                overwrite_common_target_filters: boolean(loc_keys.OVERWRITE_IDS),
                 common_target_filters: array({
                     items: object({
                         required: ['target_filter', 'target_filter_id'],

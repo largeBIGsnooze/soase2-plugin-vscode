@@ -8,6 +8,7 @@ const {
     empire_modifier_types,
     exotic_factory_modifier_types,
 } = require('./modifier_types')
+const loc_keys = require('../loc_keys')
 
 class CultureModifiers {
     constructor() {}
@@ -59,7 +60,7 @@ class WeaponModifiers {
                         keys: {
                             modifier_type: enumerate({ items: weapon_modifier_types() }),
                             tags: array({
-                                desc: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+                                desc: loc_keys.WEAPON_TAGS,
                                 items: cache.weapon_tags,
                                 isUnique: true,
                             }),

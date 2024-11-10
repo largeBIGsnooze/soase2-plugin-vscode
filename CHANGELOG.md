@@ -1,11 +1,27 @@
+## 1.7.0
+
+-  Added support to cache the vanilla directory in conjunction with the mod using `soase2-plugin.cache.vanilla` property
+
+## 1.6.0
+
+-  Consolidated extension commands into a status bar for ease of access
+
+## 1.4.0
+
+-   Fixed exception on invalid workspace paths
+-   Added command to enable/disable mods
+
 ## 1.3.0
+
 -   Removed chokidar dependency and opted for regular fs.watch() due to performance reasons, it should now be much faster
 -   Will now apply schemas on document switching
 
 ## 1.2.0
+
 -   Increased update and filewatching intervals
 
 ## 1.0.0
+
 -   Bug fixes
 
 ## 0.4.4

@@ -24,7 +24,7 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_empire_modifier_id: string('id of buff_empire_modifier found in action_data_source'),
+                    buff_empire_modifier_id: string(loc_keys.BUFF_EMPIRE_MODIFIER_ID),
                     modifier_type: enumerate({
                         items: empire_modifier_types(),
                     }),
@@ -55,7 +55,7 @@ module.exports = class Buff extends Ability {
             keys: {
                 alert_type: Definitions.alert_type(),
                 apply_damage: object({
-                    description: 'used for showing torpedo damage on tooltip',
+                    description: loc_keys.APPLY_DAMAGE,
                     keys: {
                         bypass_shields_chance_value: this.cache.action_values(),
                         damage_value: this.cache.action_values(),
@@ -79,10 +79,8 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_planet_modifier_id: string('id of buff_planet_modifier_id found in action_data_source'),
-                    modifier_type: enumerate({
-                        items: planet_modifier_types(),
-                    }),
+                    buff_planet_modifier_id: string(loc_keys.BUFF_PLANET_MODIFIER_ID),
+                    modifier_type: enumerate({ items: planet_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value_id: this.cache.action_values(),
                 },
@@ -96,14 +94,10 @@ module.exports = class Buff extends Ability {
                 required: ['action_group'],
                 keys: {
                     action_group: super.action_group_definition(ctx, ptr),
-                    execution_interval_count_value: this.cache.action_values(
-                        'Maximum number of executions. If not specified will execute infinitely.'
-                    ),
-                    execution_interval_value: this.cache.action_values(
-                        'Interval between each execution. If not specified will be executed every update.'
-                    ),
-                    executions_per_interval_value: this.cache.action_values('How many executions per interval. Default to 1.'),
-                    first_action_delay_time_value: this.cache.action_values('Delay before first execution'),
+                    execution_interval_count_value: this.cache.action_values(loc_keys.EXECUTION_INTERVAL_COUNT_VALUE),
+                    execution_interval_value: this.cache.action_values(loc_keys.EXECUTION_INTERVAL_VALUE),
+                    executions_per_interval_value: this.cache.action_values(loc_keys.EXECUTIONS_PER_INTERVAL_VALUE),
+                    first_action_delay_time_value: this.cache.action_values(loc_keys.FIRST_ACTION_DELAY_TIME_VALUE),
                 },
             }),
         })
@@ -125,10 +119,8 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_unit_factory_modifier_id: string('id of unit_factory_modifier found in action_data_source'),
-                    modifier_type: enumerate({
-                        items: unit_factory_modifier_types(),
-                    }),
+                    buff_unit_factory_modifier_id: string(loc_keys.BUFF_UNIT_FACTORY_MODIFIER_ID),
+                    modifier_type: enumerate({ items: unit_factory_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value_id: this.cache.action_values(),
                 },
@@ -139,10 +131,8 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_unit_modifier_id: string('id of buff_unit_modifier found in action_data_source'),
-                    modifier_type: enumerate({
-                        items: unit_modifier_types(),
-                    }),
+                    buff_unit_modifier_id: string(loc_keys.BUFF_UNIT_MODIFIER_ID),
+                    modifier_type: enumerate({ items: unit_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value_id: this.cache.action_values(),
                 },
@@ -153,12 +143,10 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_weapon_modifier_id: string('id of buff_weapon_modifier found in action_data_source'),
-                    modifier_type: enumerate({
-                        items: weapon_modifier_types(),
-                    }),
+                    buff_weapon_modifier_id: string(loc_keys.BUFF_WEAPON_MODIFIER_ID),
+                    modifier_type: enumerate({ items: weapon_modifier_types() }),
                     tags: array({
-                        desc: 'If not empty, this modifier will only be applied to weapons that contain one of these tags.',
+                        desc: loc_keys.WEAPON_TAGS,
                         items: this.cache.weapon_tags,
                         isUnique: true,
                     }),
@@ -173,7 +161,7 @@ module.exports = class Buff extends Ability {
     create() {
         return schema({
             keys: {
-                active_duration: this.cache.action_values('This buff will be made dead after this duration time has elapsed'),
+                active_duration: this.cache.action_values(loc_keys.ACTIVE_DURATION),
                 are_mutations_finite: boolean(loc_keys.ARE_MUTATIONS_FINITE),
                 disable_collision_displacement_with_first_spawner: boolean('default=false'),
                 empire_modifiers: this.empire_modifiers_definition(),
@@ -197,9 +185,7 @@ module.exports = class Buff extends Ability {
                 make_dead_on_parent_buff_made_dead: boolean('default=false'),
                 make_dead_on_source_ability_released: boolean('default=false'),
                 make_dead_when_no_child_buffs_exist: boolean('default=false'),
-                make_dead_when_no_child_buffs_exist_delay_time: this.cache.action_values(
-                    'Delay time before make_dead_when_no_child_buffs_exist is evaluated. Purpose is to allow child buffs time to be created.'
-                ),
+                make_dead_when_no_child_buffs_exist_delay_time: this.cache.action_values(loc_keys.MAKE_DEAD_WHEAN_NO_CHILD_BUFFS_EXIST_DELAY_TIME),
                 planet_modifiers: this.planet_modifiers_definition(),
                 provides_detection: boolean('default=false'),
                 restart_other_stacked_buffs_when_started: boolean('default=true'),

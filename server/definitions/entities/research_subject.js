@@ -1,4 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
+const loc_keys = require('../../loc_keys')
 const { boolean, object, enumerate, schema, array, integer, exclusiveArray, vector2i, float } = require('../data_types')
 const Definitions = require('../definitions')
 const {
@@ -116,12 +117,9 @@ module.exports = class ResearchSubject {
                 empire_modifiers: EmpireModifiers.create(),
                 exotic_factory_modifiers: ExoticFactoryModifiers.create(this.cache),
                 exotic_price: Definitions.exotic_price(this.cache),
-                extra_text_filter_strings: array({
-                    items: this.cache.localisation,
-                    isUnique: true,
-                }),
+                extra_text_filter_strings: array({ items: this.cache.localisation, isUnique: true }),
                 field: this.cache.research_fields,
-                field_coord: vector2i('The X and Y coordinates on the research screen.'),
+                field_coord: vector2i(loc_keys.FIELD_COORD),
                 hud_icon: this.cache.textures(),
                 name: this.cache.localisation,
                 name_uppercase: this.cache.localisation,
@@ -135,7 +133,7 @@ module.exports = class ResearchSubject {
                 provides_dominant_culture_detection: boolean(),
                 provides_victory_condition_alliance_guard: boolean(),
                 required_allied_player_race: this.cache.players,
-                research_time: float(true, 'Time it takes to finish the research subject, in **seconds**'),
+                research_time: float(true, loc_keys.RESEARCH_TIME),
                 strikecraft_modifiers: StrikecraftModifiers.create(this.cache),
                 tier: this.cache.max_tier_count,
                 tooltip_icon: this.cache.textures(),

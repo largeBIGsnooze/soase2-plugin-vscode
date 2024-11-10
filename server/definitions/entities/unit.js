@@ -2,6 +2,7 @@ const { schema, float, object, array, vector3f, boolean, enumerate, integer, vec
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
 const Definitions = require('../definitions')
 const { UnitModifiers, PlanetModifiers } = require('../modifier_definitions')
+const loc_keys = require('../../loc_keys')
 
 module.exports = class Unit {
     /* eslint-disable no-unused-vars */
@@ -271,7 +272,7 @@ module.exports = class Unit {
                 can_update_build_progress_by_default: boolean(),
                 build_group_id: this.cache.unit_build_group_ids,
                 prerequisites: Definitions.research_prerequisites(this.cache.research_subjects),
-                build_radius: float(),
+                build_radius: float(true, loc_keys.STRUCTURE_BUILD_RADIUS),
                 exotic_price: Definitions.exotic_price(this.cache),
                 auto_cast_instead_of_rally_when_built: boolean(),
                 self_build_time_gravity_well_scalars: object({
@@ -498,7 +499,7 @@ module.exports = class Unit {
                 spawn_debris_time: float(),
                 generic_group_name: this.cache.debris,
                 custom_debris: array({
-                    desc: 'Specific debris are big pieces only meant for this unit.',
+                    desc: loc_keys.CUSTOM_DEBRIS,
                     items: object({
                         required: ['basis', 'unit'],
                         keys: {
@@ -1088,7 +1089,7 @@ module.exports = class Unit {
         } catch {}
         return object({
             keys: {
-                surface_radius: float(),
+                surface_radius: float(true, loc_keys.SURFACE_RADIUS),
                 line_of_sight_radius: float(),
                 radius: float(),
                 box: object({

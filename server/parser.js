@@ -14,13 +14,15 @@ module.exports = class Parser {
      * @param {String} gameInstallationFolder
      * @param {Array} filesWithDiagnostics
      */
-    constructor(connection, languageService, schemaService, gameInstallationFolder, { filesWithDiagnostics: filesWithDiagnostics }) {
+    constructor(connection, languageService, schemaService, modFolder, vanillaInstallationFolder, filesWithDiagnostics, cache) {
         this.connection = connection
         this.languageService = languageService
         this.schemaService = schemaService
-        this.gameInstallationFolder = gameInstallationFolder
+        this.modFolder = modFolder
+        this.vanillaInstallationFolder = vanillaInstallationFolder
         this.entityDefinition = new EntityLoader(languageService, schemaService)
 
+        this.cache = cache
         this.filesWithDiagnostics = filesWithDiagnostics
         this.validatedFiles = 0
     }
@@ -41,10 +43,9 @@ module.exports = class Parser {
     async validate() {
         await Parser.clearDiagnostics(this.filesWithDiagnostics, this.connection)
         const { folders, extensions } = await this.fetchRequests()
-        const cache = await require('./cache')(this.gameInstallationFolder)
         const start = process.hrtime()
 
-        await this.processFolder(this.gameInstallationFolder, folders, extensions, cache)
+        await this.processFolder(this.modFolder, folders, extensions, this.cache)
 
         Log.info('Execution time:', `${process.hrtime(start)[0]}s, validated: ${this.validatedFiles} entities`)
         return process.hrtime(start)[0]
@@ -69,19 +70,18 @@ module.exports = class Parser {
                 const currentFilePath = path.resolve(filePath, file)
                 const lstat = fs.lstatSync(currentFilePath)
 
-                if (currentFilePath.endsWith('textures') || currentFilePath.endsWith('meshes')) continue
+                if (['textures', 'meshes', 'videos'].some((e) => currentFilePath.endsWith(e))) continue
                 if (isIgnoredFolder(filterFolders, currentFilePath)) continue
                 if (lstat.isDirectory()) await this.processFolder(currentFilePath, filterFolders, filterExtensions, cache)
                 else {
-                    if (isValidExtension(file)) {
-                        if (isIgnoredFolder(filterExtensions, currentFilePath)) continue
+                    if (!isValidExtension(file) || ['.scenario', '.dll', '.fxco', '.ogg'].some((e) => file.endsWith(e))) continue
+                    if (isIgnoredFolder(filterExtensions, currentFilePath)) continue
 
-                        const start = process.hrtime()
-                        await this.processFile(currentFilePath, cache)
-                        this.validatedFiles++
+                    const start = process.hrtime()
+                    await this.processFile(currentFilePath, cache)
+                    this.validatedFiles++
 
-                        Log.info(file, `- ${(process.hrtime(start)[1] / 1000000).toFixed(3)}ms`)
-                    }
+                    Log.info(file, `- ${(process.hrtime(start)[1] / 1000000).toFixed(3)}ms`)
                 }
             }
         } catch (err) {
@@ -102,7 +102,7 @@ module.exports = class Parser {
             if (fileText.trim().length === 0) new DiagnosticReporter(fileText, EntityLoader.diagnostics).invalidJSON()
             else if (!JSON.parse(fileText)) return
 
-            this.entityDefinition.init({ gameInstallationFolder: this.gameInstallationFolder, fileText: fileText, filePath: filePath, cache: cache })
+            this.entityDefinition.init({ gameInstallationFolder: this.modFolder, fileText: fileText, filePath: filePath, cache: cache })
             const generalDiagnostics = await this.entityDefinition.jsonDoValidation(fileText, filePath)
 
             if (generalDiagnostics[0] || Array.from(EntityLoader.diagnostics).length > 0) this.filesWithDiagnostics.push(filePath)

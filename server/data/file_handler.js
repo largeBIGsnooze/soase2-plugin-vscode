@@ -4,23 +4,24 @@ const fg = require('fast-glob')
 const { Log } = require('../utils/logger')
 const { unit_modifier_types, unit_factory_modifier_types, weapon_modifier_types, planet_modifier_types } = require('../definitions/modifier_types')
 
-class EntityParser {
+class EntityReader {
     constructor(gameFolder) {
         this.gameFolder = gameFolder
     }
 
-    read(glob, { read: read = true, directories: directories = false } = {}) {
+    read(glob, { read = true, directories = false, caseSensitive = true, lower = true } = {}) {
         return fg
             .globSync(glob, {
                 dot: true,
                 cwd: this.gameFolder,
                 onlyDirectories: directories,
+                caseSensitiveMatch: caseSensitive,
             })
             .map((entity) => {
                 try {
                     const filePath = path.resolve(this.gameFolder, entity)
 
-                    const baseName = path.basename(entity, path.extname(entity)).toLowerCase()
+                    const baseName = path.basename(entity, path.extname(entity))
                     const ext = path.extname(entity).substring(1).toLowerCase()
 
                     if (directories) {
@@ -31,7 +32,7 @@ class EntityParser {
                     } else {
                         return {
                             uri: filePath,
-                            basename: baseName,
+                            basename: lower ? baseName.toLowerCase() : baseName,
                             ext: ext,
                             filename: `${baseName}.${ext}`,
                             content: read ? this.parseContents(fs.readFileSync(filePath, 'utf-8')) : null,
@@ -75,8 +76,7 @@ class EntityParser {
     }
 
     parseTextures() {
-        const textures = this.read(['textures/*.dds', 'textures/*.png'], { read: false })
-
+        const textures = this.read(['textures/*.dds', 'textures/*.png'], { read: false, caseSensitive: false })
         return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
     }
     parseFontsTtf() {
@@ -622,5 +622,5 @@ class EntityParser {
 }
 
 module.exports = {
-    EntityParser,
+    EntityReader,
 }

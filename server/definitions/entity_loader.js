@@ -205,46 +205,32 @@ module.exports = class EntityLoader extends Document {
 
     async init({ params = undefined, fileText = undefined, filePath = undefined, gameInstallationFolder, cache }) {
         if (typeof params !== 'undefined') {
-            this.configureSchema(
-                params.document.getText(),
-                path.extname(params.document.uri).substring(1),
-                path.basename(params.document.uri, path.extname(params.document.uri)),
-                cache,
-                gameInstallationFolder
-            )
+            this.configureSchema(params.document.getText(), params.document.uri, cache, gameInstallationFolder)
         } else {
-            this.configureSchema(
-                fileText,
-                path.extname(filePath).substring(1),
-                path.basename(filePath, path.extname(filePath)),
-                cache,
-                gameInstallationFolder
-            )
+            this.configureSchema(fileText, filePath, cache, gameInstallationFolder)
         }
     }
 
     defineSchema(schema) {
         return this.languageService.configure({
             validate: true,
-            schemas: [
-                {
-                    fileMatch: ['*'],
-                    schema: schema,
-                },
-            ],
+            schemas: [{ fileMatch: ['*'], schema: schema }],
         })
     }
 
-    configureSchema(fileText, fileExt, fileName, cache, gameInstallationFolder) {
-        const Entity = EntityLoader.files[`${fileName}.${fileExt}`] || EntityLoader.files[fileExt] || EntityLoader.files[fileName]
+    configureSchema(fileText, fileName, cache, gameInstallationFolder) {
+        const name = path.basename(fileName, path.extname(fileName))
+        const ext = path.extname(fileName).substring(1)
+
+        const Entity = EntityLoader.files[`${name}.${ext}`] || EntityLoader.files[ext] || EntityLoader.files[name]
         try {
             if (Entity) {
                 return this.defineSchema(
                     new Entity(
                         {
                             fileText: fileText,
-                            fileExt: fileExt,
-                            fileName: fileName,
+                            fileExt: ext,
+                            fileName: name,
                         },
                         EntityLoader.diagnostics,
                         gameInstallationFolder,
@@ -252,7 +238,7 @@ module.exports = class EntityLoader extends Document {
                     ).create()
                 )
             } else {
-                EntityLoader.nonschemed_files.push(`${fileName}.${fileExt}`)
+                EntityLoader.nonschemed_files.push(`${name}.${ext}`)
                 return this.defineSchema(this.DEFAULT_SCHEMA)
             }
         } catch (err) {

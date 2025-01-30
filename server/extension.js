@@ -47,7 +47,7 @@ async function activate(ctx) {
     client
         .start()
         .then(async () => {
-            client.onRequest('cache/mod', () => Config.getWorkspaceFolder())
+            client.onRequest('cache/mod', () => Config.getModFolder())
             client.onRequest('cache/vanilla', () => Config.getVanillaInstallation())
             client.onRequest('ignore/folders', () => Config.getIgnoredFolders())
             client.onRequest('ignore/extensions', () => Config.getIgnoredExtensions())
@@ -76,6 +76,7 @@ async function activate(ctx) {
         command.openConfiguration('soase2-plugin-open-menu'),
         command.validateFilesCommand('soase2-plugin.validateFilesButton').command,
         command.changeWorkspaceCommand('soase2-plugin.changeWorkspace'),
+        command.changeVanillaFolderCommand('soase2-plugin.changeVanillaFolder'),
         command.createModCommand('soase2-plugin.create-mod'),
         command.unzipScenarioCommand('soase2-plugin.unzip-scenario'),
         command.zipScenarioCommand('soase2-plugin.zip-scenario'),

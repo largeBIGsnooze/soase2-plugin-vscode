@@ -82,6 +82,7 @@ module.exports = class PlanetUniform {
                 'structure_plate_spin_speed',
             ],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_metal_asteroids: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_crystal_asteroids: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_planets: boolean(loc_keys.OVERWRITE_IDS),
@@ -89,6 +90,7 @@ module.exports = class PlanetUniform {
                 overwrite_random_planet_bonuses: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_easter_egg_planet_bonuses: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_artifacts: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 artifact_to_planet_count_ratio: float(),
                 planets: array({
                     items: this.cache.planet_files,

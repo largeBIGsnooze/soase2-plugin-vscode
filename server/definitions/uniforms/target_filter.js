@@ -34,7 +34,9 @@ module.exports = class TargetFilterUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_common_target_filters: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 common_target_filters: array({
                     items: object({
                         required: ['target_filter', 'target_filter_id'],

@@ -72,6 +72,10 @@ module.exports = class PlayerAiUniform {
                 will_attack_other_ai_before_human_players: boolean(),
                 will_build_super_weapons: boolean(),
                 fleet_will_probably_defeat_ratio_range: array({ items: float() }),
+                /* game_version 1.31.7 */
+                chaos_factor_range: array({ items: float() }),
+                chaos_factor_update_interval: float(),
+                /* */
                 max_supply_percentage_relative_to_human_players: float(),
                 max_fleet_capital_ship_count: integer(),
                 when_build_titan_in_minutes: vector2f(),

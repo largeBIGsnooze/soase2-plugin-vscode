@@ -10,14 +10,15 @@ module.exports = class HudSkinUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_hud_skin_names: boolean(loc_keys.OVERWRITE_IDS),
+                /*  */
                 default_hud_skin_name: string(),
                 // Hardcoded?
                 hud_skin_names: array({
                     items: string(),
                 }),
             },
-            required: ['default_hud_skin_name', 'hud_skin_names'],
         })
     }
 }

@@ -1,6 +1,6 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
 const { prerequisites } = require('../definitions')
-const { schema, float, string, object, array, integer, enumerate, vector2f, boolean, percentage, vector4i } = require('../data_types')
+const { schema, float, string, object, array, integer, enumerate, vector2f, boolean, percentage, vector4i, exclusiveArray } = require('../data_types')
 const { planet_modifier_types, unit_modifier_types, empire_modifier_types, weapon_modifier_types } = require('../modifier_types')
 const Definitions = require('../definitions')
 const { PlayerModifiers } = require('../modifier_definitions')
@@ -462,6 +462,10 @@ module.exports = class Player {
                 }),
                 ai_params: object({
                     keys: {
+                        /* game_version v1.32.0 */
+                        chaos_factor_range: exclusiveArray({ items: float(), minItems: 2, maxItems: 2 }),
+                        chaos_factor_update_interval: float(false, 'default=300'),
+                        /* */
                         chance_to_ally_with_other_players: vector2f(),
                         defense_to_offsense_spend_ratio: float(true, 'default=1'),
                         desired_explore_ship_count: Definitions.desired_explore_ship_count(
@@ -484,7 +488,7 @@ module.exports = class Player {
                         will_attack_other_ai_before_human_players: boolean(),
                         will_fleet_colonize: boolean(),
                         will_use_npcs: boolean(),
-                        will_fleet_retreat: boolean('if false fleets will never retreat from battle even if losing.\ndefault=true'),
+                        will_fleet_retreat: boolean(loc_keys.WILL_FLEET_RETREET),
                     },
                 }),
                 metal_market: this.npc_asset_market_definition(),
@@ -661,6 +665,9 @@ module.exports = class Player {
     npc_reputation_definition() {
         return object({
             keys: {
+                /* game_version v1.30.0 */
+                reward_between_gravity_well_range: float(),
+                /* */
                 rewards: array({
                     items: {
                         reward: this.cache.npc_rewards,
@@ -887,6 +894,9 @@ module.exports = class Player {
                     keys: {
                         logistics: integer(),
                         commerce: integer(),
+                        /* game_version v1.30.0 */
+                        defense: integer(),
+                        /* */
                         mining: integer(),
                         research: integer(),
                         surveying: integer(),

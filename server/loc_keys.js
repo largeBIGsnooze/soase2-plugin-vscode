@@ -123,4 +123,17 @@ This property will always be empty if doesn't have a "build" component.
 
 It can be set for non-structures but will be unused by the game.
 `,
+    EASING_FUNCTION: `
+
+
+[https://www.easings.net]("https://www.easings.net")
+`,
+    HUD_BUTTON_ICON: `
+Icon used on build menu buttons.
+Vestigual now that we reuse hud_icon consistently.`,
+    WILL_FLEET_RETREET: `
+if false fleets will never retreat from battle even if losing.
+
+default=true`,
+    ASTEROID_TIERS: `Index of the asteroid set to pick from in \`planet.uniforms\``,
 }

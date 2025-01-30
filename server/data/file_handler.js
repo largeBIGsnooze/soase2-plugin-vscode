@@ -60,7 +60,7 @@ class EntityReader {
 
     parseEntityManifest(manifest) {
         const content = this.parseEntity([`entities/${manifest}.entity_manifest`])
-        if (content && content.ids) return content.ids.map((e) => e)
+        if (content && content.ids) return ['', ...content.ids.map((e) => e)]
         return ['']
     }
 
@@ -78,6 +78,16 @@ class EntityReader {
     parseTextures() {
         const textures = this.read(['textures/*.dds', 'textures/*.png'], { read: false, caseSensitive: false })
         return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
+    }
+
+    parseAsteroidTiers(type) {
+        const tiers = this.parseUniform('planet')
+        if (tiers && tiers[type]) {
+            return Array.from({
+                length: tiers[type].length,
+            }).keys()
+        }
+        return [0]
     }
     parseFontsTtf() {
         return this.read(['fonts/*.ttf'], {
@@ -320,16 +330,14 @@ class EntityReader {
 
     parseResearchTierCount(tiers = this.parseUniform('research')) {
         if (tiers && tiers.max_tier_count)
-            return [
-                ...Array.from({
-                    length: tiers.max_tier_count + 1,
-                }).keys(),
-            ]
+            return Array.from({
+                length: tiers.max_tier_count + 1,
+            }).keys()
         return ['']
     }
 
     parseDebrisUniform(debris = this.parseUniform('debris').groups) {
-        if (debris) return debris.map((e) => e[0])
+        if (debris) return debris.map((e) => e?.name)
         return ['']
     }
 
@@ -393,6 +401,16 @@ class EntityReader {
     }
 
     parseBeamEffects() {
+        const beam_effects_set = new Set()
+
+        this.read(['entities/*.unit_skin']).map((e) => {
+            e.content?.skin_stages?.flatMap((y) => y?.effects?.effect_alias_bindings?.map((e) => (y ? beam_effects_set.add(e.alias_name) : '')))
+        })
+
+        return Array.from(beam_effects_set)
+    }
+
+    parseBeamEffectFiles() {
         return this.read(['effects/*.beam_effect']).map((e) => e.basename)
     }
 

@@ -11,7 +11,9 @@ module.exports = class StrikecraftUniform {
         return schema({
             required: ['no_owner_carrier_self_destruct_duration', 'strikecraft_kinds'],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_strikecraft_kinds: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 no_owner_carrier_self_destruct_duration: integer(),
                 strikecraft_kinds: array({
                     items: object({

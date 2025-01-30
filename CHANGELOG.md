@@ -1,3 +1,12 @@
+## 2.0.0
+
+-   Updated to 1.32.0 version of the game
+-   Bugfixes
+
+## 1.9.0
+
+-   Updated to 1.30.3 version of the game
+
 ## 1.7.0
 
 -  Added support to cache the vanilla directory in conjunction with the mod using `soase2-plugin.cache.vanilla` property

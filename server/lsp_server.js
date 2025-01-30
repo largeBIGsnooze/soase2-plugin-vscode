@@ -21,12 +21,12 @@ module.exports = class Lsp {
         this.onCompletionProvider = new onCompletionProvider(this.options.languageService, this.options.schemaService)
         this.onHoverProvider = new onHoverProvider(this.options.languageService, this.options.schemaService)
         this.onDocumentFormatting = new onDocumentFormattingProvider(this.options.connection)
-        this.onDidChangeContent = this.debounce(this.onDidChangeContent.bind(this), 250)
+        this.onDidChangeContent = this.debounceDocument(this.onDidChangeContent.bind(this), 250)
     }
     /**
      * Debouncing function
      */
-    debounce(func, timeout) {
+    debounceDocument(func, timeout) {
         let timer
         return (...args) => {
             clearTimeout(timer)

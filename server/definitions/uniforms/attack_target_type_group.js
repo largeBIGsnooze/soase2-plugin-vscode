@@ -10,7 +10,9 @@ module.exports = class AttackTargetTypeGroupUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_attack_target_type_groups: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 attack_target_type_groups: array({
                     items: object({
                         keys: {

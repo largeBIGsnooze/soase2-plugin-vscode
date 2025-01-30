@@ -122,6 +122,9 @@ module.exports = class NpcReward {
             keys: {
                 between_gravity_well_range: float(),
                 gravity_well_fixture_target_filter_id: this.cache.target_filters,
+                /* game_version v1.30.0 */
+                uses_range: boolean(),
+                /* */
                 targeting_ui: Definitions.targeting_ui(),
                 gui: object({
                     keys: {

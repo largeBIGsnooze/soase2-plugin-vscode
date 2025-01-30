@@ -1,6 +1,6 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
 const loc_keys = require('../../loc_keys')
-const { float, vector3f, object, schema, enumerate, array, percentage } = require('../data_types')
+const { float, vector3f, object, schema, enumerate, array, percentage, boolean } = require('../data_types')
 const Definitions = require('../definitions')
 const { WeaponModifiers } = require('../modifier_definitions')
 
@@ -101,6 +101,9 @@ module.exports = class Weapon {
                 yaw_speed: float(true),
                 weapon_type: Definitions.weapon_type(),
                 pitch_firing_tolerance: float(true),
+                /* game_version v1.30.0 */
+                always_check_is_dead_soon: boolean(),
+                /* */
                 yaw_firing_tolerance: float(true),
                 range: float(),
                 cooldown_duration: float(),

@@ -31,7 +31,9 @@ module.exports = class PlayerRaceUniform {
         return schema({
             required: ['races'],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_races: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 races: array({
                     items: object({
                         required: ['localized_name', 'music', 'name'],

@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "1.7.0",
+    "version": "2.0.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -163,11 +163,15 @@
             },
             {
                 "command": "soase2-plugin.changeWorkspace",
-                "title": "SOASE2: Change workspace folder"
+                "title": "SOASE2: Change Mod workspace folder"
             },
             {
                 "command": "soase2-plugin.create-mod",
                 "title": "SOASE2: Create a mod"
+            },
+            {
+                "command": "soase2-plugin.changeVanillaFolder",
+                "title": "SOASE2: Change Vanilla installation folder"
             },
             {
                 "command": "soase2-plugin.unzip-scenario",

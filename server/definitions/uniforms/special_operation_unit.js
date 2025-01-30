@@ -10,7 +10,9 @@ module.exports = class SpecialOperationUnit {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_special_operation_unit_kinds: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 special_operation_unit_kinds: array({
                     items: object({
                         keys: {

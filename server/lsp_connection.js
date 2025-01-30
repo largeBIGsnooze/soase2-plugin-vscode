@@ -23,7 +23,6 @@ function initializeServer() {
             capabilities: {
                 textDocumentSync: TextDocumentSyncKind.Incremental,
                 hoverProvider: true,
-                definitionProvider: false,
                 documentFormattingProvider: true,
                 completionProvider: {
                     triggerCharacters: generateTriggerCharacters(),

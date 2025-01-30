@@ -23,9 +23,11 @@ module.exports = class UnitMutationUniform {
         return schema({
             required: ['mutations', 'permission_infos', 'suppressors'],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_mutations: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_permission_infos: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_suppressors: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 mutations: array({
                     items: object({
                         keys: {
@@ -40,6 +42,14 @@ module.exports = class UnitMutationUniform {
                 }),
                 permission_infos: object({
                     keys: {
+                        /* game_version v1.30.0 */
+                        can_use_missile_weapons: this.mutation(),
+                        can_update_weapon_cooldown_progress: this.mutation(),
+                        can_planet_update_track_upgrade_progress: this.mutation(),
+                        can_update_ability_cooldown_progress: this.mutation(),
+                        can_have_any_strikecraft_launched: this.mutation(),
+                        can_update_unit_item_build_progress: this.mutation(),
+                        /* */
                         can_use_weapons: this.mutation(),
                         can_hyperspace: this.mutation(),
                         can_be_targeted_by_allies: this.mutation(),

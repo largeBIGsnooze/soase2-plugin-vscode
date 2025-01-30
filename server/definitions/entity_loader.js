@@ -121,7 +121,7 @@ module.exports = class EntityLoader extends Document {
         ['hud_skin.uniforms']: HudSkinUniform,
         ['random_skybox_filling.uniforms']: RandomSkyboxFillingUniforms,
 
-        /* game_version v28.16 */
+        /* game_version v1.28.16 */
         ['tutorial.uniforms']: TutorialUniform,
         /* */
     }

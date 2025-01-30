@@ -10,8 +10,10 @@ module.exports = class ScenarioUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_scenarios: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_fake_server_scenarios: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 scenarios: array({
                     items: this.cache.scenarios,
                     isUnique: true,

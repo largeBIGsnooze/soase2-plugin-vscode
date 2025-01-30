@@ -10,10 +10,10 @@ module.exports = class DebrisUniform {
         return schema({
             keys: {
                 groups: array({
-                    items: array({
-                        items: [
-                            string(),
-                            object({
+                    items: object({
+                        keys: {
+                            name: string(),
+                            debris_types: object({
                                 keys: {
                                     sizes: object({
                                         keys: {
@@ -29,7 +29,7 @@ module.exports = class DebrisUniform {
                                 },
                                 required: ['sizes'],
                             }),
-                        ],
+                        },
                     }),
                 }),
             },

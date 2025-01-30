@@ -169,7 +169,7 @@ module.exports = class UnitSkin {
                 hud_monochrome_icon: this.cache.textures(
                     'Icon used in the Selection Window colorered with player color. Should map to main_view_icon.'
                 ),
-                hud_button_icon: this.cache.textures('Icon used on build menu buttons. Vestigual now that we reuse hud_icon consistently.'),
+                hud_button_icon: this.cache.textures(loc_keys.HUD_BUTTON_ICON),
                 hud_picture: this.cache.textures('Picture shown at the bottom of the HUD when unit is selected.'),
                 tooltip_icon: this.cache.textures(
                     'Tiny picture used next to ship name. Not typically specified, will fallback to hud_monochrome_icon->hud-icon.'
@@ -259,13 +259,13 @@ module.exports = class UnitSkin {
             ],
             keys: {
                 atmosphere_color: color(),
-                atmosphere_spread: float(),
-                cloud_animation_speed: float(),
-                cloud_noise_0_intensity: float(),
-                cloud_noise_0_zoom: float(),
-                cloud_noise_1_intensity: float(),
-                cloud_noise_1_zoom: float(),
-                cloud_rotation_speed: float(),
+                atmosphere_spread: float(false),
+                cloud_animation_speed: float(false),
+                cloud_noise_0_intensity: float(false),
+                cloud_noise_0_zoom: float(false),
+                cloud_noise_1_intensity: float(false),
+                cloud_noise_1_zoom: float(false),
+                cloud_rotation_speed: float(false),
                 cloud_noise_texture: this.cache.textures(),
                 cloud_material: this.cache.mesh_materials,
                 shader: enumerate({ items: ['planet_surface', 'planet_city', 'planet_atmosphere'] }),

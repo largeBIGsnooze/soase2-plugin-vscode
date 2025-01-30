@@ -20,15 +20,16 @@ module.exports = class Config {
     static async getVanillaInstallation() {
         return await this.copy().get('cache.vanilla')
     }
-    static async getWorkspaceFolder() {
+    static async getModFolder() {
         return await this.copy().get('cache.mod')
     }
-    static async setWorkspace(dir, configuration) {
-        return await this.copy().update('cache.mod', dir, configuration)
+    static async setFolder(dir, type, configuration) {
+        return await this.copy().update(`cache.${type}`, dir, configuration)
     }
-    static isValidGamePath(basePath) {
-        if (path.basename(basePath).startsWith('SinsII')) return true
-        if (basePath !== '' && fs.readdirSync(basePath).some((e) => e.includes('.mod_meta_data'))) return true
-        return false
+    static isValidVanillaFolder(folderPath) {
+        return path.basename(folderPath).startsWith('SinsII') || path.basename(folderPath).startsWith('Sins2')
+    }
+    static isValidModPath(folderPath) {
+        return fs.readdirSync(folderPath).some((e) => e.includes('.mod_meta_data'))
     }
 }

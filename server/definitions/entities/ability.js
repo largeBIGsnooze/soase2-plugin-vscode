@@ -548,6 +548,9 @@ module.exports = class Ability {
                 tooltip_icon: this.cache.textures(),
                 targeting: this.ability_gui_targeting_definition(ctx?.targeting, ptr + '/targeting'),
                 tooltip_line_groups: Definitions.tooltip_line_groups(ctx?.tooltip_line_groups, ptr + '/tooltip_line_groups', this.json, this.cache),
+                /* game_version v1.30.0 */
+                tooltip_show_current_gravity_well_resurrectable_unit_data: boolean("default=false"),
+                /* */
                 tooltip_picture: this.cache.textures(),
                 unity_window_picture: this.cache.textures(),
             },

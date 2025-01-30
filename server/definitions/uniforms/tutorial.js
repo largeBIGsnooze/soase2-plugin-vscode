@@ -10,7 +10,9 @@ module.exports = class TutorialUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_tutorials: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 tutorials: array({
                     items: this.cache.scenarios,
                     isUnique: true,

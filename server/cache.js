@@ -17,6 +17,8 @@ class Filewatcher {
         this.textures = null
         this.action_values = null
         this.cache = {
+            metal_asteroid_tiers: {},
+            crystal_asteroid_tiers: {},
             action_values: {},
             exotic_entities: {},
             player_icons: {},
@@ -87,6 +89,7 @@ class Filewatcher {
             action_data_sources: {},
             target_filters: {},
             buff_empire_ids: {},
+            beam_effect_files: {},
             beam_effects: {},
             target_filters_uniforms: {},
             buff_actions: {},
@@ -189,6 +192,17 @@ class Filewatcher {
     setCacheStorage() {
         this.cache.exotic_entities = enumerate({
             items: this.append('exotic_entities', [{ func: 'parseEntityManifest', _args: 'exotic' }]),
+        })
+
+        this.cache.metal_asteroid_tiers = enumerate({
+            desc: loc_keys.ASTEROID_TIERS,
+            items: this.append('metal_asteroid_tiers', [{ func: 'parseAsteroidTiers', _args: 'metal_asteroids' }]),
+            isIntType: true,
+        })
+        this.cache.crystal_asteroid_tiers = enumerate({
+            desc: loc_keys.ASTEROID_TIERS,
+            items: this.append('crystal_asteroid_tiers', [{ func: 'parseAsteroidTiers', _args: 'crystal_asteroids' }]),
+            isIntType: true,
         })
 
         this.cache.player_icons = enumerate({ items: this.append('player_icons', [{ func: 'parsePlayerIcons' }]) })
@@ -444,6 +458,9 @@ class Filewatcher {
         this.cache.beam_effects = enumerate({
             items: this.append('beam_effects', [{ func: 'parseBeamEffects' }]),
         })
+        this.cache.beam_effect_files = enumerate({
+            items: this.append('beam_effect_files', [{ func: 'parseBeamEffectFiles' }]),
+        })
         this.cache.target_filters_uniforms = enumerate({
             items: this.append('target_filters_uniforms', [{ func: 'parseTargetFiltersUniform' }]),
         })
@@ -537,7 +554,7 @@ class Filewatcher {
 
     watchEntities() {
         this.watchDir('textures', (textureName) => {
-            if (textureName?.endsWith('.dds') || textureName?.endsWith('.png')) {
+            if (textureName?.toLowerCase().endsWith('.dds') || textureName?.toLowerCase().endsWith('.png')) {
                 this.append((result) => (this.textures = result), [{ func: 'parseTextures' }])
             }
         })
@@ -553,9 +570,9 @@ class Filewatcher {
                 ])
             }
             if (entityName?.endsWith('.beam_effect')) {
-                this.append('beam_effects', [
+                this.append('beam_effect_files', [
                     {
-                        func: 'parseBeamEffects',
+                        func: 'parseBeamEffectFiles',
                     },
                 ])
             }
@@ -729,6 +746,11 @@ class Filewatcher {
                         func: 'parseEffectAliasBindings',
                     },
                 ])
+                this.append('beam_effects', [
+                    {
+                        func: 'parseBeamEffects',
+                    },
+                ])
                 this.append('child_meshes', [
                     {
                         func: 'parseChildMeshes',
@@ -828,9 +850,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'unit_skin',
                     },
-                ]).then((result) => {
-                    this.cache.unit_skins.enum = result
-                })
+                ]).then((result) => (this.cache.unit_skins.enum = result))
             }
             if (entityName === 'unit.entity_manifest') {
                 this.appendAsync([
@@ -838,9 +858,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'unit',
                     },
-                ]).then((result) => {
-                    this.cache.units.enum = result
-                })
+                ]).then((result) => (this.cache.units.enum = result))
             }
             if (entityName === 'buff.entity_manifest') {
                 this.appendAsync([
@@ -848,9 +866,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'buff',
                     },
-                ]).then((result) => {
-                    this.cache.buffs.enum = result
-                })
+                ]).then((result) => (this.cache.buffs.enum = result))
             }
             if (entityName === 'research_subject.entity_manifest') {
                 this.appendAsync([
@@ -858,9 +874,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'research_subject',
                     },
-                ]).then((result) => {
-                    this.cache.research_subjects.enum = result
-                })
+                ]).then((result) => (this.cache.research_subjects.enum = result))
             }
             if (entityName === 'npc_reward.entity_manifest') {
                 this.appendAsync([
@@ -868,9 +882,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'npc_reward',
                     },
-                ]).then((result) => {
-                    this.cache.npc_rewards.enum = result
-                })
+                ]).then((result) => (this.cache.npc_rewards.enum = result))
             }
             if (entityName === 'formation.entity_manifest') {
                 this.appendAsync([
@@ -878,9 +890,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'formation',
                     },
-                ]).then((result) => {
-                    this.cache.formations.enum = result
-                })
+                ]).then((result) => (this.cache.formations.enum = result))
             }
             if (entityName === 'action_data_source.entity_manifest') {
                 this.appendAsync([
@@ -888,9 +898,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'action_data_source',
                     },
-                ]).then((result) => {
-                    this.cache.action_data_sources.enum = result
-                })
+                ]).then((result) => (this.cache.action_data_sources.enum = result))
             }
             if (entityName === 'player.entity_manifest') {
                 this.appendAsync([
@@ -898,9 +906,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'player',
                     },
-                ]).then((result) => {
-                    this.cache.players.enum = result
-                })
+                ]).then((result) => (this.cache.players.enum = result))
             }
             if (entityName === 'ability.entity_manifest') {
                 this.appendAsync([
@@ -908,9 +914,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'ability',
                     },
-                ]).then((result) => {
-                    this.cache.abilities.enum = result
-                })
+                ]).then((result) => (this.cache.abilities.enum = result))
             }
             if (entityName === 'weapon.entity_manifest') {
                 this.appendAsync([
@@ -918,9 +922,7 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'weapon',
                     },
-                ]).then((result) => {
-                    this.cache.weapons.enum = result
-                })
+                ]).then((result) => (this.cache.weapons.enum = result))
             }
             if (entityName === 'exotic.entity_manifest') {
                 this.appendAsync([
@@ -928,163 +930,175 @@ class Filewatcher {
                         func: 'parseEntityManifest',
                         _args: 'exotic',
                     },
-                ]).then((result) => {
-                    this.cache.exotic_entities.enum = result
-                })
+                ]).then((result) => (this.cache.exotic_entities.enum = result))
             }
         })
 
         this.watchDir('uniforms', (entityName) => {
             if (entityName === 'player_race.uniforms') {
-                this.append('race_names', [
+                this.appendAsync([
                     {
                         func: 'parseRaceNames',
                     },
-                ])
+                ]).then((result) => (this.cache.race_names.enum = result))
             }
             if (entityName === 'debris.uniforms') {
-                this.append('debris', [
+                this.appendAsync([
                     {
                         func: 'parseDebrisUniform',
                     },
-                ])
+                ]).then((e) => (this.cache.debris.enum = e))
             }
             if (entityName === 'planet.uniforms') {
-                this.append('planets', [
+                this.appendAsync([
                     {
                         func: 'parsePlanets',
                     },
-                ])
+                ]).then((result) => (this.cache.planets.enum = result))
+
+                this.appendAsync([
+                    {
+                        func: 'parseAsteroidTiers',
+                        _args: 'metal_asteroids',
+                    },
+                ]).then((result) => (this.cache.metal_asteroid_tiers.enum = result))
+
+                this.appendAsync([
+                    {
+                        func: 'parseAsteroidTiers',
+                        _args: 'crystal_asteroids',
+                    },
+                ]).then((result) => (this.cache.crystal_asteroid_tiers.enum = result))
             }
             if (entityName === 'exotic.uniforms') {
-                this.append('exotics', [
+                this.appendAsync([
                     {
                         func: 'parseExotics',
                     },
-                ])
+                ]).then((result) => (this.cache.exotics.enum = result))
             }
             if (entityName === 'unit_build.uniforms') {
-                this.append('build_kinds', [
+                this.appendAsync([
                     {
                         func: 'parseUnitBuildKinds',
                     },
-                ])
+                ]).then((result) => (this.cache.build_kinds.enum = result))
             }
             if (entityName === 'unit.uniforms') {
-                this.append('unit_group_names', [
+                this.appendAsync([
                     {
                         func: 'parseUnitNames',
                     },
-                ])
+                ]).then((result) => (this.cache.unit_group_names.enum = result))
             }
             if (entityName === 'hud_skin.uniforms') {
-                this.append('hud_skins', [
+                this.appendAsync([
                     {
                         func: 'parseHudSkins',
                     },
-                ])
+                ]).then((e) => (this.cache.hud_skins.enum = e))
             }
             if (entityName === 'player.uniforms') {
-                this.append('npc_tags', [
+                this.appendAsync([
                     {
                         func: 'parseNpcTags',
                     },
-                ])
+                ]).then((e) => (this.cache.npc_tags.enum = e))
             }
             if (entityName === 'main_view.uniforms') {
-                this.append('mainview_groups', [
+                this.appendAsync([
                     {
                         func: 'parseMainviewGroups',
                     },
-                ])
+                ]).then((e) => (this.cache.mainview_groups.enum = e))
             }
             if (entityName === 'attack_target_type_group.uniforms') {
                 this.cache.attack_target_types.enum = string()
-                this.append('attack_target_type_groups', [
+                this.appendAsync([
                     {
                         func: 'parseAttackTargetTypeGroups',
                     },
-                ])
+                ]).then((e) => (this.cache.attack_target_type_groups.enum = e))
             }
             if (entityName === 'unit_tag.uniforms') {
-                this.append('ship_tags', [
+                this.appendAsync([
                     {
                         func: 'parseShipTags',
                     },
-                ])
+                ]).then((e) => (this.cache.ship_tags.enum = e))
             }
             if (entityName === 'unit_mutation.uniforms') {
-                this.append('mutations', [
+                this.appendAsync([
                     {
                         func: 'parseUnitMutations',
                     },
-                ])
+                ]).then((e) => (this.cache.mutations.enum = e))
             }
             if (entityName === 'strikecraft.uniforms') {
-                this.append('strikecraft_kinds', [
+                this.appendAsync([
                     {
                         func: 'parseStrikecraft',
                     },
-                ])
+                ]).then((e) => (this.cache.strikecraft_kinds.enum = e))
             }
             if (entityName === 'weapon.uniforms') {
-                this.append('weapon_tags', [
+                this.appendAsync([
                     {
                         func: 'parseWeaponTags',
                     },
-                ])
+                ]).then((e) => (this.cache.weapon_tags.enum = e))
             }
             if (entityName === 'research.uniforms') {
-                this.append('max_tier_count', [
+                this.appendAsync([
                     {
                         func: 'parseResearchTierCount',
                     },
-                ])
+                ]).then((e) => (this.cache.max_tier_count.enum = e))
             }
             if (entityName === 'target_filter.uniforms') {
-                this.append('target_filters_uniforms', [
+                this.appendAsync([
                     {
                         func: 'parseTargetFiltersUniform',
                     },
-                ])
+                ]).then((e) => (this.cache.target_filters_uniforms.enum = e))
             }
             if (entityName === 'special_operation_unit.uniforms') {
-                this.append('special_operation_kinds', [
+                this.appendAsync([
                     {
                         func: 'parseSpecialOperationUnitKinds',
                     },
-                ])
+                ]).then((e) => (this.cache.special_operation_kinds.enum = e))
             }
             if (entityName === 'random_skybox_filling.uniforms') {
-                this.append('random_skybox_fillings', [
+                this.appendAsync([
                     {
                         func: 'parseRandomSkyboxFillings',
                     },
-                ])
+                ]).then((e) => (this.cache.random_skybox_fillings.enum = e))
             }
 
             if (entityName === 'galaxy_generator.uniforms') {
-                this.append('fixture_fillings', [
+                this.appendAsync([
                     {
                         func: 'parseGravityWellFixtureFillings',
                     },
-                ])
-                this.append('random_fixture_fillings', [
+                ]).then((e) => (this.cache.fixture_fillings.enum = e))
+                this.appendAsync([
                     {
                         func: 'parseGravityWellRandomFixtureFillings',
                     },
-                ])
-                this.append('gravity_well_fillings', [
+                ]).then((e) => (this.cache.random_fixture_fillings.enum = e))
+                this.appendAsync([
                     {
                         func: 'parseGravityWellFillings',
                     },
-                ])
-                this.append('random_gravity_well_fillings', [
+                ]).then((e) => (this.cache.gravity_well_fillings.enum = e))
+                this.appendAsync([
                     {
                         func: 'parseGravityWellRandomFillings',
                     },
-                ])
-                this.append('gravity_wells', [
+                ]).then((e) => (this.cache.random_gravity_well_fillings.enum = e))
+                this.appendAsync([
                     {
                         func: 'parseGravityWellFillings',
                     },
@@ -1097,17 +1111,18 @@ class Filewatcher {
                     {
                         func: 'parseGravityWellFixtureFillings',
                     },
-                ])
-                this.append('moon_fillings', [
+                ]).then((e) => (this.cache.gravity_wells.enum = e))
+
+                this.appendAsync([
                     {
                         func: 'parseMoonFillings',
                     },
-                ])
-                this.append('node_fillings', [
+                ]).then((e) => (this.cache.moon_fillings.enum = e))
+                this.appendAsync([
                     {
                         func: 'parseNodeFillings',
                     },
-                ])
+                ]).then((e) => (this.cache.node_fillings.enum = e))
             }
         })
 
@@ -1163,36 +1178,36 @@ class Filewatcher {
         })
         this.watchDir('colors', (entityName) => {
             if (entityName === 'named_colors.named_colors') {
-                this.append('colors', [
+                this.appendAsync([
                     {
                         func: 'parseColorGroups',
                     },
-                ])
+                ]).then((e) => (this.cache.colors.enum = e))
             }
         })
         this.watchDir('sounds', (entityName) => {
             if (entityName?.endsWith('.sound')) {
-                this.append('sounds', [
+                this.appendAsync([
                     {
                         func: 'parseSounds',
                         _args: 'sound',
                     },
-                ])
+                ]).then((e) => (this.cache.sounds.enum = e))
             }
             if (entityName?.endsWith('.ogg')) {
-                this.append('ogg', [
+                this.appendAsync([
                     {
                         func: 'parseSounds',
                         _args: 'ogg',
                     },
-                ])
+                ]).then((e) => (this.cache.ogg.enum = e))
             }
         })
     }
 }
 
-module.exports = ({ modFolder, vanillaFolder = null, modFilewatchers = new Map() }) => {
-    const fw = new Filewatcher(modFilewatchers, modFolder, vanillaFolder, Config.isValidGamePath(vanillaFolder))
+module.exports = ({ modFolder = null, vanillaFolder = null, modFilewatchers = new Map() }) => {
+    const fw = new Filewatcher(modFilewatchers, modFolder, vanillaFolder, Config.isValidVanillaFolder(vanillaFolder))
 
     fw.clearFilewatchers()
     fw.watchRoot()

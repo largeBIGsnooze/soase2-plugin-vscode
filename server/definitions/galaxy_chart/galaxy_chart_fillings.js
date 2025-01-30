@@ -11,7 +11,7 @@ module.exports = class GalaxyChartFillings extends GalaxyGeneratorUniform {
     create() {
         return schema({
             keys: {
-                moon_fillings: super.moon_fillings(),
+                moon_fillings: super.moon_fillings_definition(),
             },
         })
     }

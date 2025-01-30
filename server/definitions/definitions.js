@@ -166,7 +166,7 @@ module.exports = class Definitions {
                 muzzle_effect: data['particle_effects'],
                 hit_hull_effect: data['particle_effects'],
                 charge_effect: data['particle_effects'],
-                beam_effect: data['particle_effects'],
+                beam_effect: data['beam_effects'],
                 muzzle_picking_behavior: this.muzzle_picking_behavior('default=all'),
                 burst_pattern: _.array({ items: _.float() }),
                 hit_shield_impact_radius_t: _.float('default=0.5'),
@@ -330,6 +330,15 @@ module.exports = class Definitions {
     static permission_type() {
         return _.enumerate({
             items: [
+                /* game_version v1.30.3 */
+                'can_update_ability_cooldown_progress',
+                'can_update_unit_item_build_progress',
+                'can_create_retargeting_torpedoes',
+                'can_have_any_strikecraft_launched',
+                'can_update_weapon_cooldown_progress',
+                'can_use_missile_weapons',
+                'can_planet_update_track_upgrade_progress',
+                /* */
                 'can_hyperspace',
                 'can_be_targeted_by_allies',
                 'can_be_targeted_by_enemies',
@@ -351,7 +360,6 @@ module.exports = class Definitions {
                 'can_be_colonized',
                 'can_launch_or_dock_strikecraft',
                 'can_update_unit_production',
-                'can_create_retargeting_torpedoes',
             ],
         })
     }
@@ -562,7 +570,7 @@ module.exports = class Definitions {
     }
     static easing_functions(desc = '') {
         return _.enumerate({
-            desc: desc,
+            desc: desc + loc_keys.EASING_FUNCTION,
             items: [
                 'linear',
                 'in_sine',
@@ -1454,7 +1462,7 @@ module.exports = class Definitions {
                     alias_name: _.string(),
                     alias_binding: _.object({
                         keys: {
-                            beam: cache.beam_effects,
+                            beam: cache.beam_effect_files,
                             particle_effect: cache.particle_effects,
                             sounds: _.array({
                                 items: cache.sounds,
@@ -1508,7 +1516,7 @@ module.exports = class Definitions {
                 'prerequisites',
                 'unit',
                 'unit_constraint',
-                "constraints"
+                'constraints',
             ]
             switch (ctx.constraint_type) {
                 case 'all_finite_time_actions_done':
@@ -2107,7 +2115,7 @@ module.exports = class Definitions {
                 case 'has_missing_armor':
                 case 'has_missing_antimatter':
                 case 'has_missing_shields':
-                    json.validate_keys(ptr, ctx, [], _, ['percentage_missing_threshold', 'amount_missing_threshold'])
+                    json.validate_keys(ptr, ctx, [], _, ['percentage_missing_threshold', 'amount_missing_threshold', 'include_crippled_hull_points'])
                     break
                 case 'has_missing_strikecraft':
                     json.validate_keys(ptr, ctx, [], _, ['percentage_missing_threshold', 'amount_missing_threshold', 'strikecraft_kind'])
@@ -2255,6 +2263,9 @@ module.exports = class Definitions {
                 buff: cache.buffs,
                 include_pending_buffs: _.boolean('default=false'),
                 amount_missing_threshold: _.float(),
+                /* game_version v1.30.0 */
+                include_crippled_hull_points: _.boolean(),
+                /* */
                 percentage_missing_threshold: _.percentage(),
                 strikecraft_kind: cache.strikecraft_kinds,
                 mutation: cache.mutations,
@@ -2390,7 +2401,7 @@ module.exports = class Definitions {
     static effect_definition(cache) {
         return _.object({
             keys: {
-                /* game_version v28.16 */
+                /* game_version v1.28.16 */
                 allow_binding_of_unit_skin_without_unit: _.boolean('default=false'),
                 /* */
                 binding: this.action_effect_alias_binding(),
@@ -2579,10 +2590,10 @@ module.exports = class Definitions {
     static arbitary_research_line_definition(cache) {
         return _.object({
             keys: {
-                after_number: _.integer(),
+                after_number: _.float(),
+                before_number: _.float(),
                 after_text: _.string(),
                 before_after_heading: _.string(),
-                before_number: _.integer(),
                 float_format: this.value_float_format(),
                 heading: cache.localisation,
                 sub_heading_before_empire_modifier: cache.localisation,

@@ -134,9 +134,20 @@ module.exports = class PlayerUniform {
                 'pickable_players',
                 'refund_percentage',
                 'research_overflow_tier_nth_root_modifier',
+                'npc_players_with_reputation',
             ],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_pickable_players: boolean(loc_keys.OVERWRITE_IDS),
+                remove_pickable_players: array({
+                    items: this.cache.players,
+                    isUnique: true,
+                }),
+                npc_players_with_reputation: array({
+                    items: this.cache.players,
+                    isUnique: true,
+                }),
+                /* */
                 fallback_theme_picker_skybox: this.cache.skyboxes,
                 max_fleet_count: float(),
                 fleet_factory_rally_subspace_speed: float(),

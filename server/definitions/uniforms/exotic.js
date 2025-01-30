@@ -10,7 +10,9 @@ module.exports = class ExoticUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_type_datas: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 type_datas: array({
                     items: object({
                         keys: {

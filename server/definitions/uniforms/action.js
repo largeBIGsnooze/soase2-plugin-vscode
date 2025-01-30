@@ -12,7 +12,9 @@ module.exports = class ActionUniform extends ActionDataSource {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_common_action_values: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 common_action_values: super.action_values_definition(this.json?.data?.common_action_values, '/common_action_values'),
             },
         })

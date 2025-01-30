@@ -243,6 +243,17 @@ module.exports = class UnitItem {
                 player_modifiers: PlayerModifiers.create(this.cache),
                 tooltip_icon: this.cache.textures(),
                 tooltip_picture: this.cache.textures(),
+                /* game_version v1.30.0 */
+                npc_range_origin: object({
+                    keys: {
+                        between_gravity_well_range: float(),
+                        npc_tags: array({
+                            items: this.cache.npc_tags,
+                            isUnique: true,
+                        }),
+                    },
+                }),
+                /* */
                 trade_capacity: this.trade_capacity(),
                 unit_factory_modifiers: UnitItemUnitFactoryModifiers.create(),
                 unit_modifiers: UnitItemUnitModifiers.create(this.cache),

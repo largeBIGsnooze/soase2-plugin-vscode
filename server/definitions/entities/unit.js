@@ -694,15 +694,15 @@ module.exports = class Unit {
             },
         })
     }
-    non_random_asteroids_definition(type) {
+    non_random_asteroids_definition(type, asteroid_tier) {
         return object({
             desc: type,
             keys: {
                 tiers: array({
                     items: object({
                         keys: {
+                            tier: asteroid_tier,
                             count: vector2i('how many asteroids?'),
-                            tier: integer(false, 'binding to specific asteroid type in planet.uniforms'),
                         },
                     }),
                 }),
@@ -722,38 +722,21 @@ module.exports = class Unit {
             keys: {
                 planet_type: this.cache.planets,
                 build_distance_from_inner_move_radius: float(),
-                metal_asteroids: object({
-                    keys: {
-                        tiers: array({
-                            items: object({
-                                keys: {
-                                    tier: integer(),
-                                    count: array({
-                                        items: float(),
-                                    }),
-                                },
-                            }),
-                        }),
-                    },
-                }),
-                non_random_crystal_asteroids: this.non_random_asteroids_definition('asteroids spawned with no randomness (typically home planets)'),
-                non_random_metal_asteroids: this.non_random_asteroids_definition('asteroids spawned with no randomness (typically home planets)'),
-                random_crystal_asteroids: this.non_random_asteroids_definition('asteroids spawned with randomness'),
-                random_metal_asteroids: this.non_random_asteroids_definition('asteroids spawned with randomness'),
-                crystal_asteroids: object({
-                    keys: {
-                        tiers: array({
-                            items: object({
-                                keys: {
-                                    tier: integer(),
-                                    count: array({
-                                        items: float(),
-                                    }),
-                                },
-                            }),
-                        }),
-                    },
-                }),
+                non_random_crystal_asteroids: this.non_random_asteroids_definition(
+                    'asteroids spawned with no randomness (typically home planets)',
+                    this.cache.crystal_asteroid_tiers
+                ),
+                non_random_metal_asteroids: this.non_random_asteroids_definition(
+                    'asteroids spawned with no randomness (typically home planets)',
+                    this.cache.metal_asteroid_tiers
+                ),
+                random_crystal_asteroids: this.non_random_asteroids_definition(
+                    'asteroids spawned with randomness',
+                    this.cache.crystal_asteroid_tiers
+                ),
+                random_metal_asteroids: this.non_random_asteroids_definition('asteroids spawned with randomness', this.cache.metal_asteroid_tiers),
+                metal_asteroids: this.non_random_asteroids_definition('', this.cache.metal_asteroid_tiers),
+                crystal_asteroids: this.non_random_asteroids_definition('', this.cache.crystal_asteroid_tiers),
                 destroyed_planet: this.destroyed_planet_definition(),
             },
         })
@@ -1027,6 +1010,9 @@ module.exports = class Unit {
                 json_builder['max_linear_speed'] = float(false)
                 json_builder['death_linear_speed_range'] = vector2f()
                 json_builder['linear_acceleration_angle'] = float(false)
+                /* game_version v1.30.0 */
+                json_builder['linear_deceleration_scalar'] = float()
+                /* */
             }
         } catch {}
         return object({
@@ -1068,6 +1054,20 @@ module.exports = class Unit {
                 }),
                 max_range_weapon_index: integer(),
             },
+        })
+    }
+
+    item_builds_definition() {
+        return array({
+            items: object({
+                keys: {
+                    weight: float(),
+                    build_group: array({
+                        items: this.cache.unit_items,
+                        isUnique: true,
+                    }),
+                },
+            }),
         })
     }
 
@@ -1115,6 +1115,9 @@ module.exports = class Unit {
                 antimatter: this.unit_antimatter_definiton(),
                 planet: this.planet_definition(),
                 items: this.unit_items_definition(),
+                /* game_version v1.32.0 */
+                item_builds: this.item_builds_definition(),
+                /* */
                 trade_port: this.trade_port_definition(),
                 name: object({
                     keys: {
@@ -1185,6 +1188,9 @@ module.exports = class Unit {
                 build_structure_ability: this.cache.abilities,
                 colonize_ability: this.cache.abilities,
                 ship_roles: Definitions.ship_roles(),
+                /* game_version 1.31.7 */
+                is_unity_agent: boolean(),
+                /* */
                 can_join_fleet: boolean(),
                 child_meshes: this.unit_child_mesh_definition(),
                 debris: this.unit_debris_definition(),

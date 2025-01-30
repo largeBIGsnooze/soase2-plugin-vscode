@@ -36,8 +36,12 @@ module.exports = class Command {
                         detail: 'Select to validate all the files in current directory',
                     },
                     {
-                        label: '$(file-directory) Change Workspace',
-                        detail: 'Change the directory from where the validation will be performed.',
+                        label: '$(file-directory) Change Mod workspace',
+                        detail: 'Change the directory where the mod indexing will be performed.',
+                    },
+                    {
+                        label: '$(folder) Change Vanilla installation location',
+                        detail: 'Change the directory where the game is installed.',
                     },
                     {
                         label: '$(game) Create mod',
@@ -79,22 +83,26 @@ module.exports = class Command {
                             break
 
                         case arr[2].label:
-                            commands.executeCommand('soase2-plugin.create-mod')
+                            commands.executeCommand('soase2-plugin.changeVanillaFolder')
                             break
 
                         case arr[3].label:
+                            commands.executeCommand('soase2-plugin.create-mod')
+                            break
+
+                        case arr[4].label:
                             commands.executeCommand('soase2-plugin.manage-mods')
                             break
 
-                        case arr[5].label:
+                        case arr[6].label:
                             commands.executeCommand('soase2-plugin.zip-scenario')
                             break
 
-                        case arr[6].label:
+                        case arr[7].label:
                             commands.executeCommand('soase2-plugin.unzip-scenario')
                             break
 
-                        case arr[8].label:
+                        case arr[9].label:
                             const settingsPath = path.resolve(this.sinsAppdataPath, 'settings', 'settings.json')
                             workspace.openTextDocument(Uri.parse(settingsPath).fsPath).then((e) => window.showTextDocument(e))
                             break
@@ -119,13 +127,13 @@ module.exports = class Command {
     }
 
     async getAvaliableScenarioFoldersQuickpicks() {
-        return new EntityReader(await Config.getWorkspaceFolder())
+        return new EntityReader(await Config.getModFolder())
             .read(['scenarios/*'], { directories: true })
             .map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     async getAvaliableScenarioQuickpicks() {
-        return new EntityReader(await Config.getWorkspaceFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
+        return new EntityReader(await Config.getModFolder()).read(['scenarios/*.scenario']).map((e) => ({ label: e.basename, detail: e.uri }))
     }
 
     zipScenarioCommand(commandName) {
@@ -153,7 +161,7 @@ module.exports = class Command {
     }
 
     async showModFolderSelectionIfInvalid() {
-        if (!Config.isValidGamePath(await Config.getWorkspaceFolder())) {
+        if (!Config.isValidModPath(await Config.getModFolder())) {
             const selection = await window.showErrorMessage('Could not locate mod metadata. Would you like to change path?', 'Set Folder', 'Cancel')
 
             if (selection === 'Set Folder') {
@@ -279,7 +287,7 @@ module.exports = class Command {
     }
 
     async manageScenario(zip, { mode: mode }) {
-        const gamePath = await Config.getWorkspaceFolder()
+        const gamePath = await Config.getModFolder()
 
         if (!existsSync(this.winrarPath)) {
             window.showErrorMessage('Make sure you have winrar installed on your computer')
@@ -334,7 +342,7 @@ module.exports = class Command {
             async (prog) => {
                 prog.report({ message: 'Reloading cache...' })
                 await this.client.sendRequest('function/clearDiagnostics')
-                await Config.setWorkspace(dir, ConfigurationTarget.Global)
+                await Config.setFolder(dir, 'mod', ConfigurationTarget.Global)
                 await this.client.sendRequest('function/clearCache')
             }
         )
@@ -353,12 +361,30 @@ module.exports = class Command {
             })
             .then((option) => callback(option.label, picks, option?.hidden))
     }
+    changeVanillaFolderCommand(commandName) {
+        return commands.registerCommand(commandName, async () => {
+            this.showSelectFolderDialog(async (dir) => {
+                await Config.setFolder(dir, 'vanilla', ConfigurationTarget.Global)
+                window
+                    .showInformationMessage(
+                        `Vanilla location set to: '${dir}'. Reload VS Code for it to take effect, do it now?`,
+                        'Restart',
+                        'Cancel'
+                    )
+                    .then((option) => {
+                        if (option === 'Restart') {
+                            commands.executeCommand('workbench.action.reloadWindow')
+                        }
+                    })
+            })
+        })
+    }
 
     changeWorkspaceCommand(commandName) {
         return commands.registerCommand(commandName, async () => {
             window.showInformationMessage('Ensure that you select the root directory of the game')
             this.showSelectFolderDialog(async (dir) => {
-                if (!Config.isValidGamePath(dir)) {
+                if (!Config.isValidModPath(dir)) {
                     window.showWarningMessage('Could not locate mod metadata. Ensure it is the root directory')
                     return
                 }

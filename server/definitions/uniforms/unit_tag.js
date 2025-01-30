@@ -11,7 +11,9 @@ module.exports = class UnitTagUniform {
         return schema({
             required: ['unit_tags'],
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_unit_tags: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 unit_tags: array({
                     items: object({
                         keys: {

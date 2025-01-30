@@ -78,7 +78,9 @@ module.exports = class LootUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_random_loots: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 levels: array({
                     items: object({
                         required: [

@@ -8,13 +8,13 @@ module.exports = class GalaxyGeneratorUniform {
         this.cache = cache
     }
 
-    npc_filling_type() {
+    npc_filling_type_definition() {
         return enumerate({
             items: ['guardian', 'militia', 'enemy_faction', 'friendly_faction'],
         })
     }
 
-    npc_fillings() {
+    npc_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -22,7 +22,7 @@ module.exports = class GalaxyGeneratorUniform {
                     filling: object({
                         keys: {
                             player_definition: this.cache.players,
-                            npc_filling_type: this.npc_filling_type(),
+                            npc_filling_type: this.npc_filling_type_definition(),
                             npc_id: string(),
                         },
                     }),
@@ -31,7 +31,7 @@ module.exports = class GalaxyGeneratorUniform {
         })
     }
 
-    random_fixture_fillings() {
+    random_fixture_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -55,7 +55,7 @@ module.exports = class GalaxyGeneratorUniform {
         })
     }
 
-    gravity_well_fillings() {
+    gravity_well_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -87,7 +87,7 @@ module.exports = class GalaxyGeneratorUniform {
         })
     }
 
-    random_gravity_well_fillings() {
+    random_gravity_well_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -109,7 +109,7 @@ module.exports = class GalaxyGeneratorUniform {
             }),
         })
     }
-    node_fillings() {
+    node_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -130,7 +130,7 @@ module.exports = class GalaxyGeneratorUniform {
             }),
         })
     }
-    fixture_fillings() {
+    fixture_fillingws_definition() {
         return array({
             items: object({
                 keys: {
@@ -151,7 +151,27 @@ module.exports = class GalaxyGeneratorUniform {
             }),
         })
     }
-    moon_fillings() {
+    wormhole_fillings_definition() {
+        return array({
+            items: object({
+                keys: {
+                    name: string(),
+                    filling: object({
+                        keys: {
+                            wormholes: array({
+                                items: object({
+                                    keys: {
+                                        filling_name: this.cache.fixture_fillings,
+                                    },
+                                }),
+                            }),
+                        },
+                    }),
+                },
+            }),
+        })
+    }
+    moon_fillings_definition() {
         return array({
             items: object({
                 keys: {
@@ -210,13 +230,23 @@ module.exports = class GalaxyGeneratorUniform {
     fillings_definition() {
         return object({
             keys: {
-                npc_fillings: this.npc_fillings(),
-                random_gravity_well_fillings: this.random_gravity_well_fillings(),
-                gravity_well_fillings: this.gravity_well_fillings(),
-                random_fixture_fillings: this.random_fixture_fillings(),
-                node_fillings: this.node_fillings(),
-                fixture_fillings: this.fixture_fillings(),
-                moon_fillings: this.moon_fillings(),
+                npc_fillings: this.npc_fillings_definition(),
+                random_gravity_well_fillings: this.random_gravity_well_fillings_definition(),
+                gravity_well_fillings: this.gravity_well_fillings_definition(),
+                random_fixture_fillings: this.random_fixture_fillings_definition(),
+                /* game_version v1.32.0 */
+                artifacts: array({ items: this.cache.planet_artifacts, isUnique: true }),
+                /* */
+                node_fillings: this.node_fillings_definition(),
+                fixture_fillings: this.fixture_fillingws_definition(),
+                moon_fillings: this.moon_fillings_definition(),
+                /* game_version v1.31.0 */
+                wormhole_fillings: this.wormhole_fillings_definition(),
+                artifacts: array({
+                    items: this.cache.planet_artifacts,
+                    isUnique: true,
+                }),
+                /* */
             },
         })
     }
@@ -224,6 +254,11 @@ module.exports = class GalaxyGeneratorUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.32.0 */
+                overwrite_artifacts: boolean(loc_keys.OVERWRITE_IDS),
+                overwrite_wormhole_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
+                /* game_version v1.30.3 */
                 overwrite_fixture_fillings: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_gravity_well_fillings: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_moon_fillings: boolean(loc_keys.OVERWRITE_IDS),
@@ -232,6 +267,7 @@ module.exports = class GalaxyGeneratorUniform {
                 overwrite_random_fixture_fillings: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_random_gravity_well_fillings: boolean(loc_keys.OVERWRITE_IDS),
                 overwrite_random_skybox_fillings: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 minimum_gravity_well_distances_by_hierarchy_depth: vector3f(),
                 gravity_well_y_offsets_by_hierarchy_depth: array({
                     items: vector2f(),

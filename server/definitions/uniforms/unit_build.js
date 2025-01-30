@@ -10,7 +10,9 @@ module.exports = class UnitBuildUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.30.3 */
                 overwrite_build_kinds: boolean(loc_keys.OVERWRITE_IDS),
+                /* */
                 build_kinds: array({
                     items: object({
                         keys: {

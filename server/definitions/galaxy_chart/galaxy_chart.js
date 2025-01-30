@@ -38,6 +38,9 @@ module.exports = class GalaxyChart {
         return object({
             required: ['filling_name', 'id'],
             keys: {
+                /* game_version v1.32.0 */
+                artifact_name: string(),
+                /* */
                 chance_of_first_planet_bonus: float(),
                 chance_of_loot: float(),
                 chance_of_retrograde_orbit: float(),

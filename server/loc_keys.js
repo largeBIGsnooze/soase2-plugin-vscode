@@ -136,4 +136,14 @@ if false fleets will never retreat from battle even if losing.
 
 default=true`,
     ASTEROID_TIERS: `Index of the asteroid set to pick from in \`planet.uniforms\``,
+    EFFECT_BY_SIZE: `References the \`action_effect_size\` defined in the unit entity`,
+    ACTION_EFFECT_SIZE: `Used in \`effect_definition\` with on \`start_buff_effect\` action`,
+    TARGET_FILTER_UNIT_TYPE: `Filter for the \`target_filters\` on \`unit_types\``,
+    SKIN_GROUP_SKINS: `Meshes to use. >1 meshes will be shuffled on creation. ie: \`planets\``,
+    UNIT_BUILD_GROUP_IDS: `these can be found in the player definition as \`unit_build_groups\``,
+    UNIT_BUILDS: `
+build kind definitions can be found in
+
+\`uniforms/unit_build.uniforms\`
+`,
 }

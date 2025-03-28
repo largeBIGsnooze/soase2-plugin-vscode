@@ -265,7 +265,7 @@ module.exports = class Unit {
             required: ['build_kind', 'build_time', 'price'],
             keys: {
                 build_time: float(),
-                price: Definitions.price(),
+                price: Definitions.price_definition(),
                 build_kind: this.cache.build_kinds,
                 build_point_offset: vector3f(),
                 supply_cost: integer(),
@@ -344,6 +344,11 @@ module.exports = class Unit {
                 armor_point_restore_cooldown_duration_after_damage_taken: float(),
                 hull_point_restore_cooldown_duration_after_damage_taken: float(),
                 shield_point_restore_cooldown_duration_after_damage_taken: float(),
+                /* game_version v1.40.14 */
+                hull_point_restore_scalar_after_damage_taken: float(),
+                armor_point_restore_scalar_after_damage_taken: float(),
+                shield_point_restore_scalar_after_damage_taken: float(),
+                /* */
             },
         })
     }
@@ -519,7 +524,7 @@ module.exports = class Unit {
                     },
                 }),
                 spawn_loot: object({
-                    required: ['assets', 'exotics', 'experience_given', 'loot_name', 'loot_unit'],
+                    required: ['assets', 'experience_given', 'loot_name', 'loot_unit'],
                     keys: {
                         loot_level: integer(),
                         loot_unit: this.cache.units,
@@ -656,6 +661,7 @@ module.exports = class Unit {
                 required: ['skins'],
                 keys: {
                     skins: array({
+                        desc: loc_keys.SKIN_GROUP_SKINS,
                         items: this.cache.unit_skins,
                         isUnique: true,
                     }),
@@ -689,7 +695,7 @@ module.exports = class Unit {
             required: ['skin', 'stripped_assets', 'stripped_exotics'],
             keys: {
                 skin: this.cache.unit_skins,
-                stripped_assets: Definitions.price(),
+                stripped_assets: Definitions.price_definition(),
                 stripped_exotics: Definitions.exotic_price(this.cache),
             },
         })

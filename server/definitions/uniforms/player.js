@@ -137,6 +137,9 @@ module.exports = class PlayerUniform {
                 'npc_players_with_reputation',
             ],
             keys: {
+                /* game_version v1.40.14 */
+                dlc_only_pickable_players: array({ items: this.cache.players, isUnique: true }),
+                /* */
                 /* game_version v1.30.3 */
                 overwrite_pickable_players: boolean(loc_keys.OVERWRITE_IDS),
                 remove_pickable_players: array({
@@ -176,6 +179,9 @@ module.exports = class PlayerUniform {
                 auto_upgrade_planet_track_price_threshold_multiplier: float(),
                 max_research_rate_scalar: float(false),
                 max_research_points_overflow: float(),
+                /* game_version v1.40.14 */
+                max_fleet_supply_scalar: float(),
+                /* */
                 research_overflow_tier_nth_root_modifier: float(),
                 alliance: this.alliance_definition(),
                 npc: this.npc_definition(),

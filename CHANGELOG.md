@@ -1,3 +1,18 @@
+## 2.2.0
+-   Updated to 1.40.14 version of the game
+
+## 2.1.0
+
+-   Adds validation to `rendering_type` for `gui`
+-   Add cached autocompletion for `action_id` in `action_group`
+-   More documentation strings
+-   `Validate Files` command will now only validate the entities defined in their manifests
+-   Fix `charge_duration` being invalid for beam weapons
+
+## 2.0.1
+
+-   Fixes an error with bad paths
+
 ## 2.0.0
 
 -   Updated to 1.32.0 version of the game

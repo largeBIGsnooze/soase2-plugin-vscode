@@ -54,6 +54,7 @@ module.exports = class Weapon {
                 this.json.validate_keys('/firing', this.json.data.firing, ['beam_duration'], ['travel_speed', 'torpedo_firing_definition'])
                 return {
                     beam_duration: float(true),
+                    charge_duration: float(true),
                 }
             }
         } catch {}
@@ -158,6 +159,9 @@ module.exports = class Weapon {
                     isUnique: true,
                 }),
                 bombing_damage: float(true),
+                /* game_version v1.40.14 */
+                population_damage: float(true),
+                /* */
             },
         })
     }

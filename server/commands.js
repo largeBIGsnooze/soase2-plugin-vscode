@@ -10,15 +10,13 @@ const {
     MarkdownString,
 } = require('vscode')
 const path = require('path')
-const { mkdirSync, writeFileSync, existsSync, unlinkSync, rmdirSync, readFileSync } = require('fs')
+const fs = require('fs')
 const ModMetaData = require('./definitions/mod_meta_data/mod_meta_data')
 const { CONSTANTS } = require('./constants')
 const { execFile } = require('child_process')
-const { readdirSync } = require('fs')
 const { EntityReader } = require('./data/file_handler')
 const Config = require('./utils/config')
 const { base64images } = require('./utils/base64images')
-
 module.exports = class Command {
     constructor(client) {
         this.client = client
@@ -160,7 +158,7 @@ module.exports = class Command {
         })
     }
 
-    async showModFolderSelectionIfInvalid() {
+    static async showModFolderSelectionIfInvalid() {
         if (!Config.isValidModPath(await Config.getModFolder())) {
             const selection = await window.showErrorMessage('Could not locate mod metadata. Would you like to change path?', 'Set Folder', 'Cancel')
 
@@ -194,7 +192,7 @@ module.exports = class Command {
 
         let isValidating = false
         const command = commands.registerCommand(commandName, async () => {
-            await this.showModFolderSelectionIfInvalid()
+            await Command.showModFolderSelectionIfInvalid()
 
             if (isValidating) return
             try {
@@ -234,10 +232,10 @@ module.exports = class Command {
     }
 
     manageMod(enabledMods, modFolder, modData, label) {
-        if (!existsSync(modData)) return
+        if (!fs.existsSync(modData)) return
 
         if (!enabledMods.enabled_mods.some((e) => e.folder_name === modFolder)) {
-            modData = JSON.parse(readFileSync(modData, 'utf-8'))
+            modData = JSON.parse(fs.readFileSync(modData, 'utf-8'))
 
             enabledMods.enabled_mods.push({
                 type: 0,
@@ -253,17 +251,19 @@ module.exports = class Command {
             )
             window.showInformationMessage('Mod disabled: ' + label)
         }
-        writeFileSync(this.enabledModsPath, JSON.stringify(enabledMods, null, 2))
+        fs.writeFileSync(this.enabledModsPath, JSON.stringify(enabledMods, null, 2))
     }
 
     manageMods(commandName) {
         return commands.registerCommand(commandName, async () => {
-            const enabledModsFile = JSON.parse(readFileSync(this.enabledModsPath, 'utf-8'))
+            const enabledModsFile = JSON.parse(fs.readFileSync(this.enabledModsPath, 'utf-8'))
             const picks = new EntityReader(path.resolve(this.sinsAppdataPath, 'mods'))
                 .read(['*'], { directories: true, lower: false })
                 .flatMap((e) => {
                     const isEnabled = enabledModsFile.enabled_mods.some((y) => y.folder_name === e.basename)
-                    const displayName = JSON.parse(readFileSync(path.resolve(path.normalize(e.uri, '../'), '.mod_meta_data'), 'utf-8')).display_name
+                    const displayName = JSON.parse(
+                        fs.readFileSync(path.resolve(path.normalize(e.uri, '../'), '.mod_meta_data'), 'utf-8')
+                    ).display_name
 
                     return [
                         {
@@ -280,8 +280,10 @@ module.exports = class Command {
                 })
 
             this.showQuickpicks(picks, (label, _, hidden) => {
-                const metadataPath = path.resolve(this.sinsAppdataPath, 'mods', hidden, '.mod_meta_data')
-                this.manageMod(enabledModsFile, hidden, metadataPath, label)
+                try {
+                    const metadataPath = path.resolve(this.sinsAppdataPath, 'mods', hidden, '.mod_meta_data')
+                    this.manageMod(enabledModsFile, hidden, metadataPath, label)
+                } catch {}
             })
         })
     }
@@ -289,42 +291,42 @@ module.exports = class Command {
     async manageScenario(zip, { mode: mode }) {
         const gamePath = await Config.getModFolder()
 
-        if (!existsSync(this.winrarPath)) {
+        if (!fs.existsSync(this.winrarPath)) {
             window.showErrorMessage('Make sure you have winrar installed on your computer')
             return
         }
 
-        if (!existsSync(path.resolve(gamePath, 'scenarios'))) {
+        if (!fs.existsSync(path.resolve(gamePath, 'scenarios'))) {
             window.showErrorMessage('Scenarios not found')
             return
         }
         const zipPath = path.resolve(gamePath, 'scenarios', zip)
 
         if (mode === 'unzip') {
-            if (!existsSync(`${zipPath}.scenario`)) {
+            if (!fs.existsSync(`${zipPath}.scenario`)) {
                 window.showErrorMessage('Scenario not found')
                 return
             }
             try {
-                mkdirSync(path.join(gamePath, 'scenarios', zip))
+                fs.mkdirSync(path.join(gamePath, 'scenarios', zip))
                 execFile(this.winrarPath, ['e', '-ep1', '-inul', '-o', `${zipPath}.scenario`, `${zipPath}/`], (err) =>
                     err ? this.client.debug(err) : null
-                ).on('exit', () => unlinkSync(`${zipPath}.scenario`))
+                ).on('exit', () => fs.unlinkSync(`${zipPath}.scenario`))
                 window.showInformationMessage(`Scenario unzipped at: ${zipPath}`)
             } catch (e) {
                 window.showErrorMessage(`Scenario: ${zipPath}, already exists`)
             }
         } else {
             try {
-                if (!existsSync(zipPath)) {
+                if (!fs.existsSync(zipPath)) {
                     window.showErrorMessage('Cannot zip the selected scenario. Try unzipping it first')
                     return
                 }
                 execFile(this.winrarPath, ['a', '-afzip', '-m0', '-inul', '-ep1', `${zipPath}.scenario`, `${zipPath}\\*`], (err) =>
                     err ? this.client.debug(err) : null
                 ).on('exit', () => {
-                    readdirSync(zipPath)?.map((e) => unlinkSync(path.resolve(zipPath, e)))
-                    rmdirSync(zipPath)
+                    fs.readdirSync(zipPath)?.map((e) => fs.unlinkSync(path.resolve(zipPath, e)))
+                    fs.rmdirSync(zipPath)
                 })
                 window.showInformationMessage(`Scenario zipped: ${zipPath}`)
             } catch (e) {
@@ -359,7 +361,7 @@ module.exports = class Command {
                 // ignoreFocusOut: true,
                 placeHolder: 'Type your option...',
             })
-            .then((option) => callback(option.label, picks, option?.hidden))
+            .then((option) => callback(option?.label, picks, option?.hidden))
     }
     changeVanillaFolderCommand(commandName) {
         return commands.registerCommand(commandName, async () => {
@@ -394,8 +396,8 @@ module.exports = class Command {
     }
 
     writeModData(filePath, folderName) {
-        mkdirSync(path.resolve(filePath, 'entities'))
-        writeFileSync(path.resolve(filePath, '.mod_meta_data'), JSON.stringify(ModMetaData.boilerPlate(folderName), null, 4))
+        fs.mkdirSync(path.resolve(filePath, 'entities'))
+        fs.writeFileSync(path.resolve(filePath, '.mod_meta_data'), JSON.stringify(ModMetaData.boilerPlate(folderName), null, 4))
     }
 
     showModCreatedDialog(folderPath) {
@@ -409,8 +411,8 @@ module.exports = class Command {
     }
 
     generateBoilerModImages(filePath) {
-        writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_small.png`), Buffer.from(base64images[0], 'base64'))
-        writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_large.png`), Buffer.from(base64images[1], 'base64'))
+        fs.writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_small.png`), Buffer.from(base64images[0], 'base64'))
+        fs.writeFileSync(path.resolve(filePath, `${path.basename(filePath)}_large.png`), Buffer.from(base64images[1], 'base64'))
     }
 
     createCustomDirMod(folderName) {
@@ -427,14 +429,14 @@ module.exports = class Command {
     }
 
     writeMod(folderPath) {
-        mkdirSync(folderPath)
+        fs.mkdirSync(folderPath)
         this.showModCreatedDialog(folderPath)
         this.writeModData(folderPath, path.basename(folderPath))
         this.generateBoilerModImages(folderPath)
     }
 
     createLocalDirMod(modFolderName, localPath = path.resolve(this.sinsAppdataPath, 'mods', modFolderName)) {
-        if (existsSync(localPath)) {
+        if (fs.existsSync(localPath)) {
             window.showErrorMessage('A mod with that name already exists in the local mod folder.')
             return
         }

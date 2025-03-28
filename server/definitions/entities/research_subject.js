@@ -90,7 +90,7 @@ module.exports = class ResearchSubject {
         })
     }
 
-    npc_alliance() {
+    npc_alliance_definition() {
         return object({
             keys: {
                 npc_tag: enumerate({ items: ['pirates'] }),
@@ -105,9 +105,26 @@ module.exports = class ResearchSubject {
     }
 
     create() {
+        try {
+            const tier = this.json?.data?.tier
+            const field_coord_x = this.json?.data?.field_coord[0]
+
+            if (tier && tier !== Math.floor(field_coord_x / 2)) {
+                this.json.reportAtPos(
+                    '/field_coord',
+                    `field_coord.x (${field_coord_x}) has a tier of ${Math.floor(
+                        field_coord_x / 2
+                    )} which doesn't match it's explicit tier of ${tier}`
+                )
+            }
+        } catch {}
+
         return schema({
             required: ['domain', 'field', 'field_coord', 'name', 'name_uppercase', 'price', 'research_time', 'tier'],
             keys: {
+                field: this.cache.research_fields,
+                field_coord: vector2i(loc_keys.FIELD_COORD),
+                tier: this.cache.max_tier_count,
                 all_culture_known: boolean(),
                 bonus_unit_limits: this.bonus_unit_limits(),
                 buff_providers: this.buff_providers(this.json?.data?.buff_providers, '/buff_providers'),
@@ -118,24 +135,21 @@ module.exports = class ResearchSubject {
                 exotic_factory_modifiers: ExoticFactoryModifiers.create(this.cache),
                 exotic_price: Definitions.exotic_price(this.cache),
                 extra_text_filter_strings: array({ items: this.cache.localisation, isUnique: true }),
-                field: this.cache.research_fields,
-                field_coord: vector2i(loc_keys.FIELD_COORD),
                 hud_icon: this.cache.textures(),
                 name: this.cache.localisation,
                 name_uppercase: this.cache.localisation,
-                npc_alliance: this.npc_alliance(),
+                npc_alliance: this.npc_alliance_definition(),
                 npc_modifiers: NpcModifiers.create(this.cache),
                 planet_modifiers: PlanetModifiers.create(this.cache),
                 player_modifiers: PlayerModifiers.create(this.cache),
                 prerequisites: Definitions.research_prerequisites(this.cache.research_subjects),
-                price: Definitions.price(),
+                price: Definitions.price_definition(),
                 provides_detection_to_all_trade_ships: boolean(),
                 provides_dominant_culture_detection: boolean(),
                 provides_victory_condition_alliance_guard: boolean(),
                 required_allied_player_race: this.cache.players,
                 research_time: float(true, loc_keys.RESEARCH_TIME),
                 strikecraft_modifiers: StrikecraftModifiers.create(this.cache),
-                tier: this.cache.max_tier_count,
                 tooltip_icon: this.cache.textures(),
                 tooltip_picture: this.cache.textures(),
                 unit_factory_modifiers: UnitFactoryModifiers.create(this.cache),

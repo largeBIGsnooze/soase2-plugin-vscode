@@ -1,10 +1,8 @@
-const { EntityReader } = require('../../data/file_handler')
-const { schema, array, object, string, float, vector2f, boolean, enumerate } = require('../data_types')
+const { schema, array, object, string, float, vector2f, boolean } = require('../data_types')
 
 module.exports = class UnitUniform {
     /* eslint-disable no-unused-vars */
     constructor({ fileText: fileText, fileExt: fileExt, fileName: fileName }, diagnostics, gameInstallationFolder, cache) {
-        this.entityReader = new EntityReader(gameInstallationFolder)
         this.cache = cache
     }
 
@@ -58,15 +56,15 @@ module.exports = class UnitUniform {
                         large_unit: this.cache.units,
                     },
                 }),
-                culture_provider_buff_agent_unit: this.cache.units,
+                culture_provider_buff_agent_unit: this.cache.culture_provider_units,
                 phase_lane_marked_for_delete_duration_before_release: float(),
                 disable_weapons_while_channeling_ability_mutation: this.cache.mutations,
                 dialogue_scared_when_crippled_enemy_supply_threshold: float(),
                 dialogue_scared_supply_ratio_threshold: float(),
                 dialogue_smug_supply_ratio_threshold: float(),
-                default_gravity_well: enumerate({ items: this.entityReader.parseGravityWellUnit() }),
-                default_phase_lane: enumerate({ items: this.entityReader.parsePhaseLaneUnit() }),
-                default_rally_point: enumerate({ items: this.entityReader.parseRallyPointUnit() }),
+                default_gravity_well: this.cache.gravity_well_units,
+                default_phase_lane: this.cache.phase_lane_units,
+                default_rally_point: this.cache.rally_point_units,
                 scuttle_duration: float(),
                 damage_scalar_per_additive_defensive_value: float(),
                 recently_damaged_time_threshold: float(),

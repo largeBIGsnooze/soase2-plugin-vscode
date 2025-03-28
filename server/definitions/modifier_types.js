@@ -57,6 +57,11 @@ const unit_factory_modifier_types = () => {
 
 const unit_modifier_types = () => {
     return [
+        /* game_version v1.40.14 */
+        'armor_point_restore_scalar_after_damage_taken',
+        'hull_point_restore_scalar_after_damage_taken',
+        'shield_point_restore_scalar_after_damage_taken',
+        /* */
         'ability_cooldown_duration',
         'ability_antimatter_cost',
         'ability_hull_cost',
@@ -111,6 +116,10 @@ const unit_modifier_types = () => {
 }
 const empire_modifier_types = () => {
     return [
+        /* game_version v1.40.14 */
+        'military_research_rate_per_population',
+        'civilian_research_rate_per_population',
+        /* */
         'credit_income_rate',
         'metal_income_rate',
         'crystal_income_rate',
@@ -138,6 +147,19 @@ const empire_modifier_types = () => {
 
 const planet_modifier_types = () => {
     return [
+        /* game_version v1.40.14 */
+        'enemy_population_assimilation_rate',
+        'neutral_population_assimilation_rate',
+        'population_growth_rate',
+        'commerce_track_credit_income_rate_per_population',
+        'mining_track_crystal_income_rate_per_population',
+        'mining_track_metal_income_rate_per_population',
+        'max_population_points',
+        'military_research_rate_per_population',
+        'civilian_research_rate_per_population',
+        'max_allied_population_factor',
+        'bombing_population_damage_taken',
+        /* */
         'max_civilian_structure_slots',
         'max_military_structure_slots',
         'commerce_track_credit_income_rate',

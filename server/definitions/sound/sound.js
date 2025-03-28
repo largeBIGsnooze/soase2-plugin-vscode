@@ -16,6 +16,9 @@ module.exports = class Sound {
                 data: this.cache.ogg,
                 sound_group: enumerate({
                     items: [
+                        /* game_version v1.40.14 */
+                        'hit_shield',
+                        /* */
                         'exhaust',
                         'ability',
                         'hit_hull',

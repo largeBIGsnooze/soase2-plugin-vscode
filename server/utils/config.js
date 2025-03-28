@@ -30,6 +30,10 @@ module.exports = class Config {
         return path.basename(folderPath).startsWith('SinsII') || path.basename(folderPath).startsWith('Sins2')
     }
     static isValidModPath(folderPath) {
-        return fs.readdirSync(folderPath).some((e) => e.includes('.mod_meta_data'))
+        try {
+            return fs.readdirSync(folderPath).some((e) => e.includes('.mod_meta_data'))
+        } catch {
+            return false
+        }
     }
 }

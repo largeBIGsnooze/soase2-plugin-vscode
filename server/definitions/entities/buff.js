@@ -79,7 +79,7 @@ module.exports = class Buff extends Ability {
         return array({
             items: object({
                 keys: {
-                    buff_planet_modifier_id: string(loc_keys.BUFF_PLANET_MODIFIER_ID),
+                    buff_planet_modifier_id: this.cache.planet_modifier_ids,
                     modifier_type: enumerate({ items: planet_modifier_types() }),
                     value_behavior: Definitions.value_behavior(),
                     value_id: this.cache.action_values(),

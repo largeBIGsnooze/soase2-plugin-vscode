@@ -44,6 +44,10 @@ class Filewatcher {
             units: {},
             buffs: {},
             ttf: {},
+            gravity_well_units: {},
+            phase_lane_units: {},
+            rally_point_units: {},
+            culture_provider_units: {},
             sounds: {},
             ogg: {},
             textures: {},
@@ -152,11 +156,11 @@ class Filewatcher {
                 if (filename === null) return
                 if (event === 'rename') {
                     callback(filename)
-                    console.log(event, filename)
+                    Log.info(`${event}: '${filename}'`)
                 } else if (event === 'change') {
                     if (!timeout) {
                         callback(filename)
-                        console.log(event, filename)
+                        Log.info(`${event}: '${filename}'`)
                         timeout = setTimeout(() => {
                             timeout = null
                         }, 50)
@@ -177,7 +181,7 @@ class Filewatcher {
                         this.watchRoot()
                         this.cache = this.setCacheStorage()
                         this.watchEntities()
-                        console.log('Reloading watchers...', Array.from(this.filewatchers.keys()))
+                        Log.info('Reloading watchers...', Array.from(this.filewatchers.keys()))
                     }
                 }
             }
@@ -246,6 +250,7 @@ class Filewatcher {
         })
 
         this.cache.build_kinds = enumerate({
+            desc: loc_keys.UNIT_BUILDS,
             items: this.append('build_kinds', [{ func: 'parseUnitBuildKinds' }]),
         })
 
@@ -272,6 +277,11 @@ class Filewatcher {
         this.cache.gravity_well_props = enumerate({
             items: this.append('gravity_well_props', [{ func: 'parseGravityWellProps' }]),
         })
+
+        this.cache.gravity_well_units = enumerate({ items: this.append('gravity_well_units', [{ func: 'parseGravityWellUnit' }]) })
+        this.cache.phase_lane_units = enumerate({ items: this.append('phase_lane_units', [{ func: 'parsePhaseLaneUnit' }]) })
+        this.cache.rally_point_units = enumerate({ items: this.append('rally_point_units', [{ func: 'parseRallyPointUnit' }]) })
+        this.cache.culture_provider_units = enumerate({ items: this.append('culture_provider_units', [{ func: 'parseCultureProviderUnit' }]) })
 
         this.cache.texture_animations = enumerate({
             items: this.append('texture_animations', [{ func: 'parseTextureAnimations' }]),
@@ -340,6 +350,7 @@ class Filewatcher {
         })
 
         this.cache.unit_build_group_ids = enumerate({
+            desc: loc_keys.UNIT_BUILD_GROUP_IDS,
             items: this.append('unit_build_group_ids', [{ func: 'parseUnitBuildGroupIds' }]),
         })
 
@@ -465,6 +476,7 @@ class Filewatcher {
             items: this.append('target_filters_uniforms', [{ func: 'parseTargetFiltersUniform' }]),
         })
         this.cache.buff_actions = enumerate({
+            desc: loc_keys.ACTION_ID,
             items: this.append('buff_actions', [{ func: 'parseBuffActions' }]),
         })
         this.cache.hud_skins = enumerate({
@@ -532,6 +544,291 @@ class Filewatcher {
         }
 
         return this.cache
+    }
+
+    reloadUnits(entityName) {
+        if (entityName?.endsWith('.unit')) {
+            this.append('strikecraft_units', [
+                {
+                    func: 'parseStrikecraftUnits',
+                },
+            ])
+            this.append('metal_asteroids', [
+                {
+                    func: 'parseMetalAsteroids',
+                },
+            ])
+            this.append('crystal_asteroids', [
+                {
+                    func: 'parseCrystalAsteroids',
+                },
+            ])
+
+            this.append('gravity_well_units', [
+                {
+                    func: 'parseGravityWellUnit',
+                },
+            ])
+            this.append('phase_lane_units', [
+                {
+                    func: 'parsePhaseLaneUnit',
+                },
+            ])
+            this.append('rally_point_units', [
+                {
+                    func: 'parseRallyPointUnit',
+                },
+            ])
+            this.append('culture_provider_units', [
+                {
+                    func: 'parseCultureProviderUnit',
+                },
+            ])
+        }
+    }
+
+    reloadUnitItems(entityName) {
+        if (entityName?.endsWith('.unit_item')) {
+            this.append('planet_components', [
+                {
+                    func: 'parseComponents',
+                    _args: 'planet_component',
+                },
+            ])
+            this.append('ship_components', [
+                {
+                    func: 'parseComponents',
+                    _args: 'ship_component',
+                },
+            ])
+            this.append('unit_items', [
+                {
+                    func: 'parseUnitItems',
+                },
+            ])
+            this.append('loot', [
+                {
+                    func: 'parseLoots',
+                },
+            ])
+            this.append('planet_bonuses', [
+                {
+                    func: 'parsePlanetBonuses',
+                },
+            ])
+            this.append('planet_artifacts', [
+                {
+                    func: 'parsePlanetArtifacts',
+                },
+            ])
+        }
+    }
+
+    reloadUnitSkins(entityName) {
+        if (entityName?.endsWith('.unit_skin')) {
+            this.append('effect_alias_bindings', [
+                {
+                    func: 'parseEffectAliasBindings',
+                },
+            ])
+            this.append('beam_effects', [
+                {
+                    func: 'parseBeamEffects',
+                },
+            ])
+            this.append('child_meshes', [
+                {
+                    func: 'parseChildMeshes',
+                },
+            ])
+        }
+    }
+
+    reloadPlayers(entityName) {
+        if (entityName?.endsWith('.player')) {
+            this.append('user_interface_sounds', [
+                {
+                    func: 'parseUserInterfaceSounds',
+                },
+            ])
+            this.append('research_fields', [
+                {
+                    func: 'parseResearchFields',
+                },
+            ])
+            this.append('unit_group_names', [
+                {
+                    func: 'parseUnitNames',
+                },
+            ])
+            this.append('unit_item_build_group_ids', [
+                {
+                    func: 'parseUnitItemBuildGroupIds',
+                },
+            ])
+            this.append('unit_build_group_ids', [
+                {
+                    func: 'parseUnitBuildGroupIds',
+                },
+            ])
+        }
+    }
+
+    reloadActionDataSources(entityName) {
+        if (entityName?.endsWith('.action_data_source')) {
+            this.append('target_filters', [
+                {
+                    func: 'parseTargetFilters',
+                },
+                {
+                    func: 'parseTargetFiltersUniform',
+                },
+            ])
+            this.append(
+                (result) => (this.action_values = result),
+                [
+                    {
+                        func: 'parseActionValues',
+                    },
+                ]
+            )
+            this.append('float_variables', [
+                {
+                    func: 'parseFloatVariables',
+                },
+            ])
+            this.append('buff_actions', [
+                {
+                    func: 'parseBuffActions',
+                },
+            ])
+            this.append('unit_variables', [
+                {
+                    func: 'parseUnitVariableIds',
+                },
+            ])
+            this.append('buff_unit_modifiers', [
+                {
+                    func: 'parseBuffUnitModifiers',
+                },
+            ])
+            this.append('weapon_modifier_ids', [
+                {
+                    func: 'parseBuffWeaponModifiers',
+                },
+            ])
+            this.append('planet_modifier_ids', [
+                {
+                    func: 'parseBuffPlanetModifiers',
+                },
+            ])
+            this.append('buff_unit_factory_modifiers', [
+                {
+                    func: 'parseBuffUnitFactoryModifiers',
+                },
+            ])
+            this.append('buff_empire_ids', [
+                {
+                    func: 'parseBuffModifierIds',
+                },
+            ])
+        }
+    }
+
+    reloadEntityManifests(entityName) {
+        if (entityName === 'unit_skin.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'unit_skin',
+                },
+            ]).then((result) => (this.cache.unit_skins.enum = result))
+        }
+        if (entityName === 'unit.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'unit',
+                },
+            ]).then((result) => (this.cache.units.enum = result))
+            this.append('fleet_units', [
+                {
+                    func: 'parseFleetUnits',
+                },
+            ])
+        }
+        if (entityName === 'buff.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'buff',
+                },
+            ]).then((result) => (this.cache.buffs.enum = result))
+        }
+        if (entityName === 'research_subject.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'research_subject',
+                },
+            ]).then((result) => (this.cache.research_subjects.enum = result))
+        }
+        if (entityName === 'npc_reward.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'npc_reward',
+                },
+            ]).then((result) => (this.cache.npc_rewards.enum = result))
+        }
+        if (entityName === 'formation.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'formation',
+                },
+            ]).then((result) => (this.cache.formations.enum = result))
+        }
+        if (entityName === 'action_data_source.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'action_data_source',
+                },
+            ]).then((result) => (this.cache.action_data_sources.enum = result))
+        }
+        if (entityName === 'player.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'player',
+                },
+            ]).then((result) => (this.cache.players.enum = result))
+        }
+        if (entityName === 'ability.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'ability',
+                },
+            ]).then((result) => (this.cache.abilities.enum = result))
+        }
+        if (entityName === 'weapon.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'weapon',
+                },
+            ]).then((result) => (this.cache.weapons.enum = result))
+        }
+        if (entityName === 'exotic.entity_manifest') {
+            this.appendAsync([
+                {
+                    func: 'parseEntityManifest',
+                    _args: 'exotic',
+                },
+            ]).then((result) => (this.cache.exotic_entities.enum = result))
+        }
     }
 
     appendAsync(args) {
@@ -660,278 +957,25 @@ class Filewatcher {
         })
         this.watchDir('mesh_materials', (entityName) => {
             if (entityName?.endsWith('.mesh_material')) {
-                this.append('mesh_materials', [
-                    {
-                        func: 'parseMeshMaterials',
-                    },
-                ])
+                this.append('mesh_materials', [{ func: 'parseMeshMaterials' }])
             }
         })
         this.watchDir('meshes', (entityName) => {
             if (entityName?.endsWith('.mesh')) {
-                this.append('meshes', [
-                    {
-                        func: 'parseMeshes',
-                    },
-                ])
+                this.append('meshes', [{ func: 'parseMeshes' }])
             }
         })
         this.watchDir('entities', (entityName) => {
-            if (entityName?.endsWith('.unit')) {
-                this.append('strikecraft_units', [
-                    {
-                        func: 'parseStrikecraftUnits',
-                    },
-                ])
-                this.append('metal_asteroids', [
-                    {
-                        func: 'parseMetalAsteroids',
-                    },
-                ])
-                this.append('crystal_asteroids', [
-                    {
-                        func: 'parseCrystalAsteroids',
-                    },
-                ])
-                this.append('fleet_units', [
-                    {
-                        func: 'parseFleetUnits',
-                    },
-                ])
-            }
             if (entityName?.endsWith('.planet')) {
-                this.append('planet_files', [
-                    {
-                        func: 'parsePlanetFiles',
-                    },
-                ])
+                this.append('planet_files', [{ func: 'parsePlanetFiles' }])
             }
-            if (entityName?.endsWith('.unit_item')) {
-                this.append('planet_components', [
-                    {
-                        func: 'parseComponents',
-                        _args: 'planet_component',
-                    },
-                ])
-                this.append('ship_components', [
-                    {
-                        func: 'parseComponents',
-                        _args: 'ship_component',
-                    },
-                ])
-                this.append('unit_items', [
-                    {
-                        func: 'parseUnitItems',
-                    },
-                ])
-                this.append('loot', [
-                    {
-                        func: 'parseLoots',
-                    },
-                ])
-                this.append('planet_bonuses', [
-                    {
-                        func: 'parsePlanetBonuses',
-                    },
-                ])
-                this.append('planet_artifacts', [
-                    {
-                        func: 'parsePlanetArtifacts',
-                    },
-                ])
-            }
-            if (entityName?.endsWith('.unit_skin')) {
-                this.append('effect_alias_bindings', [
-                    {
-                        func: 'parseEffectAliasBindings',
-                    },
-                ])
-                this.append('beam_effects', [
-                    {
-                        func: 'parseBeamEffects',
-                    },
-                ])
-                this.append('child_meshes', [
-                    {
-                        func: 'parseChildMeshes',
-                    },
-                ])
-            }
-
-            if (entityName?.endsWith('.player')) {
-                this.append('user_interface_sounds', [
-                    {
-                        func: 'parseUserInterfaceSounds',
-                    },
-                ])
-                this.append('research_fields', [
-                    {
-                        func: 'parseResearchFields',
-                    },
-                ])
-                this.append('unit_group_names', [
-                    {
-                        func: 'parseUnitNames',
-                    },
-                ])
-                this.append('unit_item_build_group_ids', [
-                    {
-                        func: 'parseUnitItemBuildGroupIds',
-                    },
-                ])
-                this.append('unit_build_group_ids', [
-                    {
-                        func: 'parseUnitBuildGroupIds',
-                    },
-                ])
-            }
-            if (entityName?.endsWith('.action_data_source')) {
-                this.append('target_filters', [
-                    {
-                        func: 'parseTargetFilters',
-                    },
-                    {
-                        func: 'parseTargetFiltersUniform',
-                    },
-                ])
-                this.append(
-                    (result) => (this.action_values = result),
-                    [
-                        {
-                            func: 'parseActionValues',
-                        },
-                    ]
-                )
-                this.append('float_variables', [
-                    {
-                        func: 'parseFloatVariables',
-                    },
-                ])
-                this.append('buff_actions', [
-                    {
-                        func: 'parseBuffActions',
-                    },
-                ])
-                this.append('unit_variables', [
-                    {
-                        func: 'parseUnitVariableIds',
-                    },
-                ])
-                this.append('buff_unit_modifiers', [
-                    {
-                        func: 'parseBuffUnitModifiers',
-                    },
-                ])
-                this.append('weapon_modifier_ids', [
-                    {
-                        func: 'parseBuffWeaponModifiers',
-                    },
-                ])
-                this.append('planet_modifier_ids', [
-                    {
-                        func: 'parseBuffPlanetModifiers',
-                    },
-                ])
-                this.append('buff_unit_factory_modifiers', [
-                    {
-                        func: 'parseBuffUnitFactoryModifiers',
-                    },
-                ])
-                this.append('buff_empire_ids', [
-                    {
-                        func: 'parseBuffModifierIds',
-                    },
-                ])
-            }
-
-            if (entityName === 'unit_skin.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'unit_skin',
-                    },
-                ]).then((result) => (this.cache.unit_skins.enum = result))
-            }
-            if (entityName === 'unit.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'unit',
-                    },
-                ]).then((result) => (this.cache.units.enum = result))
-            }
-            if (entityName === 'buff.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'buff',
-                    },
-                ]).then((result) => (this.cache.buffs.enum = result))
-            }
-            if (entityName === 'research_subject.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'research_subject',
-                    },
-                ]).then((result) => (this.cache.research_subjects.enum = result))
-            }
-            if (entityName === 'npc_reward.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'npc_reward',
-                    },
-                ]).then((result) => (this.cache.npc_rewards.enum = result))
-            }
-            if (entityName === 'formation.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'formation',
-                    },
-                ]).then((result) => (this.cache.formations.enum = result))
-            }
-            if (entityName === 'action_data_source.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'action_data_source',
-                    },
-                ]).then((result) => (this.cache.action_data_sources.enum = result))
-            }
-            if (entityName === 'player.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'player',
-                    },
-                ]).then((result) => (this.cache.players.enum = result))
-            }
-            if (entityName === 'ability.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'ability',
-                    },
-                ]).then((result) => (this.cache.abilities.enum = result))
-            }
-            if (entityName === 'weapon.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'weapon',
-                    },
-                ]).then((result) => (this.cache.weapons.enum = result))
-            }
-            if (entityName === 'exotic.entity_manifest') {
-                this.appendAsync([
-                    {
-                        func: 'parseEntityManifest',
-                        _args: 'exotic',
-                    },
-                ]).then((result) => (this.cache.exotic_entities.enum = result))
-            }
+            this.reloadUnits(entityName)
+            this.reloadUnitSkins(entityName)
+            this.reloadUnitItems(entityName)
+            this.reloadUnitSkins(entityName)
+            this.reloadPlayers(entityName)
+            this.reloadActionDataSources(entityName)
+            this.reloadEntityManifests(entityName)
         })
 
         this.watchDir('uniforms', (entityName) => {

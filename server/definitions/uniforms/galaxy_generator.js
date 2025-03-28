@@ -234,9 +234,6 @@ module.exports = class GalaxyGeneratorUniform {
                 random_gravity_well_fillings: this.random_gravity_well_fillings_definition(),
                 gravity_well_fillings: this.gravity_well_fillings_definition(),
                 random_fixture_fillings: this.random_fixture_fillings_definition(),
-                /* game_version v1.32.0 */
-                artifacts: array({ items: this.cache.planet_artifacts, isUnique: true }),
-                /* */
                 node_fillings: this.node_fillings_definition(),
                 fixture_fillings: this.fixture_fillingws_definition(),
                 moon_fillings: this.moon_fillings_definition(),

@@ -76,6 +76,14 @@ module.exports = class GuiUniform {
     unit_modifier_names_definition() {
         return object({
             keys: {
+                /* game_version v1.40.14 */
+                hull_point_restore_scalar_after_damage_taken: this.cache.localisation,
+                armor_point_restore_scalar_after_damage_taken: this.cache.localisation,
+                shield_point_restore_scalar_after_damage_taken: this.cache.localisation,
+                credit_income_rate_per_population: this.cache.localisation,
+                metal_income_rate_per_population: this.cache.localisation,
+                crystal_income_rate_per_population: this.cache.localisation,
+                /* */
                 ability_cooldown_duration: this.cache.localisation,
                 ability_antimatter_cost: this.cache.localisation,
                 ability_hull_cost: this.cache.localisation,
@@ -134,6 +142,19 @@ module.exports = class GuiUniform {
     planet_modifier_names_definition() {
         return object({
             keys: {
+                /* game_version v1.40.14 */
+                commerce_track_credit_income_rate_per_population: this.cache.localisation,
+                mining_track_metal_income_rate_per_population: this.cache.localisation,
+                mining_track_crystal_income_rate_per_population: this.cache.localisation,
+                civilian_research_rate_per_population: this.cache.localisation,
+                military_research_rate_per_population: this.cache.localisation,
+                max_population_points: this.cache.localisation,
+                population_growth_rate: this.cache.localisation,
+                max_allied_population_factor: this.cache.localisation,
+                neutral_population_assimilation_rate: this.cache.localisation,
+                enemy_population_assimilation_rate: this.cache.localisation,
+                bombing_population_damage_taken: this.cache.localisation,
+                /* */
                 max_civilian_structure_slots: this.cache.localisation,
                 max_military_structure_slots: this.cache.localisation,
                 commerce_track_credit_income_rate: this.cache.localisation,
@@ -196,6 +217,9 @@ module.exports = class GuiUniform {
                 normal: object({
                     keys: {
                         damage: this.cache.localisation,
+                        /* game_version v1.40.14 */
+                        population_damage: this.cache.localisation,
+                        /* */
                         cooldown_duration: this.cache.localisation,
                         range: this.cache.localisation,
                         tracking_speed: this.cache.localisation,
@@ -205,6 +229,9 @@ module.exports = class GuiUniform {
                 planet_bombing: object({
                     keys: {
                         damage: this.cache.localisation,
+                        /* game_version v1.40.14 */
+                        population_damage: this.cache.localisation,
+                        /* */
                         cooldown_duration: this.cache.localisation,
                         range: this.cache.localisation,
                         tracking_speed: this.cache.localisation,
@@ -218,6 +245,14 @@ module.exports = class GuiUniform {
     empire_modifier_names_definition() {
         return object({
             keys: {
+                /* game_version v1.40.14 */
+                credit_income_rate_per_population: this.cache.localisation,
+                metal_income_rate_per_population: this.cache.localisation,
+                crystal_income_rate_per_population: this.cache.localisation,
+                civilian_research_rate_per_population: this.cache.localisation,
+                military_research_rate_per_population: this.cache.localisation,
+                /* */
+
                 credit_income_rate: this.cache.localisation,
                 metal_income_rate: this.cache.localisation,
                 crystal_income_rate: this.cache.localisation,
@@ -555,6 +590,9 @@ module.exports = class GuiUniform {
                                 planet_shield_points: this.unitAttributeColors(),
                                 build_progress: this.unitAttributeColors(),
                                 scuttle_progress: this.unitAttributeColors(),
+                                /* game_version v1.40.14 */
+                                planet_population_points: this.unitAttributeColors(),
+                                /* */
                             },
                         }),
                     },

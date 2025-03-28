@@ -449,6 +449,13 @@ module.exports = class Ability {
     }
 
     active_actions_definition(ctx, ptr) {
+        try {
+            if (ctx?.stop_use_type === 'on_spawned_buff_removed') {
+                this.json.validate_keys(ptr, ctx, ['watched_buff'], [])
+            } else {
+                this.json.reportUnusedKey(ptr + '/watched_buff')
+            }
+        } catch {}
         return object({
             keys: {
                 actions: this.actions_definition(ctx?.actions, ptr + '/actions'),
@@ -549,7 +556,7 @@ module.exports = class Ability {
                 targeting: this.ability_gui_targeting_definition(ctx?.targeting, ptr + '/targeting'),
                 tooltip_line_groups: Definitions.tooltip_line_groups(ctx?.tooltip_line_groups, ptr + '/tooltip_line_groups', this.json, this.cache),
                 /* game_version v1.30.0 */
-                tooltip_show_current_gravity_well_resurrectable_unit_data: boolean("default=false"),
+                tooltip_show_current_gravity_well_resurrectable_unit_data: boolean('default=false'),
                 /* */
                 tooltip_picture: this.cache.textures(),
                 unity_window_picture: this.cache.textures(),

@@ -70,7 +70,7 @@ async function activate(ctx) {
         config.update(`[${CONSTANTS.name}]`, { 'editor.acceptSuggestionOnEnter': 'off' }, ConfigurationTarget.Global)
     }
 
-    command.showModFolderSelectionIfInvalid()
+    Command.showModFolderSelectionIfInvalid()
 
     ctx.subscriptions.push(
         command.openConfiguration('soase2-plugin-open-menu'),

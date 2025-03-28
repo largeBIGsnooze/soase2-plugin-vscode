@@ -138,8 +138,9 @@ module.exports = class Definitions {
         })
     }
 
-    static action_effect_size() {
+    static action_effect_size(desc = loc_keys.ACTION_EFFECT_SIZE) {
         return _.enumerate({
+            desc: desc,
             items: ['medium_unit', 'large_unit', 'small_unit'],
         })
     }
@@ -196,6 +197,9 @@ module.exports = class Definitions {
     static transform_type() {
         return _.enumerate({
             items: [
+                /* game_version v1.40.14 */
+                'per_planet_max_population_points',
+                /* */
                 'fixed',
                 'simulation_time',
                 'action_level',
@@ -454,9 +458,10 @@ module.exports = class Definitions {
         })
     }
 
-    static target_filter_unit_type() {
+    static target_filter_unit_type(desc = loc_keys.TARGET_FILTER_UNIT_TYPE) {
         // TODO: Change this once it gets de-hardcoded
         return _.enumerate({
+            desc: desc,
             items: [
                 'strikecraft',
                 'corvette',
@@ -783,6 +788,85 @@ module.exports = class Definitions {
         })
     }
 
+    static validateRenderingType(ctx, ptr, json) {
+        const _ = [
+            'asset_value_ids',
+            'exotic_counts',
+            'value_id',
+            'unit_item',
+            'unit',
+            'label_text',
+            'exotics',
+            'weapon_modifier_id',
+            'unit_modifier_id',
+            'unit_factory_modifier_id',
+            'planet_modifier_id',
+            'trade_import_points_id',
+        ]
+
+        try {
+            switch (ctx?.rendering_type) {
+                case 'asset_values':
+                    json.validate_keys(ptr, ctx, ['asset_value_ids'], _, ['label_text'])
+                    break
+                case 'exotic_counts':
+                    json.validate_keys(ptr, ctx, ['exotic_counts', 'exotics'], _, ['label_text'])
+                    break
+                case 'buff_empire_modifier':
+                    json.validate_keys(ptr, ctx, ['empire_modifier_id'], _, ['label_text'])
+                    break
+                case 'single_value':
+                    json.validate_keys(ptr, ctx, ['value_id'], _, ['label_text'])
+                    break
+                case 'unit_item_value':
+                    json.validate_keys(ptr, ctx, ['unit_item'], _, ['label_text'])
+                    break
+                case 'unit_icon_and_name':
+                    json.validate_keys(ptr, ctx, ['unit'], _, ['label_text'])
+                    break
+                case 'single_line':
+                    json.validate_keys(ptr, ctx, ['label_text'], _, ['label_text'])
+                    break
+                case 'exotic_income':
+                    json.validate_keys(ptr, ctx, ['exotics'], _, ['value_id'])
+                    break
+                case 'buff_weapon_modifier':
+                    json.validate_keys(ptr, ctx, ['weapon_modifier_id'], _, ['label_text'])
+                    break
+                case 'buff_unit_modifier':
+                    json.validate_keys(ptr, ctx, ['unit_modifier_id'], _, ['label_text'])
+                    break
+                case 'buff_unit_factory_modifier':
+                    json.validate_keys(ptr, ctx, ['unit_factory_modifier_id'], _, ['label_text'])
+                    break
+                case 'buff_trade_capacity':
+                    json.validate_keys(ptr, ctx, ['trade_import_points_id'], _, ['label_text'])
+                    break
+                case 'buff_planet_modifier':
+                    json.validate_keys(ptr, ctx, ['planet_modifier_id'], _, ['label_text'])
+                    break
+                default:
+                    break
+            }
+        } catch {}
+    }
+
+    static validateTooltipLines(json, ptr, cache, actionIdx, lines, propName) {
+        if (lines) {
+            lines.forEach((line, lineIdx) => {
+                ptr += `/${actionIdx}/${propName}/${lineIdx}`
+
+                this.validateRenderingType(line, ptr, json)
+                if (line?.value_modifiers) {
+                    line.value_modifiers.forEach((value, valueIdx) => {
+                        const line_ptr = ptr + `/value_modifiers/${valueIdx}`
+                        this.action_math_operator(json, cache, value, line_ptr)
+                    })
+                }
+            })
+        }
+    }
+
     static action_math_operator(json, cache, ctx = '', ptr = '') {
         const properties = [
             'lerp_range_lower_bound_value',
@@ -793,22 +877,10 @@ module.exports = class Definitions {
             'operand_value',
         ]
         try {
-            const validateTooltipLines = (actionIdx, lines, propName) => {
-                if (lines) {
-                    lines.forEach((line, lineIdx) => {
-                        if (line?.value_modifiers) {
-                            line.value_modifiers.forEach((value, valueIdx) => {
-                                const line_ptr = ptr + `/${actionIdx}/${propName}/${lineIdx}/value_modifiers/${valueIdx}`
-                                this.action_math_operator(json, cache, value, line_ptr)
-                            })
-                        }
-                    })
-                }
-            }
             if (Array.isArray(ctx)) {
                 ctx.forEach((action, actionIdx) => {
-                    validateTooltipLines(actionIdx, action?.lines, 'lines')
-                    validateTooltipLines(actionIdx, action?.tooltip_lines, 'tooltip_lines')
+                    this.validateTooltipLines(json, ptr, cache, actionIdx, action?.lines, 'lines')
+                    this.validateTooltipLines(json, ptr, cache, actionIdx, action?.tooltip_lines, 'tooltip_lines')
 
                     if (Array.isArray(action.math_operators)) {
                         action.math_operators.forEach((math_op, math_op_idx) => {
@@ -1323,7 +1395,7 @@ module.exports = class Definitions {
                     }
                     break
                 case 'bomb_planet':
-                    json.validate_keys(ptr, ctx, ['bombing_damage_value', 'damage_source'], _, [
+                    json.validate_keys(ptr, ctx, ['bombing_damage_value', 'damage_source', 'bombing_population_damage_value'], _, [
                         'weapon_tags',
                         'show_enemy_planet_made_dead_from_bombing_notification',
                     ])
@@ -1549,7 +1621,9 @@ module.exports = class Definitions {
                     json.validate_keys(ptr, ctx, ['gravity_well_reference_unit', 'target_filter_id'], _)
                     break
                 case 'has_valid_targets_in_radius':
-                    json.validate_keys(ptr, ctx, ['radius_origin_unit', 'radius_value', 'target_count_value', 'target_filter_id'], _)
+                    json.validate_keys(ptr, ctx, ['radius_origin_unit', 'radius_value', 'target_count_value', 'target_filter_id'], _, [
+                        'target_override_filter_id',
+                    ])
                     break
                 case 'player_has_available_supply':
                     json.validate_keys(ptr, ctx, ['player'], _, ['minimum_available_supply'])
@@ -1598,9 +1672,13 @@ module.exports = class Definitions {
             }
         } catch {}
 
-        // if (ctx?.constraint) {
-        //     // this.validateActionConstraintType(ctx?.constraint, ptr + '/constraint', json)
-        // }
+        /* TODO: ? */
+        if (ctx?.constraint) {
+            this.validateActionConstraintType(ctx?.constraint, ptr + '/constraint', json)
+        }
+        if (ctx?.buff_constraint) {
+            this.validateActionConstraintType(ctx?.buff_constraint, ptr + '/buff_constraint', json)
+        }
     }
 
     static action_constraint(ctx, ptr, cache, json, depth = 0, maxDepth = 5) {
@@ -1618,9 +1696,6 @@ module.exports = class Definitions {
                     }
                     if (action?.constraint) {
                         this.validateActionConstraintType(action?.constraint, `${ptr}/${idx}/constraint`, json)
-                    }
-                    if (action?.buff_constraint) {
-                        this.validateActionConstraintType(action?.buff_constraint, `${ptr}/${idx}/buff_constraint`, json)
                     }
                     if (action?.resurrection_constraint) {
                         this.validateActionConstraintType(action?.resurrection_constraint, `${ptr}/${idx}/resurrection_constraint`, json)
@@ -1660,6 +1735,7 @@ module.exports = class Definitions {
                 minimum_available_supply: cache.action_values(),
                 player: Definitions.action_player(cache),
                 target_count_value: cache.action_values(),
+                target_override_filter_id: cache.target_filters,
                 target_filter_id: cache.target_filters,
                 dead_units_player: Definitions.action_player(cache),
                 constraint: this.action_constraint(ctx?.constraint, ptr + '/constraint', cache, json, depth + 1, 2),
@@ -1694,7 +1770,7 @@ module.exports = class Definitions {
         return _.object({
             // required: ['action_type'],
             keys: {
-                action_id: _.string(loc_keys.ACTION_ID),
+                action_id: cache.buff_actions,
                 action_type: Definitions.action_type(),
                 constraint: Definitions.action_constraint(ctx, ptr, cache, json, 0, 2),
                 bonus_damage_value: cache.action_values(),
@@ -1765,6 +1841,7 @@ module.exports = class Definitions {
                 constraint_not_satisified_operators: _.array({
                     items: Definitions.action_unit_operator(ctx, ptr, cache, json),
                 }),
+                origin_unit: Definitions.action_unit({ cache: cache }),
                 operators: _.array({
                     items: Definitions.action_unit_operator(ctx, ptr, cache, json),
                 }),
@@ -1877,6 +1954,10 @@ module.exports = class Definitions {
                 use_source_weapon_properties: _.boolean('default=false'),
 
                 bombing_damage_value: cache.action_values(),
+                // TODO: check later when schemas are released
+                /* game_version v1.40.14 */
+                bombing_population_damage_value: cache.action_values(),
+                /* */
                 damage_source: Definitions.damage_source_type(),
                 damage_affect_type: Definitions.damage_affect_type(),
                 show_enemy_planet_made_dead_from_bombing_notification: _.boolean('default=true'),
@@ -2383,8 +2464,9 @@ module.exports = class Definitions {
         })
     }
 
-    static effect_by_size(cache) {
+    static effect_by_size(cache, desc = loc_keys.EFFECT_BY_SIZE) {
         return _.object({
+            desc: desc,
             required: ['large_unit', 'medium_unit', 'small_unit'],
             keys: {
                 small_unit: cache['effect_alias_bindings'],
@@ -2799,7 +2881,7 @@ module.exports = class Definitions {
         })
     }
 
-    static price(desc = '') {
+    static price_definition(desc = '') {
         return _.object({
             keys: {
                 credits: _.float(true, desc),

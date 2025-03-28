@@ -77,15 +77,13 @@ class EntityReader {
 
     parseTextures() {
         const textures = this.read(['textures/*.dds', 'textures/*.png'], { read: false, caseSensitive: false })
-        return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), '']
+        return [...textures.map((e) => e.basename), ...textures.map((e) => e.filename), ...this.parsePlayerIcons(), '']
     }
 
     parseAsteroidTiers(type) {
         const tiers = this.parseUniform('planet')
         if (tiers && tiers[type]) {
-            return Array.from({
-                length: tiers[type].length,
-            }).keys()
+            return Array.from({ length: tiers[type].length }).keys()
         }
         return [0]
     }
@@ -205,9 +203,16 @@ class EntityReader {
             read: false,
         }).map((e) => e.basename)
     }
-    parseGravityWellUnit() {
+    parseCultureProviderUnit() {
+        const units = this.parseEntityManifest('unit')
         return this.read(['entities/*.unit'])
-            .filter((e) => e.content?.gravity_well)
+            .filter((e) => e.content?.culture_provider && units.includes(e.basename))
+            .map((e) => e.basename)
+    }
+    parseGravityWellUnit() {
+        const units = this.parseEntityManifest('unit')
+        return this.read(['entities/*.unit'])
+            .filter((e) => e.content?.gravity_well && units.includes(e.basename))
             .map((e) => e.basename)
     }
     parseUnitBuildGroupIds(unit_build_groups = this.read(['entities/*.player'])) {
@@ -329,10 +334,7 @@ class EntityReader {
     }
 
     parseResearchTierCount(tiers = this.parseUniform('research')) {
-        if (tiers && tiers.max_tier_count)
-            return Array.from({
-                length: tiers.max_tier_count + 1,
-            }).keys()
+        if (tiers && tiers.max_tier_count) return Array.from({ length: tiers.max_tier_count }).keys()
         return ['']
     }
 
@@ -359,8 +361,10 @@ class EntityReader {
     }
 
     parseFleetUnits() {
+        const units = this.parseEntityManifest('unit')
         return this.read(['entities/*.unit'])
             .filter((e) => e.content.hasOwnProperty('fleet'))
+            .filter((e) => e.content?.fleet && units.includes(e.basename))
             .map((e) => e.basename)
     }
 
@@ -378,13 +382,15 @@ class EntityReader {
     }
 
     parsePhaseLaneUnit() {
+        const units = this.parseEntityManifest('unit')
         return this.read(['entities/*.unit'])
-            .filter((e) => e.content.hasOwnProperty('phase_lane'))
+            .filter((e) => e.content?.phase_lane && units.includes(e.basename))
             .map((e) => e.basename)
     }
     parseRallyPointUnit() {
+        const units = this.parseEntityManifest('unit')
         return this.read(['entities/*.unit'])
-            .filter((e) => e.content.hasOwnProperty('rally_point'))
+            .filter((e) => e.content?.rally_point && units.includes(e.basename))
             .map((e) => e.basename)
     }
     parseUnitItems() {

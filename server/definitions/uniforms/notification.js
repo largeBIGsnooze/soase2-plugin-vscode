@@ -152,6 +152,12 @@ module.exports = class NotificationUniform {
                         enemy_player_lost: this.type_definition(),
                         insurgent_units_arrived: this.type_definition(),
                         derelict_loot_discovered: this.type_definition(),
+                        /* game_version v1.40.14 */
+                        objective_structure_captured: this.type_definition(),
+                        objective_structure_destroyed: this.type_definition(),
+                        enemy_captured_objective_structure: this.type_definition(),
+                        enemy_destroyed_objective_structure: this.type_definition(),
+                        /* */
                         derelict_loot_collected: this.type_definition(),
                         wreckage_loot_collected: this.type_definition(),
                         player_lost: this.type_definition(),

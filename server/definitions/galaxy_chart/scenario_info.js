@@ -1,5 +1,5 @@
 const { DiagnosticReporter } = require('../../data/diagnostic_reporter')
-const { schema, boolean, object, integer, enumerate, vector2i, string } = require('../data_types')
+const { schema, boolean, object, integer, enumerate, vector2i, string, array } = require('../data_types')
 
 module.exports = class ScenarioInfo {
     /* eslint-disable no-unused-vars */
@@ -19,6 +19,10 @@ module.exports = class ScenarioInfo {
             keys: {
                 name: getLocalisation('name'),
                 description: getLocalisation('description'),
+                /* game_version v1.40.14 */
+                uppercase_name: getLocalisation('uppercase_name'),
+                are_player_slots_randomized: boolean(),
+                /* */
                 planet_counts: vector2i(),
                 star_counts: vector2i(),
                 has_wormholes: boolean(),
@@ -31,8 +35,10 @@ module.exports = class ScenarioInfo {
                     keys: {
                         player_count: integer(),
                         team_count: integer(),
+                        team_assignments: array({ items: integer() }),
                     },
                 }),
+                does_scenario_track_leaderboards: boolean(),
                 can_gravity_wells_move: boolean(),
             },
         })

@@ -60,6 +60,17 @@ module.exports = class PlanetUniform {
         })
     }
 
+    population_definition() {
+        return object({
+            keys: {
+                starting_population: integer(true),
+                population_maximum: integer(true),
+                growth_rate: float(true),
+                growth_rate_if_above_max_population: float(false),
+            },
+        })
+    }
+
     create() {
         return schema({
             required: [
@@ -139,6 +150,7 @@ module.exports = class PlanetUniform {
                             can_have_planet_elevators: boolean(),
                             surveying_track_levels: this.surveying_track_levels_definition(),
                             can_have_artifacts: boolean(),
+                            population: this.population_definition(),
                         },
                     }),
                 }),

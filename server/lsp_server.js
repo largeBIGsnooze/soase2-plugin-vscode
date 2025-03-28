@@ -85,7 +85,7 @@ module.exports = class Lsp {
 
         Log.info(`${CONSTANTS.source} initialized, version: ${CONSTANTS.version}`)
         // Log.info('Operational files: ', JSON.stringify(results, null, 4))
-        Log.info(`Validating: ${Object.keys(results).length} entities!`)
+        Log.info(`Validating: ${Object.keys(results).length} entity types!`)
 
         const { modFolder, vanillaFolder } = await this.getFolders()
         Lsp.cache = await require('./cache')({

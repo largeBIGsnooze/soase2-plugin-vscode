@@ -6,7 +6,7 @@
     "author": "Tyloth",
     "publisher": "cyno-studios",
     "license": "MIT",
-    "version": "2.0.0",
+    "version": "2.2.0",
     "preview": true,
     "private": true,
     "qna": "marketplace",
@@ -189,9 +189,6 @@
     },
     "scripts": {
         "test": "node ./test/index.js",
-        "esbuild": "npm run esbuild-base -- --sourcemap",
-        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "esbuild-base": "esbuild ./server/client.js ./server/lsp_connection.js --bundle --outdir=out/ --external:vscode --format=cjs --platform=node",
         "lint": "eslint .",
         "prettier": "npx prettier . --write",
         "package": "vsce package"
@@ -202,7 +199,6 @@
         "@types/node": "20.2.5",
         "@types/vscode": "^1.79.0",
         "@vscode/test-electron": "^2.3.9",
-        "esbuild": "^0.20.0",
         "eslint": "^8.41.0",
         "typescript": "^5.1.3"
     },

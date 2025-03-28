@@ -1,5 +1,5 @@
 const loc_keys = require('../../loc_keys')
-const { schema, array, boolean } = require('../data_types')
+const { schema, array, boolean, object, enumerate } = require('../data_types')
 
 module.exports = class ScenarioUniform {
     /* eslint-disable no-unused-vars */
@@ -18,6 +18,16 @@ module.exports = class ScenarioUniform {
                     items: this.cache.scenarios,
                     isUnique: true,
                 }),
+                /* game_version v1.40.14 */
+                dlc_scenarios: array({
+                    items: object({
+                        keys: {
+                            product_id: enumerate({ items: ['dlc_PathsToPower'] }),
+                            scenarios: array({ items: this.cache.scenarios, isUnique: true }),
+                        },
+                    }),
+                }),
+                /* */
                 fake_server_scenarios: array({
                     items: this.cache.scenarios,
                     isUnique: true,

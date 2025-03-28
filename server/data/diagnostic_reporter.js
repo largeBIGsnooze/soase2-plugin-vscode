@@ -90,6 +90,10 @@ class DiagnosticReporter extends Property {
         return this.diagnostics.push(new DiagnosticLogger(this.docText, key).set(message, severity))
     }
 
+    reportUnusedKey(pointer) {
+        this.reportAtPos(pointer, "- unused key")
+    }
+
     invalidJSON() {
         return this.createDiagnostic(0, `- json parsing failed!`)
     }

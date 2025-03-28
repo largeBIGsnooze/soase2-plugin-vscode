@@ -14,7 +14,7 @@ module.exports = class Player {
         this.cache = cache
     }
 
-    player_research_domain_definition() {
+    player_research_domain() {
         return object({
             required: [
                 'button_background',
@@ -36,7 +36,7 @@ module.exports = class Player {
                             acquire_time: float(),
                             required_research_points: integer(),
                             button_background: this.cache.textures(),
-                            price: Definitions.price(),
+                            price: Definitions.price_definition(),
                             exotic_price: Definitions.exotic_price(this.cache),
                             player_modifiers: PlayerModifiers.create(this.cache, { UnitModifierFloatValue: true }),
                         },
@@ -53,6 +53,9 @@ module.exports = class Player {
                     }),
                 }),
                 research_rate_name: this.cache.localisation,
+                /* game_version v1.40.14 */
+                research_rate_per_population_name: this.cache.localisation,
+                /* */
                 name: this.cache.localisation,
                 full_name: this.cache.localisation,
                 partial_name: this.cache.localisation,
@@ -115,6 +118,14 @@ module.exports = class Player {
     npc_track_definition() {
         return object({
             keys: {
+                /* game_version v1.40.14 */
+                civilian_research_rate_per_population_scalar: float(),
+                military_research_rate_per_population_scalar: float(),
+                credits_income_rate_per_population: float(),
+                metal_income_rate_per_population: float(),
+                crystal_income_rate_per_population: float(),
+                /* */
+
                 civilian_research_points: float(),
                 civilian_research_rate_scalar: float(),
                 credits_income_rate: float(),
@@ -248,6 +259,13 @@ module.exports = class Player {
         return object({
             required: ['propagation_rates'],
             keys: {
+                /* game_version v1.40.14 */
+                base_allegiance_growth_rate_from_neutral: float(),
+                base_allegiance_growth_rate_from_other_players: float(),
+                base_max_allegiance_factor: float(),
+                base_per_population_bonus_per_allied_population_percentage_scalar: float(),
+                base_per_population_penalty_per_other_population_percentage_scalar: float(),
+                /* */
                 decay_rates: array({
                     items: object({
                         keys: {
@@ -556,8 +574,8 @@ module.exports = class Player {
                 research_domains: object({
                     desc: 'todo_schema_def',
                     keys: {
-                        civilian: this.player_research_domain_definition(),
-                        military: this.player_research_domain_definition(),
+                        civilian: this.player_research_domain(),
+                        military: this.player_research_domain(),
                     },
                 }),
                 research_subjects: array({
@@ -836,7 +854,7 @@ module.exports = class Player {
                 levels: array({
                     items: object({
                         keys: {
-                            income_rates: Definitions.price('default=0'),
+                            income_rates: Definitions.price_definition('default=0'),
                             modifier_values: object({
                                 keys: {
                                     any_development_track_build_price: this.player_home_planet_levels_modifier(),
@@ -906,7 +924,7 @@ module.exports = class Player {
                     items: this.cache.planet_components,
                     isUnique: true,
                 }),
-                establish_price: Definitions.price(),
+                establish_price: Definitions.price_definition(),
                 establish_duration: integer(),
             },
         })
@@ -1068,6 +1086,11 @@ module.exports = class Player {
                         insufficient_defense_exotics: Definitions.sound(this.cache),
                         insufficient_economic_exotics: Definitions.sound(this.cache),
                         insufficient_generic_exotics: Definitions.sound(this.cache),
+                        /* game_version v1.40.14 */
+                        insufficient_custom_exotics_a: Definitions.sound(this.cache),
+                        insufficient_custom_exotics_b: Definitions.sound(this.cache),
+                        insufficient_custom_exotics_c: Definitions.sound(this.cache),
+                        /* */
                         insufficient_metal: Definitions.sound(this.cache),
                         insufficient_military_research_points: Definitions.sound(this.cache),
                         insufficient_military_structure_slots: Definitions.sound(this.cache),
@@ -1195,8 +1218,8 @@ module.exports = class Player {
     player_trade_definition() {
         return object({
             keys: {
-                trade_income_rates: Definitions.price(),
-                trade_ship_death_assets: Definitions.price(),
+                trade_income_rates: Definitions.price_definition(),
+                trade_ship_death_assets: Definitions.price_definition(),
                 trade_ship_escorts: array({
                     items: object({
                         keys: {
@@ -1270,7 +1293,7 @@ module.exports = class Player {
                         required: ['upgrade_duration', 'upgrade_price'],
                         keys: {
                             upgrade_duration: float(),
-                            upgrade_price: Definitions.price(),
+                            upgrade_price: Definitions.price_definition(),
                         },
                     }),
                 }),
@@ -1278,7 +1301,7 @@ module.exports = class Player {
                     items: object({
                         required: ['upgrade_duration', 'upgrade_price'],
                         keys: {
-                            upgrade_price: Definitions.price(),
+                            upgrade_price: Definitions.price_definition(),
                             upgrade_duration: float(),
                             experience_given_on_bombed_to_neutral: float(),
                         },
@@ -1288,7 +1311,7 @@ module.exports = class Player {
                 planet_excavation_levels: array({
                     items: object({
                         keys: {
-                            upgrade_price: Definitions.price(),
+                            upgrade_price: Definitions.price_definition(),
                             upgrade_duration: float(),
                         },
                     }),
@@ -1395,7 +1418,7 @@ module.exports = class Player {
                 planet_component_build_groups: this.player_unit_build_group_definition(),
                 first_capital_ship_item: this.cache.unit_items,
                 planet_types: this.player_planet_type_definition_array(),
-                default_starting_assets: Definitions.price(),
+                default_starting_assets: Definitions.price_definition(),
                 default_starting_exotics: array({
                     items: object({
                         keys: {

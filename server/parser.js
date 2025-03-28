@@ -25,6 +25,22 @@ module.exports = class Parser {
         this.cache = cache
         this.filesWithDiagnostics = filesWithDiagnostics
         this.validatedFiles = 0
+
+        this.entityManifests = [
+            'weapon.entity_manifest',
+            'unit_skin.entity_manifest',
+            'unit_item.entity_manifest',
+            'unit.entity_manifest',
+            'research_subject.entity_manifest',
+            'player.entity_manifest',
+            'npc_reward.entity_manifest',
+            'formation.entity_manifest',
+            'flight_pattern.entity_manifest',
+            'exotic.entity_manifest',
+            'buff.entity_manifest',
+            'action_data_source.entity_manifest',
+            'ability.entity_manifest',
+        ]
     }
     /**
      * Retrieves data from the client
@@ -50,6 +66,18 @@ module.exports = class Parser {
         Log.info('Execution time:', `${process.hrtime(start)[0]}s, validated: ${this.validatedFiles} entities`)
         return process.hrtime(start)[0]
     }
+
+    /**
+     * Processes the entity and logs it
+     */
+
+    async processEntity(file, filePath, cache) {
+        const start = process.hrtime()
+        await this.processFile(filePath, cache)
+        this.validatedFiles++
+        Log.info(file, `- ${(process.hrtime(start)[1] / 1e6).toFixed(3)}ms`)
+    }
+
     /**
      * Reads all folders with specified filters
      * @param {string} filePath
@@ -58,6 +86,9 @@ module.exports = class Parser {
      * @param {cache} cache
      */
     async processFolder(filePath, filterFolders, filterExtensions, cache) {
+        const defaultIgnoredFolders = (e) => ['textures', 'meshes', 'videos'].some((y) => e.endsWith(y))
+        const defaultIgnoredExtensions = (e) => ['.scenario', '.dll', '.fxco', '.ogg'].some((y) => e.endsWith(y))
+
         const isIgnoredFolder = (arr, filePath) => {
             return arr.some((e) => filePath.endsWith(e))
         }
@@ -70,18 +101,22 @@ module.exports = class Parser {
                 const currentFilePath = path.resolve(filePath, file)
                 const lstat = fs.lstatSync(currentFilePath)
 
-                if (['textures', 'meshes', 'videos'].some((e) => currentFilePath.endsWith(e))) continue
-                if (isIgnoredFolder(filterFolders, currentFilePath)) continue
-                if (lstat.isDirectory()) await this.processFolder(currentFilePath, filterFolders, filterExtensions, cache)
-                else {
-                    if (!isValidExtension(file) || ['.scenario', '.dll', '.fxco', '.ogg'].some((e) => file.endsWith(e))) continue
-                    if (isIgnoredFolder(filterExtensions, currentFilePath)) continue
+                if (defaultIgnoredFolders(currentFilePath) || isIgnoredFolder(filterFolders, currentFilePath)) continue
 
-                    const start = process.hrtime()
-                    await this.processFile(currentFilePath, cache)
-                    this.validatedFiles++
+                if (path.basename(path.dirname(currentFilePath)) === 'entities') {
+                    const ids = JSON.parse(fs.readFileSync(currentFilePath, 'utf-8'))?.ids || []
+                    if (this.entityManifests.includes(file)) {
+                        for (const id of ids) {
+                            const entity = `${id}.${path.basename(file, path.extname(file))}`
+                            await this.processEntity(entity, path.join(path.dirname(currentFilePath), entity), cache)
+                        }
+                    }
+                } else if (lstat.isDirectory()) {
+                    await this.processFolder(currentFilePath, filterFolders, filterExtensions, cache)
+                } else {
+                    if (!isValidExtension(file) || defaultIgnoredExtensions(file) || isIgnoredFolder(filterExtensions, currentFilePath)) continue
 
-                    Log.info(file, `- ${(process.hrtime(start)[1] / 1000000).toFixed(3)}ms`)
+                    await this.processEntity(file, currentFilePath, cache)
                 }
             }
         } catch (err) {

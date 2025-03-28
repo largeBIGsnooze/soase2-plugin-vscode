@@ -1,4 +1,4 @@
-const { schema, object, string, integer, vector2f, array, float } = require('../data_types')
+const { schema, object, string, integer, vector2f, array, float, percentage, enumerate } = require('../data_types')
 
 module.exports = class GalaxyChartGeneratorParams {
     /* eslint-disable no-unused-vars */
@@ -17,6 +17,10 @@ module.exports = class GalaxyChartGeneratorParams {
                         moon_filling_name: this.cache.moon_fillings,
                     },
                 }),
+                /* game_version v1.40.14 */
+                extra_solar_system_offset_scalar: vector2f(),
+                generate_random_star_amount_from_solar_systems: vector2f(),
+                /* */
                 recommended_team_count: integer(),
                 solar_systems: array({
                     items: object({
@@ -31,7 +35,41 @@ module.exports = class GalaxyChartGeneratorParams {
                                     filling_name: this.cache.node_fillings,
                                 },
                             }),
-                            planet_ranges: array({ items: {} }),
+                            planet_ranges: array({
+                                items: object({
+                                    keys: {
+                                        count: vector2f(),
+                                        planet: object({
+                                            keys: {
+                                                filling_name: string(),
+                                                solar_system_radius_range: vector2f(),
+                                                chance_of_retrograde_orbit: percentage(),
+                                            },
+                                        }),
+                                    },
+                                }),
+                            }),
+                            /* game_version v1.40.14 */
+                            npcs: array({
+                                items: object({
+                                    keys: {
+                                        npc_filling_name: string(),
+                                        planet: object({
+                                            keys: {
+                                                filling_name: this.cache.node_fillings,
+                                                count: integer(),
+                                                npc_filling_type: enumerate({ items: 'friendly_faction' }),
+                                                solar_system_radius_range: vector2f(),
+                                                chance_of_retrograde_orbit: percentage(),
+                                                chance_of_first_planet_bonus: percentage(),
+                                                chance_of_second_planet_bonus: percentage(),
+                                                orbit_speed_scalar: float(),
+                                            },
+                                        }),
+                                    },
+                                }),
+                            }),
+                            /* */
                         },
                     }),
                 }),

@@ -113,6 +113,9 @@ module.exports = class NotificationUniform {
                         mining: this.cache.user_interface_sounds,
                         research: this.cache.user_interface_sounds,
                         surveying: this.cache.user_interface_sounds,
+                        /* game_version v1.42.5 */
+                        focus: this.cache.user_interface_sounds,
+                        /* */
                     },
                 }),
                 ping_type_player_sound_ids: object({
@@ -214,6 +217,10 @@ module.exports = class NotificationUniform {
                         unit_built: this.type_definition(),
                         planet_conversion_colonized: this.type_definition(),
                         player_added_first_ruler_ship: this.type_definition(),
+                        /* game_version v1.41 */
+                        mad_titan_built_by_player: this.type_definition(),
+                        mad_titan_built_by_enemy: this.type_definition(),
+                        /* */
                         ally_titan_destroyed: this.type_definition(),
                         titan_destroyed: this.type_definition(),
                         titan_armor_down: this.type_definition(),

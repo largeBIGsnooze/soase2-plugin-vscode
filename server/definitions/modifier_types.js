@@ -1,5 +1,5 @@
 const weapon_modifier_types = () => {
-    return ['cooldown_duration', 'damage', 'range', 'tracking_speed', 'bypass_shields_chance']
+    return ['cooldown_duration', 'damage', 'range', 'tracking_speed', 'bypass_shields_chance', 'population_damage']
 }
 
 const exotic_factory_modifier_types = () => {
@@ -147,6 +147,11 @@ const empire_modifier_types = () => {
 
 const planet_modifier_types = () => {
     return [
+        /* game_version v1.42.5 */
+        'planet_shield_burst_restore',
+        'planet_shield_burst_cooldown',
+        'mana_restore_rate_per_population',
+        /* */
         /* game_version v1.40.14 */
         'enemy_population_assimilation_rate',
         'neutral_population_assimilation_rate',

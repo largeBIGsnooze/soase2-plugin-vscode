@@ -71,6 +71,8 @@ module.exports = class ActionDataSource extends Ability {
                 case 'per_enemy_unit_in_gravity_well':
                 case 'per_unit_level':
                 case 'per_build_or_virtual_supply':
+                case 'per_planet_current_population_points':
+                case 'per_planet_max_population_points':
                 case 'per_unit_id':
                     json.validate_keys(ptr, ctx, [], _, ['transform_unit'])
                     break

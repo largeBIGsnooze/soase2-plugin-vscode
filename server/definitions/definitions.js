@@ -197,8 +197,12 @@ module.exports = class Definitions {
     static transform_type() {
         return _.enumerate({
             items: [
+                /* game_version v1.42.5 */
+                'per_planet_owner_allied_population_points',
+                /* */
                 /* game_version v1.40.14 */
                 'per_planet_max_population_points',
+                'per_planet_current_population_points',
                 /* */
                 'fixed',
                 'simulation_time',
@@ -454,6 +458,11 @@ module.exports = class Definitions {
                 'composite_not',
                 'composite_and',
                 'composite_or',
+                /* game_version v1.40.14 */
+                'has_allied_population_amount',
+                'has_missing_population_amount',
+                'has_minimum_population_amount',
+                /* */
             ],
         })
     }
@@ -570,6 +579,11 @@ module.exports = class Definitions {
                 'increase_planet_track_level',
                 'remove_unit_item',
                 'add_unit_item',
+                /* game_version v1.40.14 */
+                'apply_population_damage',
+                'convert_population',
+                'cull_allegiance_population',
+                /* */
             ],
         })
     }
@@ -972,7 +986,12 @@ module.exports = class Definitions {
                 'percentage',
                 'percentage_one_decimal_place',
                 'percentage_with_sign',
+                /* game_version v1.40.14 */
                 'percentage_one_decimal_place_with_sign',
+                'percentage_two_decimal_place_with_sign',
+                'percentage_three_decimal_place_with_sign',
+                'three_decimal_place_with_sign',
+                /* */
             ],
         })
     }
@@ -1368,6 +1387,11 @@ module.exports = class Definitions {
                 'planet_track_type',
                 'will_offset_development_track_upgrade_price',
                 'unit_item',
+                'population_reduction_type',
+                'conversion_source',
+                'population_reduction_modifier_type',
+                'population_culled_value',
+                'player_allegiance_to_cull',
             ]
             switch (ctx.operator_type) {
                 case 'apply_buff':
@@ -1379,6 +1403,47 @@ module.exports = class Definitions {
                         'override_ownership_player',
                         'override_ownership_unit',
                     ])
+                    break
+                case 'convert_population':
+                    if (ctx?.use_source_weapon_properties || ctx?.use_source_weapon_properties == true) {
+                        json.validate_keys(ptr, ctx, ['conversion_source'], _, [])
+                    } else {
+                        json.validate_keys(ptr, ctx, ['allegiance_destination_player', 'conversion_value', 'population_reduction_type'], _, [
+                            'ignore_infinite_recursion_guard',
+                            'population_reduction_modifier_type',
+                            'source_unit',
+                            'use_source_weapon_properties',
+                        ])
+                    }
+                    break
+                case 'cull_allegiance_population':
+                    if (ctx?.use_source_weapon_properties || ctx?.use_source_weapon_properties == true) {
+                        json.validate_keys(ptr, ctx, ['damage_source'], _, [])
+                    } else {
+                        json.validate_keys(ptr, ctx, ['population_culled_value', 'population_reduction_type'], _, [
+                            'ignore_infinite_recursion_guard',
+                            'population_culled_value',
+                            'population_reduction_modifier_type',
+                            'source_unit',
+                            'player_allegiance_to_cull',
+                            'damage_source',
+                        ])
+                    }
+                    break
+                case 'apply_population_damage':
+                    if (ctx?.use_source_weapon_properties || ctx?.use_source_weapon_properties == true) {
+                        json.validate_keys(ptr, ctx, ['damage_source'], _, [])
+                    } else {
+                        json.validate_keys(ptr, ctx, ['damage_value', 'population_reduction_type'], _, [
+                            'can_damage_be_propagated',
+                            'damage_value',
+                            'ignore_infinite_recursion_guard',
+                            'population_damage_modifier_type',
+                            'population_reduction_type',
+                            'source_unit',
+                            'use_source_weapon_properties',
+                        ])
+                    }
                     break
                 case 'apply_damage':
                     if (ctx?.use_source_weapon_properties || ctx?.use_source_weapon_properties == true) {
@@ -1954,9 +2019,13 @@ module.exports = class Definitions {
                 use_source_weapon_properties: _.boolean('default=false'),
 
                 bombing_damage_value: cache.action_values(),
-                // TODO: check later when schemas are released
                 /* game_version v1.40.14 */
                 bombing_population_damage_value: cache.action_values(),
+                population_reduction_type: Definitions.population_reduction_type(),
+                conversion_source: Definitions.damage_source_type(),
+                population_reduction_modifier_type: Definitions.value_behavior(),
+                population_culled_value: cache.action_values(),
+                player_allegiance_to_cull: this.action_player(cache),
                 /* */
                 damage_source: Definitions.damage_source_type(),
                 damage_affect_type: Definitions.damage_affect_type(),
@@ -2249,6 +2318,15 @@ module.exports = class Definitions {
                 case 'is_in_dominant_culture':
                     json.validate_keys(ptr, ctx, ['dominant_culture_player_relationship'], _, [])
                     break
+                case 'has_allied_population_amount':
+                    json.validate_keys(ptr, ctx, ['percentage_of_current_pop'], _, ['real_population_number'])
+                    break
+                case 'has_minimum_population_amount':
+                    json.validate_keys(ptr, ctx, ['minimum_population_percent_of_maximum', 'real_minimum_population'], _, [])
+                    break
+                case 'has_missing_population_amount':
+                    json.validate_keys(ptr, ctx, ['missing_population_percent_of_maximum', 'real_missing_population'], _, [])
+                    break
                 case 'is_in_current_gravity_well':
                 case 'is_in_fleet':
                 case 'is_friendly':
@@ -2348,6 +2426,14 @@ module.exports = class Definitions {
                 include_crippled_hull_points: _.boolean(),
                 /* */
                 percentage_missing_threshold: _.percentage(),
+                /* game_version v1.40.14 */
+                percentage_of_current_pop: _.percentage(),
+                real_population_number: _.integer(),
+                missing_population_percent_of_maximum: _.float(),
+                minimum_population_percent_of_maximum: _.float(),
+                real_missing_population: _.integer(),
+                real_minimum_population: _.integer(),
+                /* */
                 strikecraft_kind: cache.strikecraft_kinds,
                 mutation: cache.mutations,
                 comparison_type: Definitions.comparison_type(),
@@ -2437,7 +2523,7 @@ module.exports = class Definitions {
 
     static planet_track_type() {
         return _.enumerate({
-            items: ['defense', 'logistics', 'commerce', 'mining', 'research', 'surveying'],
+            items: ['defense', 'logistics', 'commerce', 'mining', 'research', 'surveying', 'focus'],
         })
     }
 
@@ -2684,6 +2770,12 @@ module.exports = class Definitions {
                 unlock_label: cache.localisation,
                 upgrade_label: cache.localisation,
             },
+        })
+    }
+
+    static population_reduction_type() {
+        return _.enumerate({
+            items: ['all_equally', 'neutral_only', 'owner_only', 'enemy_only', 'all_except_owner'],
         })
     }
 

@@ -176,6 +176,9 @@ module.exports = class UnitSkin {
                 ),
                 name: this.cache.localisation,
                 description: this.cache.localisation,
+                /* game_version v1.40.14 */
+                show_description_in_unit_tooltip: boolean(),
+                /* */
                 tooltip_picture: this.cache.textures('Big picture used on tooltips when building unit. (459x216)'),
                 hud_selection_window_icon_offet: vector2i(),
                 special_operation_names: array({

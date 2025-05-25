@@ -62,6 +62,7 @@ module.exports = class PlanetUniform {
 
     population_definition() {
         return object({
+            required: ['growth_rate', 'growth_rate_if_above_max_population', 'population_maximum', 'starting_population'],
             keys: {
                 starting_population: integer(true),
                 population_maximum: integer(true),
@@ -142,7 +143,7 @@ module.exports = class PlanetUniform {
                 }),
                 planet_types: array({
                     items: object({
-                        required: ['localized_name', 'name', 'surveying_track_levels', 'tooltip_icon'],
+                        required: ['localized_name', 'name', 'population', 'surveying_track_levels', 'tooltip_icon'],
                         keys: {
                             name: string(),
                             localized_name: this.cache.localisation,

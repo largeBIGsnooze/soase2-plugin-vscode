@@ -272,6 +272,19 @@ module.exports = class MainViewUniform {
     create() {
         return schema({
             keys: {
+                /* game_version v1.42.5 */
+                social_system: object({
+                    keys: {
+                        out_of_game_text: this.cache.localisation,
+                        in_lobby_text: this.cache.localisation,
+                        in_game_text: this.cache.localisation,
+                        loading_text: this.cache.localisation,
+                        requesting_server_text: this.cache.localisation,
+                        joining_server_text: this.cache.localisation,
+                        waiting_for_server_text: this.cache.localisation,
+                    },
+                }),
+                /* */
                 gravity_well_props: object({
                     keys: {
                         begin_cloud_fade_distance: float(),

@@ -237,6 +237,10 @@ module.exports = class GalaxyGeneratorUniform {
                 node_fillings: this.node_fillings_definition(),
                 fixture_fillings: this.fixture_fillingws_definition(),
                 moon_fillings: this.moon_fillings_definition(),
+                /* game_version v1.42.5 */
+                ancient_starbase_id: enumerate({ items: ['dlc_ancient_starbase'] }),
+                max_ancient_starbases: integer(),
+                /* */
                 /* game_version v1.31.0 */
                 wormhole_fillings: this.wormhole_fillings_definition(),
                 artifacts: array({

@@ -31,6 +31,9 @@ module.exports = class PlanetTrackUniform {
                         mining: this.track_definition(),
                         research: this.track_definition(),
                         surveying: this.track_definition(),
+                        /* game_version v1.42.5 */
+                        focus: this.track_definition(),
+                        /* */
                         excavation: this.track_definition(),
                     },
                 }),

@@ -1,4 +1,7 @@
-## 2.2.0
+## 2.4.0
+-   Updated to 1.42.5 version of the game
+
+## 2.2.0 - 2.3.0
 -   Updated to 1.40.14 version of the game
 
 ## 2.1.0

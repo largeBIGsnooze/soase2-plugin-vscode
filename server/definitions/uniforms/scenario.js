@@ -7,6 +7,17 @@ module.exports = class ScenarioUniform {
         this.cache = cache
     }
 
+    scenarios_definition() {
+        return array({
+            items: object({
+                keys: {
+                    product_id: enumerate({ items: ['dlc_PathsToPower'] }),
+                    scenarios: array({ items: this.cache.scenarios, isUnique: true }),
+                },
+            }),
+        })
+    }
+
     create() {
         return schema({
             keys: {
@@ -18,15 +29,11 @@ module.exports = class ScenarioUniform {
                     items: this.cache.scenarios,
                     isUnique: true,
                 }),
+                /* game_version v1.41 */
+                dlc_multiplayer_scenarios: this.scenarios_definition(),
+                /* */
                 /* game_version v1.40.14 */
-                dlc_scenarios: array({
-                    items: object({
-                        keys: {
-                            product_id: enumerate({ items: ['dlc_PathsToPower'] }),
-                            scenarios: array({ items: this.cache.scenarios, isUnique: true }),
-                        },
-                    }),
-                }),
+                dlc_scenarios: this.scenarios_definition(),
                 /* */
                 fake_server_scenarios: array({
                     items: this.cache.scenarios,

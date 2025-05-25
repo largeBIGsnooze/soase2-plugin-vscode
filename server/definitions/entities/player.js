@@ -61,6 +61,9 @@ module.exports = class Player {
                 partial_name: this.cache.localisation,
                 partial_name_uppercase: this.cache.localisation,
                 research_points_name: this.cache.localisation,
+                /* game_version v1.42.5 */
+                research_points_per_population_name: this.cache.localisation,
+                /* */
                 planet_track_name: this.cache.localisation,
                 planet_track_description: this.cache.localisation,
                 planet_track_max_level_label: this.cache.localisation,
@@ -118,6 +121,15 @@ module.exports = class Player {
     npc_track_definition() {
         return object({
             keys: {
+                /* game_version v1.42.5 */
+                civilian_research_points_per_population: float(),
+                military_research_points_per_population: float(),
+                mana_restore_rate: float(),
+                mana_restore_rate_per_population: float(),
+                bonus_max_mana: integer(),
+                bonus_max_mana_per_population: float(),
+                max_unity_provider_count: integer(),
+                /* */
                 /* game_version v1.40.14 */
                 civilian_research_rate_per_population_scalar: float(),
                 military_research_rate_per_population_scalar: float(),
@@ -125,7 +137,6 @@ module.exports = class Player {
                 metal_income_rate_per_population: float(),
                 crystal_income_rate_per_population: float(),
                 /* */
-
                 civilian_research_points: float(),
                 civilian_research_rate_scalar: float(),
                 credits_income_rate: float(),
@@ -140,6 +151,14 @@ module.exports = class Player {
                 military_research_points: float(),
                 military_research_rate_scalar: float(),
                 shield_points_restore_rate: float(),
+                /* game_version v1.42.5 */
+                planet_shield_burst_restore: object({
+                    keys: {
+                        cooldown_duration: float(),
+                        restore_percentage: float(),
+                    },
+                }),
+                /* */
                 structure_builder_count: float(),
                 mutation: this.cache.mutations,
                 prerequisites: Definitions.research_prerequisites(this.cache.research_subjects),
@@ -155,6 +174,9 @@ module.exports = class Player {
                 mining: array({ items: this.npc_track_definition() }),
                 research: array({ items: this.npc_track_definition() }),
                 surveying: array({ items: this.npc_track_definition() }),
+                /* game_version v1.42.5 */
+                focus: array({ items: this.npc_track_definition() }),
+                /* */
             },
         })
     }
@@ -327,9 +349,7 @@ module.exports = class Player {
         return array({
             items: object({
                 keys: {
-                    track_type: enumerate({
-                        items: ['defense', 'logistics', 'commerce', 'mining', 'research', 'surveying'],
-                    }),
+                    track_type: Definitions.planet_track_type(),
                     resistance_rate: float(),
                     minimum_level: integer(),
                     prerequisites: Definitions.research_prerequisites(this.cache.research_subjects),
@@ -559,6 +579,9 @@ module.exports = class Player {
                         commerce: this.npc_track_definition(),
                         research: this.npc_track_definition(),
                         surveying: this.npc_track_definition(),
+                        /* game_version v1.42.5 */
+                        focus: this.npc_track_definition(),
+                        /* */
                     },
                 }),
                 simple_trade_capacity: this.trade_capacity_definition(),
@@ -918,6 +941,9 @@ module.exports = class Player {
                         mining: integer(),
                         research: integer(),
                         surveying: integer(),
+                        /* game_version v1.42.5 */
+                        focus: integer(),
+                        /* */
                     },
                 }),
                 starting_planet_components: array({
@@ -1133,7 +1159,11 @@ module.exports = class Player {
                         planet_track_upgrade_defense_completed: Definitions.sound(this.cache),
                         planet_track_upgrade_logistics_completed: Definitions.sound(this.cache),
                         planet_track_upgrade_mining_completed: Definitions.sound(this.cache),
+                        /* game_version v1.42.5 */
                         planet_track_upgrade_research_completed: Definitions.sound(this.cache),
+                        planet_track_upgrade_focus_completed: Definitions.sound(this.cache),
+                        /* */
+                        planet_track_upgrade_focus_completed: Definitions.sound(this.cache),
                         player_added_first_ruler_ship: Definitions.sound(this.cache),
                         player_lost: Definitions.sound(this.cache),
                         player_units_arrived_at_enemy_phase_jump_inhibitor: Definitions.sound(this.cache),

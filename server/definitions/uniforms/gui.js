@@ -1,4 +1,4 @@
-const { schema, object, float, array } = require('../data_types')
+const { schema, object, float, array, string } = require('../data_types')
 const UI = require('../ui_definitions')
 
 module.exports = class GuiUniform {
@@ -9,6 +9,7 @@ module.exports = class GuiUniform {
 
     unitAttributeColors() {
         return object({
+            required: ['low', 'medium', 'high'],
             keys: {
                 low: this.cache.colors,
                 medium: this.cache.colors,
@@ -161,6 +162,18 @@ module.exports = class GuiUniform {
                 mining_track_metal_income_rate: this.cache.localisation,
                 mining_track_crystal_income_rate: this.cache.localisation,
                 orbital_extraction_metal_income_rate: this.cache.localisation,
+                /* game_version v1.42.5 */
+                civilian_research_points_per_population: this.cache.localisation,
+                military_research_points_per_population: this.cache.localisation,
+                planet_shield_burst_restore: this.cache.localisation,
+                planet_shield_burst_cooldown: this.cache.localisation,
+                focus_track_build_price: this.cache.localisation,
+                focus_track_build_time: this.cache.localisation,
+                mana_restore_rate: this.cache.localisation,
+                bonus_max_mana: this.cache.localisation,
+                mana_restore_rate_per_population: this.cache.localisation,
+                bonus_max_mana_per_population: this.cache.localisation,
+                /* */
                 research_track_build_price: this.cache.localisation,
                 research_track_build_time: this.cache.localisation,
                 surveying_track_build_price: this.cache.localisation,
@@ -252,7 +265,6 @@ module.exports = class GuiUniform {
                 civilian_research_rate_per_population: this.cache.localisation,
                 military_research_rate_per_population: this.cache.localisation,
                 /* */
-
                 credit_income_rate: this.cache.localisation,
                 metal_income_rate: this.cache.localisation,
                 crystal_income_rate: this.cache.localisation,
@@ -627,6 +639,16 @@ module.exports = class GuiUniform {
                 structure_builder_tooltip_icon: this.cache.textures(),
                 home_planet_tooltip_icon: this.cache.textures(),
                 planet_component_items_tooltip_icon: this.cache.textures(),
+                /* game_version v1.41 */
+                inline_icons: array({
+                    items: object({
+                        keys: {
+                            name: string(),
+                            icon: this.cache.textures(),
+                        },
+                    }),
+                }),
+                /* */
                 target_filter_unit_type_names: object({
                     keys: {
                         strikecraft: this.cache.localisation,
